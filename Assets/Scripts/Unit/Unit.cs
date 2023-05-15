@@ -28,14 +28,14 @@ public class Unit : MonoBehaviour
     {
         glowHighlight.ToggleGlow();
     }
-    internal void MoveThroughPath(List<Vector3> currentPath)
+    internal void MoveThroughPath(List<Vector3> currentPath ,Hex lastHex ,bool isMove = true)
     {
         pathPositions = new Queue<Vector3>(currentPath);
+        if(currentPath.Count == 0) return;
         Vector3 firstTarget = pathPositions.Dequeue();
-        StartCoroutine(RotationCoroutine(firstTarget,rotationDuration,true));
-
+        StartCoroutine(RotationCoroutine(firstTarget,lastHex,rotationDuration,true,isMove));
     }
-    private IEnumerator RotationCoroutine(Vector3 endPos, float rotationDuration,bool firstRotation = true)
+    private IEnumerator RotationCoroutine(Vector3 endPos,Hex hex, float rotationDuration,bool firstRotation = true,bool isMove = true)
     {
         Quaternion startRotation = transform.rotation;
         endPos.y = transform.position.y;
@@ -54,9 +54,17 @@ public class Unit : MonoBehaviour
             }
             transform.rotation = endRotation;
         }
-        StartCoroutine(MovementCoroutine(endPos));
+        if(isMove)
+        {
+            StartCoroutine(MovementCoroutine(endPos,hex));
+        }
+        else
+        {
+            GetComponent<Melee>().Attack(hex.Unit);
+            MovementFinished?.Invoke(this);
+        }
     }
-    private IEnumerator MovementCoroutine(Vector3 endPos)
+    private IEnumerator MovementCoroutine(Vector3 endPos,Hex hex)
     {
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
@@ -73,13 +81,17 @@ public class Unit : MonoBehaviour
         if(pathPositions.Count > 0)
         {
             // Debug.Log("Selecting the next position");
-            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),rotationDuration));
+            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),hex,rotationDuration));
 
         }
         else
         {
             // Debug.Log("Movement Finished");
             MovementFinished?.Invoke(this);
+            if(hex.Unit != null && hex.Unit.side == Side.Enemy)
+            {
+                GetComponent<Melee>().Attack(hex.Unit);
+            }
         }
     }
 }

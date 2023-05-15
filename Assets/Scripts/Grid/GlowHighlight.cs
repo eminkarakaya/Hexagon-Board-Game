@@ -105,25 +105,25 @@ public class GlowHighlight : MonoBehaviour
         isGlowing = !state;
         ToggleGlow();
     }
-    public void EnemyToggleGlow()
-    {
-        if(!isGlowing)
-        {
-            ResetGlowHighlight();
-            foreach (Renderer renderer in enemyGlowMaterialDict.Keys)
-            {
-                renderer.materials = enemyGlowMaterialDict[renderer];
-            }
-        }
-        else
-        {
-            foreach (Renderer renderer in originalMaterialDict.Keys)
-            {
-                renderer.materials = originalMaterialDict[renderer];
-            }
-        }
-        isGlowing = !isGlowing;
-    }
+    // public void EnemyToggleGlow()
+    // {
+    //     if(!isGlowing)
+    //     {
+    //         ResetGlowHighlight();
+    //         foreach (Renderer renderer in enemyGlowMaterialDict.Keys)
+    //         {
+    //             renderer.materials = enemyGlowMaterialDict[renderer];
+    //         }
+    //     }
+    //     else
+    //     {
+    //         foreach (Renderer renderer in originalMaterialDict.Keys)
+    //         {
+    //             renderer.materials = originalMaterialDict[renderer];
+    //         }
+    //     }
+    //     isGlowing = !isGlowing;
+    // }
     internal void ResetGlowHighlight()
     {
         Hex hex;

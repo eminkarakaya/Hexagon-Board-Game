@@ -44,19 +44,13 @@ public class Hex : MonoBehaviour
     }
     public void EnableHighligh(bool IsEnemy = false)
     {
-        if(IsEnemy){
-            highlight.EnemyToggleGlow();
-            return;
-        }
+        
 
         highlight.ToggleGlow(true);
     }
     public void DisableHighligh(bool IsEnemy = false)
     {
-        if(IsEnemy){
-            highlight.EnemyToggleGlow();
-            return;
-        }
+        
         highlight.ToggleGlow(false);
     }
 }

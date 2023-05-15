@@ -9,8 +9,8 @@ public class UnitManager : MonoBehaviour
 
     [SerializeField]
     private MovementSystem movementSystem;
-
-    public bool PlayersTurn { get; private set; } = true;
+    [SerializeField] private bool playersTurn = true;
+    public bool PlayersTurn { get => playersTurn; private set{} } 
 
     [SerializeField]
     private Unit selectedUnit;
@@ -97,6 +97,7 @@ public class UnitManager : MonoBehaviour
 
         this.selectedUnit = unitReference;
         this.selectedUnit.Select();
+        
         movementSystem.ShowRange(this.selectedUnit, this.hexGrid);
     }
 
