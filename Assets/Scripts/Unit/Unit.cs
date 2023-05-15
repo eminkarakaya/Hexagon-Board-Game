@@ -33,9 +33,9 @@ public class Unit : MonoBehaviour
         pathPositions = new Queue<Vector3>(currentPath);
         if(currentPath.Count == 0) return;
         Vector3 firstTarget = pathPositions.Dequeue();
-        StartCoroutine(RotationCoroutine(firstTarget,lastHex,rotationDuration,true,isMove));
+        StartCoroutine(RotationCoroutine(firstTarget,lastHex,rotationDuration,isMove));
     }
-    private IEnumerator RotationCoroutine(Vector3 endPos,Hex hex, float rotationDuration,bool firstRotation = true,bool isMove = true)
+    private IEnumerator RotationCoroutine(Vector3 endPos,Hex hex, float rotationDuration,bool isMove = true)
     {
         Quaternion startRotation = transform.rotation;
         endPos.y = transform.position.y;
@@ -60,6 +60,18 @@ public class Unit : MonoBehaviour
         }
         else
         {
+            startRotation = transform.rotation;
+            direction = new Vector3(hex.transform.position.x,transform.position.y,hex.transform.position.z) - transform.position;
+            endRotation = Quaternion.LookRotation(direction,Vector3.up);
+            float timeElapsed = 0;
+            while(timeElapsed < rotationDuration)
+            {
+                timeElapsed += Time.deltaTime;
+                float lerpStep = timeElapsed / rotationDuration;
+                transform.rotation = Quaternion.Lerp(startRotation,endRotation,lerpStep);
+                yield return null;
+            }
+            transform.rotation = endRotation;
             GetComponent<Melee>().Attack(hex.Unit);
             MovementFinished?.Invoke(this);
         }
@@ -86,7 +98,18 @@ public class Unit : MonoBehaviour
         }
         else
         {
-            // Debug.Log("Movement Finished");
+            Quaternion startRotation = transform.rotation;
+            Vector3 direction = new Vector3(hex.transform.position.x,transform.position.y,hex.transform.position.z) - transform.position;
+            Quaternion endRotation = Quaternion.LookRotation(direction,Vector3.up);
+            timeElapsed = 0;
+            while(timeElapsed < rotationDuration)
+            {
+                timeElapsed += Time.deltaTime;
+                float lerpStep = timeElapsed / rotationDuration;
+                transform.rotation = Quaternion.Lerp(startRotation,endRotation,lerpStep);
+                yield return null;
+            }
+            transform.rotation = endRotation;
             MovementFinished?.Invoke(this);
             if(hex.Unit != null && hex.Unit.side == Side.Enemy)
             {
