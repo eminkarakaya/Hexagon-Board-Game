@@ -7,7 +7,6 @@ public class GraphSearch
 {
     public static BFSResult BsfGetRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
     {
-        GameObject arrow = GameObject.Find("Arrow");
         int movementPointsTemp = movementPoints;
         Dictionary<Vector3Int, Vector3Int?> visitedNodes = new Dictionary<Vector3Int, Vector3Int?>();
         Dictionary<Vector3Int, Vector3Int?> enemiesNodes = new Dictionary<Vector3Int, Vector3Int?>();
@@ -61,7 +60,9 @@ public class GraphSearch
             foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
             {
                 if(hexGrid.GetTileAt(currentNode).IsEnemy())
+                {
                     continue;
+                }
                 if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
                     continue;
                 int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
@@ -92,23 +93,76 @@ public class GraphSearch
                 }
             }
         }
+        
             foreach (var item in enemiesNodes)
             {
                 // Debug.Log(item.Key + "  " + item.Value);
                 allNodes.Add(item.Key, item.Value);
             }
-        return new BFSResult { visitedNodesDict = visitedNodes, enemiesNodesDict = enemiesNodes, allNodesDict = allNodes };
+        return new BFSResult { visitedNodesDict = visitedNodes, enemiesNodesDict = enemiesNodes, allNodesDict = allNodes , costDict = costSoFar1,startPoint = startPoint};
     }
-    public static List<Vector3Int> GetCloseseteHex(
-        HexGrid hexGrid,
-        Vector3Int current,
-        Dictionary<Vector3Int, Vector3Int?> allNodesDict,
-        Dictionary<Vector3Int, Vector3Int?> enemyNodesDict)
+    public static BFSResult GetRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
+    {
+        Dictionary<Vector3Int, int> costSoFar = new Dictionary<Vector3Int, int>();
+        Queue<Vector3Int> nodesToVisitQueue = new Queue<Vector3Int>();
+
+        Dictionary<Vector3Int, Vector3Int?> allNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        Dictionary<Vector3Int, Vector3Int?> enemiesNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        enemiesNodes.Add(startPoint, null);
+        allNodes.Add(startPoint, null);
+        nodesToVisitQueue.Enqueue(startPoint);  // startpoint ekleniyor 
+        costSoFar.Add(startPoint, 0);            // suana kadarkı malıyete startpoint eklenıyor
+
+        while (nodesToVisitQueue.Count > 0)      // 
+        {
+            Vector3Int currentNode = nodesToVisitQueue.Dequeue();
+            foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
+            {
+                if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
+                    continue;
+                int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
+                int currentCost = costSoFar[currentNode];
+                int newCost = currentCost + nodeCost;
+                //    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy())
+                //         {
+                //             enemiesNodes[neighbourPosition] = currentNode;
+                //             continue;
+                //         
+                if (newCost <= movementPoints)
+                {
+                    if (!allNodes.ContainsKey(neighbourPosition))
+                    {
+                        allNodes[neighbourPosition] = currentNode;
+                        costSoFar[neighbourPosition] = newCost;
+                        nodesToVisitQueue.Enqueue(neighbourPosition);
+                    }
+                    else if (costSoFar[neighbourPosition] > newCost)
+                    {
+                        costSoFar[neighbourPosition] = newCost;
+                        allNodes[neighbourPosition] = currentNode;
+                    }
+                }
+            }
+        }
+        // allNodes.Remove(startPoint);
+        foreach (var item in allNodes)
+        {
+            if(HexGrid.Instance.GetTileAt (item.Key).IsEnemy())
+                enemiesNodes.Add(item.Key,item.Value);
+        }
+        return new BFSResult{rangeNodesDict = enemiesNodes};
+    }
+    public static List<Vector3Int> GetCloseseteHex(HexGrid hexGrid,Vector3Int current,Dictionary<Vector3Int, Vector3Int?> allNodesDict,int rangePoint)
     {
         List<Vector3Int> list = GneratePathBFS(current, allNodesDict);
-        list.RemoveAt(list.Count - 1);
+        for (int i = 0; i < rangePoint; i++)
+        {
+            list.RemoveAt(list.Count - 1);
+            
+        }
         return list;
     }
+    
     public static List<Vector3Int> GneratePathBFS(Vector3Int current, Dictionary<Vector3Int, Vector3Int?> visitedNodesDict)
     {
         List<Vector3Int> path = new List<Vector3Int>();
@@ -126,17 +180,30 @@ public class GraphSearch
 }
 public struct BFSResult
 {
-    
+    public Vector3Int startPoint;
     public Dictionary<Vector3Int, Vector3Int?> visitedNodesDict;
     public Dictionary<Vector3Int, Vector3Int?> enemiesNodesDict;
     public Dictionary<Vector3Int, Vector3Int?> allNodesDict;
+    public Dictionary<Vector3Int, Vector3Int?> rangeNodesDict;
+    public Dictionary<Vector3Int, int> costDict;
     public List<Vector3Int> GetPathEnemyGridForMovement(Vector3Int destination)
     {
         if (allNodesDict.ContainsKey(destination) == false)
             return new List<Vector3Int>();
         return GraphSearch.GneratePathBFS(destination, allNodesDict);
     }
-    public List<Vector3Int> GetPathEnemyGrid(Vector3Int destination, out Vector3Int? enemyGrid)
+    public int GetCost(Vector3Int pos)
+    {
+        if(enemiesNodesDict.ContainsKey(pos))
+        {
+            // costDict.Add(pos,costDict[GraphSearch.GetCloseseteHex(HexGrid.Instance,startPoint,allNodesDict,1)[GraphSearch.GetCloseseteHex(HexGrid.Instance,startPoint,allNodesDict,1).Count-1]]);
+
+            return costDict[pos];
+        }
+            
+        return costDict[pos];
+    }
+    public List<Vector3Int> GetPathEnemyGrid(Vector3Int destination, out Vector3Int? enemyGrid , int rangePoint = 1)
     {
         if (allNodesDict.ContainsKey(destination) == false)
         {
@@ -144,13 +211,18 @@ public struct BFSResult
             return new List<Vector3Int>();
         }
         enemyGrid = GraphSearch.GneratePathBFS(destination, allNodesDict)[0];
-        return GraphSearch.GetCloseseteHex(HexGrid.Instance, destination, allNodesDict,enemiesNodesDict);
+        return GraphSearch.GetCloseseteHex(HexGrid.Instance, destination, allNodesDict,rangePoint);
     }
     public List<Vector3Int> GetPathTo(Vector3Int destination)
     {
         if (visitedNodesDict.ContainsKey(destination) == false)
             return new List<Vector3Int>();
         return GraphSearch.GneratePathBFS(destination, visitedNodesDict);
+    }
+    public Hex GetLastIndexClosestHex(int range)
+    {
+        List<Vector3Int> closestList =  GraphSearch.GetCloseseteHex(HexGrid.Instance,startPoint,allNodesDict,range);
+        return HexGrid.Instance.GetTileAt (closestList[closestList.Count-1]);
     }
     public bool IsHecPositionInRange(Vector3Int position)
     {

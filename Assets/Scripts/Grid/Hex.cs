@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 [SelectionBase]
 public class Hex : MonoBehaviour
 {
-    
     [SerializeField] private Unit unit;
     [SerializeField] private GlowHighlight highlight;
     [SerializeField] private HexType hexType;
@@ -42,17 +42,26 @@ public class Hex : MonoBehaviour
 
         highlight.HighlightValidPath();
     }
-    public void EnableHighligh(bool IsEnemy = false)
+    public void DisableHighlighRange()
     {
-        
+        highlight.ToggleRangeGlow(false);
 
+    }
+    public void EnableHighlighRange()
+    {
+        highlight.ToggleRangeGlow(true);
+    }
+    
+    
+    public void EnableHighligh()
+    {
         highlight.ToggleGlow(true);
     }
-    public void DisableHighligh(bool IsEnemy = false)
+    public void DisableHighligh()
     {
-        
         highlight.ToggleGlow(false);
     }
+    
 }
 public enum HexType
 {

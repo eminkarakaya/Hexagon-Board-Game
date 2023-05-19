@@ -7,8 +7,8 @@ public class UnitManager : MonoBehaviour
     [SerializeField]
     private HexGrid hexGrid;
 
-    [SerializeField]
-    private MovementSystem movementSystem;
+    [SerializeField] private MovementSystem movementSystem;
+    [SerializeField] private AttackSystem attackSystem;
     [SerializeField] private bool playersTurn = true;
     public bool PlayersTurn { get => playersTurn; private set{} } 
 
@@ -29,7 +29,7 @@ public class UnitManager : MonoBehaviour
         {
             
         }
-
+        
         if (CheckIfTheSameUnitSelected(unitReference))
             return;
 
@@ -64,17 +64,19 @@ public class UnitManager : MonoBehaviour
     {
         if(selectedUnit == null || PlayersTurn == false)
             return;
+
         Hex selectedHex = hexGO.GetComponent<Hex>();
-        
+        if(attackSystem.CheckEnemyInRange(selectedHex))
+        {
+            selectedUnit.GetComponent<Attack>().AttackUnit(selectedHex.Unit);
+            selectedUnit.SetCurrentMovementPoints(0);
+            ClearOldSelection();
+            return;
+        }
         if (HandleHexOutOfRange(selectedHex.HexCoordinates) || HandleSelectedHexIsUnitHex(selectedHex.HexCoordinates))
             return;
-        // if(selectedHex.Unit != null && selectedHex.Unit.Side == Side.Enemy)
-        // {
-        //     // Debug.Log("Unit Selected " , hexGrid.GetTileAt(GraphSearch.GetCloseseteHex(movementSystem.movementRange.allNodesDict,selectedHex.HexCoordinates)));
-        //     HandleTargetHexSelected();
-        // }
-        // else
-            HandleTargetHexSelected(selectedHex);
+        
+        HandleTargetHexSelected(selectedHex);
     }
 
     public void HandleUnitSelectedRightClick(GameObject unit)  
@@ -99,6 +101,7 @@ public class UnitManager : MonoBehaviour
         this.selectedUnit.Select();
         
         movementSystem.ShowRange(this.selectedUnit, this.hexGrid);
+        attackSystem.ShowRange(selectedUnit);
     }
 
     private void ClearOldSelection()
@@ -106,21 +109,29 @@ public class UnitManager : MonoBehaviour
         previouslySelectedHex = null;
         this.selectedUnit.Deselect();
         movementSystem.HideRange(this.hexGrid);
+        attackSystem.HideRange();
         this.selectedUnit = null;
 
     }
 
     private void HandleTargetHexSelected(Hex selectedHex)
-    {
+    {   
         if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
         {
             previouslySelectedHex = selectedHex;
-            movementSystem.ShowPath(selectedHex.HexCoordinates, this.hexGrid);
+            movementSystem.ShowPath(selectedHex.HexCoordinates, this.hexGrid,selectedUnit.GetComponent<Attack>().range);
         }
         else
         {
-            selectedUnit.Hex.Unit = null;
-            movementSystem.MoveUnit(selectedUnit, this.hexGrid,selectedHex);
+            // if(selectedUnit.Hex.IsEnemy())
+            // {
+            //     movementSystem.MoveUnit(selectedUnit, this.hexGrid,selectedHex);
+            // }
+            // selectedUnit.Hex.Unit = null;
+           
+                movementSystem.MoveUnit(selectedUnit, this.hexGrid,selectedHex,selectedUnit.GetComponent<Attack>().range);
+
+            
             PlayersTurn = false;
             selectedUnit.MovementFinished += ResetTurn;
             ClearOldSelection();

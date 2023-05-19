@@ -6,14 +6,15 @@ public class GlowHighlight : MonoBehaviour
 {
     Dictionary<Renderer,Material[]> glowMaterialDict = new Dictionary<Renderer, Material[]>(); 
     Dictionary<Renderer,Material[]> enemyGlowMaterialDict = new Dictionary<Renderer, Material[]>(); 
+    // Dictionary<Renderer,Material[]> rangeGlowMaterialDict = new Dictionary<Renderer, Material[]>(); 
     Dictionary<Renderer,Material[]> originalMaterialDict = new Dictionary<Renderer, Material[]>(); 
     Dictionary<Color,Material> cachedGlowMaterials = new Dictionary<Color, Material>(); 
 
-    public Material glowMaterial,enemyGlowMaterial;
+    public Material glowMaterial,enemyGlowMaterial,rangeGlowMaterial;
     private bool isGlowing = false;
     private Color validSpaceColor = Color.green;
-    private Color originalGlowColor,enemyGlowColor;
-    private void Awake() {
+    private Color originalGlowColor,enemyGlowColor,rangeGlowColor;
+    private void Awake() {  
         PrepareMaterialDictionaries();
         originalGlowColor = glowMaterial.GetColor("_GlowColor");
         enemyGlowColor = enemyGlowMaterial.GetColor("_GlowColor");
@@ -26,31 +27,38 @@ public class GlowHighlight : MonoBehaviour
             originalMaterialDict.Add(renderer,originalMaterials);               // dict e atıyorz
             Material [] newMaterials = new Material[renderer.materials.Length]; // yenı materıal olusturuyoruz
             Material [] enemyMaterials = new Material[renderer.materials.Length];
+            Material [] rangeMaterials = new Material[renderer.materials.Length];
 
             for (int i = 0; i < originalMaterials.Length; i++)                  
             {
                 Material mat = null;
                 Material enemyMat = null;
+                // Material rangeMat = null;
                 if(cachedGlowMaterials.TryGetValue(originalMaterials[i].color,out mat) == false)
                 {
+                    // rangeMat = new Material(rangeGlowMaterial);
                     enemyMat = new Material(enemyGlowMaterial);
                     mat = new Material(glowMaterial);
+                    // rangeMat.color = originalMaterials[i].color;
                     enemyMat.color = originalMaterials[i].color;
                     mat.color = originalMaterials[i].color;
+                    
                     cachedGlowMaterials[mat.color] = mat;
                 }
                 newMaterials[i] = mat;
                 enemyMaterials[i] = enemyMat;
+                // rangeMaterials[i] = rangeMat;
 
             }
             glowMaterialDict.Add(renderer,newMaterials);
             enemyGlowMaterialDict.Add(renderer,enemyMaterials);
+            // rangeGlowMaterialDict.Add(renderer,rangeMaterials);
         }
         
     }
     public void ToggleGlow()
     {
-        Hex hex;
+       Hex hex;
         if(TryGetComponent(out Hex hex1))
         {
             hex = hex1;
@@ -97,6 +105,31 @@ public class GlowHighlight : MonoBehaviour
             }
             isGlowing = !isGlowing;
         }
+    
+    }
+   
+    public void ToggleRangeGlow(bool state)
+    {
+        // if(isGlowing == state)
+        //     return;
+        // isGlowing = !state;
+        // if(!isGlowing)
+        //     {
+                transform.GetChild(1).gameObject.SetActive(state);
+            //     ResetGlowHighlight();
+            //     foreach (Renderer renderer in originalMaterialDict.Keys)
+            //     {
+            //         renderer.materials = rangeGlowMaterialDict[renderer];
+            //     }
+            // }
+            // else
+            // {
+            //     foreach (Renderer renderer in originalMaterialDict.Keys)
+            //     {
+            //         renderer.materials = originalMaterialDict[renderer];
+            //     }
+            // }
+            // isGlowing = !isGlowing;
     }
     public void ToggleGlow(bool state)
     {
@@ -105,25 +138,7 @@ public class GlowHighlight : MonoBehaviour
         isGlowing = !state;
         ToggleGlow();
     }
-    // public void EnemyToggleGlow()
-    // {
-    //     if(!isGlowing)
-    //     {
-    //         ResetGlowHighlight();
-    //         foreach (Renderer renderer in enemyGlowMaterialDict.Keys)
-    //         {
-    //             renderer.materials = enemyGlowMaterialDict[renderer];
-    //         }
-    //     }
-    //     else
-    //     {
-    //         foreach (Renderer renderer in originalMaterialDict.Keys)
-    //         {
-    //             renderer.materials = originalMaterialDict[renderer];
-    //         }
-    //     }
-    //     isGlowing = !isGlowing;
-    // }
+    
     internal void ResetGlowHighlight()
     {
         Hex hex;
@@ -158,6 +173,7 @@ public class GlowHighlight : MonoBehaviour
                 renderer.materials = glowMaterialDict[renderer];
             }
         }
+
     }
     internal void HighlightValidPath()
     {

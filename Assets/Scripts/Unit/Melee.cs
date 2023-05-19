@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Melee : MonoBehaviour
+public class Melee : Attack
 {
-    public void Attack(Unit unit)
+    public override void AttackUnit(Unit unit)
     {
-        Debug.Log("attak to : " + unit);
+        if(GetComponent<Unit>().GetCurrentMovementPoints()==0) return;
+        Debug.Log("melee attack to : "  + unit);
     }
 }
