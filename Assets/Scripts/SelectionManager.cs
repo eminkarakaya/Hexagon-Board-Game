@@ -32,13 +32,13 @@ public class SelectionManager : MonoBehaviour
         GameObject result;
         if(FindTarget(mousePosition,out result))
         {
+            Debug.Log("rightClick2");
             if(UnitSelected(result))
             {
                 OnUnitSelectedRightClick?.Invoke(result);
             }
             else
                 OnTerrainSelectedRightClick?.Invoke(result);
-
         }
     }
     private bool UnitSelected(GameObject result)

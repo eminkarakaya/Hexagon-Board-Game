@@ -23,6 +23,7 @@ public class PlayerInput : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(1))
         {
+            Debug.Log("rightClick");
             Vector3 mousePos = Input.mousePosition;
             PointerRightClick?.Invoke(mousePos);
         }

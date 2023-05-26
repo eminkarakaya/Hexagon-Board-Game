@@ -16,7 +16,7 @@ public class MovementSystem : Singleton<MovementSystem>
         }
         foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
         {
-            hexGrid.GetTileAt(hexPosition).DisableHighligh();
+            hexGrid.GetTileAt(hexPosition).DisableHighlighEnemy();
         }
         movementRange = new BFSResult();
     }
@@ -32,7 +32,7 @@ public class MovementSystem : Singleton<MovementSystem>
         foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
         {
             // hexGrid.GetTileAt(hexPosition).
-            hexGrid.GetTileAt(hexPosition).EnableHighligh();
+            hexGrid.GetTileAt(hexPosition).EnableHighlighEnemy();
         }
         
     }
@@ -43,42 +43,60 @@ public class MovementSystem : Singleton<MovementSystem>
     public void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid, int range = 1)
     {
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
-        if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
+        if(hex.isVisible)
         {
-            if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
+            if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
-                foreach (Vector3Int hexPosition in currentPath)
+                if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
-                    hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    }
+                    Vector3Int? enemyHex = null;
+                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,range);
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).HighlightPath();                    
+                    }
+                    if(currentPath.Count == 0)
+                    {
+                        currentPath.Add((Vector3Int)enemyHex);
+                        // hexGrid.GetTileAt((Vector3Int)enemyHex).HighlightPath();                    
+                    }
                 }
-                Vector3Int? enemyHex = null;
-                currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,range);
-                foreach (Vector3Int hexPosition in currentPath)
+            }
+
+            else
+            {
+                if(movementRange.GetRangePositions().Contains(selectedHexPosition))
                 {
-                    hexGrid.GetTileAt(hexPosition).HighlightPath();                    
-                }
-                if(currentPath.Count == 0)
-                {
-                    currentPath.Add((Vector3Int)enemyHex);
-                    // hexGrid.GetTileAt((Vector3Int)enemyHex).HighlightPath();                    
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    }
+                    currentPath = movementRange.GetPathTo(selectedHexPosition);
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                    }
                 }
             }
         }
-
         else
         {
-            if(movementRange.GetRangePositions().Contains(selectedHexPosition))
-            {
-                foreach (Vector3Int hexPosition in currentPath)
+                if(movementRange.GetRangePositions().Contains(selectedHexPosition))
                 {
-                    hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    }
+                    currentPath = movementRange.GetPathTo(selectedHexPosition);
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                    }
                 }
-                currentPath = movementRange.GetPathTo(selectedHexPosition);
-                foreach (Vector3Int hexPosition in currentPath)
-                {
-                    hexGrid.GetTileAt(hexPosition).HighlightPath();
-                }
-            }
         }
     }
     private void OnDrawGizmos() {
@@ -86,7 +104,6 @@ public class MovementSystem : Singleton<MovementSystem>
         {
 return;
         }
-
         foreach (var item in movementRange.allNodesDict )
         {
             Vector3 startPos = HexGrid.Instance.GetTileAt (item.Key).transform.position;
@@ -94,7 +111,6 @@ return;
             {
                 Vector3 valuePos = HexGrid.Instance.GetTileAt ((Vector3Int)item.Value).transform.position;
                 DrawArrow.ForGizmo(valuePos + Vector3.up * h,(startPos-valuePos),Color.black,.5f,25);
-                // Debug.Log(item.Key + "  " + item.Value);
             }
         }
     }
@@ -103,29 +119,24 @@ return;
         if(selectedUnit.GetCurrentMovementPoints() == 0) 
             return;
         // selectedUnit.SetCurrentMovementPoints(selectedUnit.GetCurrentMovementPoints() - movementRange.GetCost(hex.HexCoordinates));
-        // Debug.Log(movementRange.GetCost(hex.HexCoordinates));
-        selectedUnit.Hex = hex;
+        
         List<Vector3> currentPathTemp = currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList(); 
+        List<Hex> currentHexes = currentPath.Select(pos => hexGrid.GetTileAt(pos)).ToList(); 
             if(hex.IsEnemy())
             {
                 if(currentPath.Count == 1 && hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy)
                 {
-                    Debug.Log(" 1 ");
-                    selectedUnit.MoveThroughPath(currentPathTemp,  hex,false);
+                    selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,false);
                 }
                 else
                 {
-                    Debug.Log(" 2 ");
-                    selectedUnit.MoveThroughPath(currentPathTemp, hex);
-
+                    selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex);
                 }
 
             }
             else
             {
-                    Debug.Log(" 3");
-
-                selectedUnit.MoveThroughPath(currentPathTemp, hex);
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex);
             }
     }
     public bool IsHexInRange(Vector3Int hexPosition)

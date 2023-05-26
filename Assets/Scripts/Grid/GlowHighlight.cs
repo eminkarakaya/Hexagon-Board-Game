@@ -56,9 +56,9 @@ public class GlowHighlight : MonoBehaviour
         }
         
     }
-    public void ToggleGlow()
+    public void EnemyToggleGlow()
     {
-       Hex hex;
+        Hex hex;
         if(TryGetComponent(out Hex hex1))
         {
             hex = hex1;
@@ -67,44 +67,52 @@ public class GlowHighlight : MonoBehaviour
         {
             hex = GetComponent<Unit>().Hex;
         }
-        if(hex.IsEnemy())
+        if(!isGlowing)
         {
-            if(!isGlowing)
+            ResetGlowHighlight();
+            foreach (Renderer renderer in originalMaterialDict.Keys)
             {
-                ResetGlowHighlight();
-                foreach (Renderer renderer in originalMaterialDict.Keys)
-                {
-                    renderer.materials = enemyGlowMaterialDict[renderer];
-                }
+                renderer.materials = enemyGlowMaterialDict[renderer];
             }
-            else
-            {
-                foreach (Renderer renderer in originalMaterialDict.Keys)
-                {
-                    renderer.materials = originalMaterialDict[renderer];
-                }
-            }
-            isGlowing = !isGlowing;
         }
         else
         {
-            if(!isGlowing)
+            foreach (Renderer renderer in originalMaterialDict.Keys)
             {
-                ResetGlowHighlight();
-                foreach (Renderer renderer in originalMaterialDict.Keys)
-                {
-                    renderer.materials = glowMaterialDict[renderer];
-                }
+                renderer.materials = originalMaterialDict[renderer];
             }
-            else
-            {
-                foreach (Renderer renderer in originalMaterialDict.Keys)
-                {
-                    renderer.materials = originalMaterialDict[renderer];
-                }
-            }
-            isGlowing = !isGlowing;
         }
+        isGlowing = !isGlowing;
+    }
+    public void ToggleGlow()
+    {
+        Hex hex;
+        if(TryGetComponent(out Hex hex1))
+        {
+            hex = hex1;
+        }
+        else
+        {
+            hex = GetComponent<Unit>().Hex;
+        }
+        
+        if(!isGlowing)
+        {
+            ResetGlowHighlight();
+            foreach (Renderer renderer in originalMaterialDict.Keys)
+            {
+                renderer.materials = glowMaterialDict[renderer];
+            }
+        }
+        else
+        {
+            foreach (Renderer renderer in originalMaterialDict.Keys)
+            {
+                renderer.materials = originalMaterialDict[renderer];
+            }
+        }
+        isGlowing = !isGlowing;
+    
     
     }
    
@@ -136,11 +144,22 @@ public class GlowHighlight : MonoBehaviour
         if(isGlowing == state)
             return;
         isGlowing = !state;
+        
+        
+        // ToggleEnemyGlow();
         ToggleGlow();
     }
     
-    internal void ResetGlowHighlight()
+    public void ToggleEnemyGlow(bool state)
     {
+        if(isGlowing == state)
+            return;
+        isGlowing = !state;
+        
+        EnemyToggleGlow();
+    }
+    internal void ResetGlowHighlight()
+    {   
         Hex hex;
         if(TryGetComponent(out Hex hex1))
         {

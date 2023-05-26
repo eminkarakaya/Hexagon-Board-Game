@@ -9,20 +9,68 @@ public class Unit : MonoBehaviour
     public Hex Hex {get => hex; set {hex = value;}}
     [SerializeField] private Side side;
     public Side Side {get => side;}
-
+    [SerializeField] private int sightDistance = 2;
+    public int SightDistance {get => sightDistance;}
     [SerializeField] private int _movementPoints = 20;
     public int MovementPoints {get => _movementPoints;}
     [SerializeField] private int _currentMovementPoints = 20;
     [SerializeField] private float movementDuration = 1, rotationDuration = .3f;
     private GlowHighlight glowHighlight;
     private Queue<Vector3> pathPositions = new Queue<Vector3>();
-
+    private Queue<Hex> pathHexes = new Queue<Hex>();
+    public event System.Action<Hex> HexChanges;
     public event System.Action<Unit> MovementFinished;    
-    public event System.Action<Unit> Selected;
-    public event System.Action<Unit> Deselected;
+    
+    [SerializeField] private List<GameObject> sight;
+    public List<GameObject> Sight{get => sight;}
+    SightResult sightRange;
+    
+    public void ShowSight(Hex hex)
+    {
+        if(side == Side.Enemy) return;
+        HideSight(hex);
+        sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance);
+        HexGrid hexGrid = HexGrid.Instance;
+        foreach (var item in sightRange.GetRangeSight())
+        {
 
+            if(hexGrid.GetTileAt(item) != null)
+            {
+                Hex hex1 = hexGrid.GetTileAt(item);
+                hex1.OpenLinkedObjectSight();
+                hex1.isVisible=true;
+            }
+        }
+    }
+    public void HideSight(Hex hex)
+    {
+        if(sightRange.sightNodesDict == null) return;
+        if(side == Side.Enemy) return;
+        HexGrid hexGrid = HexGrid.Instance;
+        foreach (var item in sightRange.sightNodesDict)
+        {
+            Hex hex1 = hexGrid.GetTileAt(item.Key);
+            hex1.CloseLinkedObjectSight();
+            hex.isVisible = false;
+        }
+    }
     private void Awake() {
         glowHighlight = GetComponent<GlowHighlight>();
+    }
+    private void OnEnable() {
+        HexChanges += ShowSight;
+    }
+    private void OnDisable() {
+        
+        HexChanges -= ShowSight;
+    }
+    private void Start() {
+        if(TryGetComponent(out Photon.Pun.PhotonView pw))
+        {
+            if(pw.IsMine)
+                Select();
+        }
+        ShowSight(hex);
     }
     
     public int GetCurrentMovementPoints()
@@ -42,15 +90,17 @@ public class Unit : MonoBehaviour
     {
         glowHighlight.ToggleGlow();
     }
-    internal void MoveThroughPath(List<Vector3> currentPath ,Hex lastHex ,bool isMove = true)
+    internal void MoveThroughPath(List<Vector3> currentPathTemp,List<Hex> currentPath ,Hex lastHex ,bool isMove = true)
     {
-        pathPositions = new Queue<Vector3>(currentPath);
+        pathPositions = new Queue<Vector3>(currentPathTemp);
+        pathHexes = new Queue<Hex>(currentPath);
         
-        if(currentPath.Count == 0) return;
+        if(currentPathTemp.Count == 0) return;
         Vector3 firstTarget = pathPositions.Dequeue();
-        StartCoroutine(RotationCoroutine(firstTarget,lastHex,rotationDuration,isMove));
+        Hex firstHex = pathHexes.Dequeue();
+        StartCoroutine(RotationCoroutine(firstTarget,firstHex,lastHex,rotationDuration,isMove));
     }
-    private IEnumerator RotationCoroutine(Vector3 endPos,Hex hex, float rotationDuration,bool isMove = true)
+    private IEnumerator RotationCoroutine(Vector3 endPos,Hex endHex,Hex hex, float rotationDuration,bool isMove = true)
     {
         Quaternion startRotation = transform.rotation;
         endPos.y = transform.position.y;
@@ -71,7 +121,7 @@ public class Unit : MonoBehaviour
         }
         if(isMove)
         {
-            StartCoroutine(MovementCoroutine(endPos,hex));
+            StartCoroutine(MovementCoroutine(endPos,endHex,hex));
         }
         else
         {
@@ -101,7 +151,7 @@ public class Unit : MonoBehaviour
         // }
         
     }
-    private IEnumerator MovementCoroutine(Vector3 endPos,Hex hex)
+    private IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex)
     {
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
@@ -113,21 +163,21 @@ public class Unit : MonoBehaviour
             transform.position = Vector3.Lerp(startPos,endPos,lerpStep);
             yield return null;
         }
-        transform.position = endPos;
 
+        Hex = endHex;
+        transform.position = endPos;
+        // HexChanges?.Invoke(endHex);
+        GameManager.Instance.SightAllUnits();
+        
         if(pathPositions.Count > 0)
         {
-            // Debug.Log("Selecting the next position");
-            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),hex,rotationDuration));
-            Debug.Log(pathPositions.Count + " pathpositioncount");
+            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),hex,rotationDuration));
         }
         else
         {
-            Debug.Log(hex.HexCoordinates);
             MovementFinished?.Invoke(this);
             if(hex.Unit != null && hex.Unit.side == Side.Enemy)
             {
-                Debug.Log(pathPositions.Count + " pathpositioncount   1");
                 Quaternion startRotation = transform.rotation;
                 Vector3 direction = new Vector3(hex.transform.position.x,transform.position.y,hex.transform.position.z) - transform.position;
                 Quaternion endRotation = Quaternion.LookRotation(direction,Vector3.up);

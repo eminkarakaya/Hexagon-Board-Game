@@ -6,6 +6,7 @@ public class UnitManager : MonoBehaviour
 {
     [SerializeField]
     private HexGrid hexGrid;
+    public LayerMask layer,defaulLayer;
 
     [SerializeField] private MovementSystem movementSystem;
     [SerializeField] private AttackSystem attackSystem;
@@ -39,7 +40,6 @@ public class UnitManager : MonoBehaviour
     {
         if(selectedUnit != null)
         {
-
         }
     }
     private bool CheckIfTheSameUnitSelected(Unit unitReference)
@@ -64,12 +64,11 @@ public class UnitManager : MonoBehaviour
     {
         if(selectedUnit == null || PlayersTurn == false)
             return;
-
         Hex selectedHex = hexGO.GetComponent<Hex>();
         if(attackSystem.CheckEnemyInRange(selectedHex))
         {
             selectedUnit.GetComponent<Attack>().AttackUnit(selectedHex.Unit);
-            selectedUnit.SetCurrentMovementPoints(0);
+            // selectedUnit.SetCurrentMovementPoints(0);
             ClearOldSelection();
             return;
         }
@@ -151,9 +150,9 @@ public class UnitManager : MonoBehaviour
 
     private bool HandleHexOutOfRange(Vector3Int hexPosition)
     {
+        if(!hexGrid.GetTileAt(hexPosition).isVisible) return false;
         if (movementSystem.IsHexInRange(hexPosition) == false)
         {
-            // Debug.Log("Hex Out of range!");
             return true;
         }
         return false;

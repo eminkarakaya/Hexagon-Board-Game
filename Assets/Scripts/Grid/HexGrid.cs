@@ -13,6 +13,13 @@ public class HexGrid : Singleton<HexGrid>
         }
         
     }
+    public void CloseVisible()
+    {
+        foreach (var item in hexTileDict.Values)
+        {
+            item.isVisible = false;
+        }
+    }
     internal Vector3Int GetClosestHex(Vector3 worldPosition)
     {
         worldPosition.y = 0;

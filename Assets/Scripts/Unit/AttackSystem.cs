@@ -20,8 +20,6 @@ public class AttackSystem : MonoBehaviour
         {
             HexGrid.Instance.GetTileAt(item.Key).EnableHighlighRange();
         }
-        
-        
     }
     public void HideRange()
     {

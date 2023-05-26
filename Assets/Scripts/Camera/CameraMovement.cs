@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
+
+    private LayerMask mask;
+    public LayerMask Mask{get => mask; set {
+        mask = value;
+        Camera.main.cullingMask = mask;
+        }
+    }
+    
     [SerializeField] private Vector2 clampX,clampY;
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] private float _movementSpeed,_movementTime,_normalSpeed,_fastSpeed;
