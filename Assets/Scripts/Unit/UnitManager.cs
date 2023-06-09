@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class UnitManager : MonoBehaviour
 {
     [SerializeField]
     private HexGrid hexGrid;
     public LayerMask layer,defaulLayer;
-
+    [SerializeField] private UnityEvent OnSelectedUnit;
     [SerializeField] private MovementSystem movementSystem;
     [SerializeField] private AttackSystem attackSystem;
     [SerializeField] private bool playersTurn = true;
@@ -30,11 +31,16 @@ public class UnitManager : MonoBehaviour
         {
             
         }
-        
         if (CheckIfTheSameUnitSelected(unitReference))
             return;
 
+        OnSelectedUnit?.Invoke();
+        
         PrepareUnitForMovement(unitReference);
+    }
+    public void ResetSelectedUnit()
+    {
+        ClearOldSelection();
     }
     public void HandleEnemyUnitSelected(GameObject unit)
     {
@@ -47,6 +53,7 @@ public class UnitManager : MonoBehaviour
         if (this.selectedUnit == unitReference)
         {
             ClearOldSelection();
+            unitReference.CloseCanvas();
             return true;
         }
         return false;
@@ -98,13 +105,16 @@ public class UnitManager : MonoBehaviour
 
         this.selectedUnit = unitReference;
         this.selectedUnit.Select();
-        
+
+        unitReference.OpenCanvas();
         movementSystem.ShowRange(this.selectedUnit, this.hexGrid);
         attackSystem.ShowRange(selectedUnit);
     }
 
     private void ClearOldSelection()
     {
+        if(selectedUnit == null) return;
+        selectedUnit.CloseCanvas();
         previouslySelectedHex = null;
         this.selectedUnit.Deselect();
         movementSystem.HideRange(this.hexGrid);

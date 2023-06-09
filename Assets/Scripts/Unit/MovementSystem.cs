@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
 public class MovementSystem : Singleton<MovementSystem>
 {
     public float h;
@@ -100,11 +99,11 @@ public class MovementSystem : Singleton<MovementSystem>
         }
     }
     private void OnDrawGizmos() {
-        if(movementRange.allNodesDict== null)
+        if(movementRange.allNodesDict2== null)
         {
-return;
+            return;
         }
-        foreach (var item in movementRange.allNodesDict )
+        foreach (var item in movementRange.allNodesDict2 )
         {
             Vector3 startPos = HexGrid.Instance.GetTileAt (item.Key).transform.position;
             if( item.Value != null)

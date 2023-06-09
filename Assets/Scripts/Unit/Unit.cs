@@ -5,10 +5,16 @@ using UnityEngine;
 [SelectionBase]
 public class Unit : MonoBehaviour
 {
+    
     [SerializeField] private Hex hex;
     public Hex Hex {get => hex; set {hex = value;}}
+    [SerializeField] private GameObject canvas;
     [SerializeField] private Side side;
     public Side Side {get => side;}
+    public void SetSide(Side side)
+    {
+       this.side = side;
+    }
     [SerializeField] private int sightDistance = 2;
     public int SightDistance {get => sightDistance;}
     [SerializeField] private int _movementPoints = 20;
@@ -24,10 +30,34 @@ public class Unit : MonoBehaviour
     [SerializeField] private List<GameObject> sight;
     public List<GameObject> Sight{get => sight;}
     SightResult sightRange;
-    
+    public void OpenCanvas()
+    {
+        canvas.SetActive(true);
+    }
+    public void CloseCanvas()
+    {
+        canvas.SetActive(false);
+
+    }
+    public void ShowSight1(Hex hex)
+    {
+        if(Side == Side.Enemy) return;
+        // HideSight(hex);
+        sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance);
+        HexGrid hexGrid = HexGrid.Instance;
+        foreach (var item in sightRange.GetRangeSight())
+        {
+            if(hexGrid.GetTileAt(item) != null)
+            {
+                Hex hex1 = hexGrid.GetTileAt(item);
+                hex1.OpenLinkedObjectSight();
+                hex1.isVisible=true;
+            }
+        }
+    }
     public void ShowSight(Hex hex)
     {
-        if(side == Side.Enemy) return;
+        if(Side == Side.Enemy) return;
         HideSight(hex);
         sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance);
         HexGrid hexGrid = HexGrid.Instance;
@@ -45,7 +75,7 @@ public class Unit : MonoBehaviour
     public void HideSight(Hex hex)
     {
         if(sightRange.sightNodesDict == null) return;
-        if(side == Side.Enemy) return;
+        if(Side == Side.Enemy) return;
         HexGrid hexGrid = HexGrid.Instance;
         foreach (var item in sightRange.sightNodesDict)
         {
@@ -57,20 +87,14 @@ public class Unit : MonoBehaviour
     private void Awake() {
         glowHighlight = GetComponent<GlowHighlight>();
     }
-    private void OnEnable() {
-        HexChanges += ShowSight;
-    }
-    private void OnDisable() {
-        
-        HexChanges -= ShowSight;
-    }
+    
     private void Start() {
-        if(TryGetComponent(out Photon.Pun.PhotonView pw))
-        {
-            if(pw.IsMine)
-                Select();
-        }
-        ShowSight(hex);
+        // if(TryGetComponent(out Photon.Pun.PhotonView pw))
+        // {
+        //     if(pw.IsMine)
+        //         Select();
+        // }
+        ShowSight1(hex);
     }
     
     public int GetCurrentMovementPoints()
@@ -155,6 +179,10 @@ public class Unit : MonoBehaviour
     {
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
+        if(endHex.IsEnemy()) 
+        {
+            yield break;
+        }
         float timeElapsed = 0f;
         while(timeElapsed<movementDuration)
         {
@@ -167,7 +195,8 @@ public class Unit : MonoBehaviour
         Hex = endHex;
         transform.position = endPos;
         // HexChanges?.Invoke(endHex);
-        GameManager.Instance.SightAllUnits();
+        PlayerManager.Instance.SightAllUnits();
+
         
         if(pathPositions.Count > 0)
         {
@@ -176,7 +205,7 @@ public class Unit : MonoBehaviour
         else
         {
             MovementFinished?.Invoke(this);
-            if(hex.Unit != null && hex.Unit.side == Side.Enemy)
+            if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
                 Quaternion startRotation = transform.rotation;
                 Vector3 direction = new Vector3(hex.transform.position.x,transform.position.y,hex.transform.position.z) - transform.position;
@@ -199,5 +228,6 @@ public class Unit : MonoBehaviour
 public enum Side
 {
     Ally,
+    Me,
     Enemy
 }

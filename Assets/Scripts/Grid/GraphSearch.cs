@@ -146,9 +146,12 @@ public class GraphSearch
             Vector3Int currentNode = nodesToVisitQueue1.Dequeue();
             foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
             {
-                if(hexGrid.GetTileAt(currentNode).IsEnemy())
+                if(hexGrid.GetTileAt(currentNode).isVisible)
                 {
-                    continue;
+                    if(hexGrid.GetTileAt(currentNode).IsEnemy())
+                    {
+                        continue;
+                    }
                 }
                 if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
                     continue;
@@ -172,7 +175,7 @@ public class GraphSearch
                                 // enemiesNodes[neighbourPosition] = currentNode;
                                 continue;
                             }
-                    }
+                    }                        
                     if (!visitedNodes.ContainsKey(neighbourPosition))
                     {
                         visitedNodes[neighbourPosition] = currentNode;

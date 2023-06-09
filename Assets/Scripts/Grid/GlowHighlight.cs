@@ -86,15 +86,7 @@ public class GlowHighlight : MonoBehaviour
     }
     public void ToggleGlow()
     {
-        Hex hex;
-        if(TryGetComponent(out Hex hex1))
-        {
-            hex = hex1;
-        }
-        else
-        {
-            hex = GetComponent<Unit>().Hex;
-        }
+        
         
         if(!isGlowing)
         {
@@ -116,6 +108,25 @@ public class GlowHighlight : MonoBehaviour
     
     }
    
+    // public void ToggleBuilding()
+    // {
+    //     if(!isGlowing)
+    //     {
+    //         ResetGlowHighlightBuilding();
+    //         foreach (Renderer renderer in originalMaterialDict.Keys)
+    //         {
+    //             renderer.materials = glowMaterialDict[renderer];
+    //         }
+    //     }
+    //     else
+    //     {
+    //         foreach (Renderer renderer in originalMaterialDict.Keys)
+    //         {
+    //             renderer.materials = originalMaterialDict[renderer];
+    //         }
+    //     }
+    //     isGlowing = !isGlowing;
+    // }
     public void ToggleRangeGlow(bool state)
     {
         // if(isGlowing == state)
@@ -157,6 +168,29 @@ public class GlowHighlight : MonoBehaviour
         isGlowing = !state;
         
         EnemyToggleGlow();
+    }
+    private void ResetGlowHighlightBuilding()
+    {
+        foreach (Renderer renderer1 in enemyGlowMaterialDict.Keys)
+            {
+                foreach (var item in enemyGlowMaterialDict[renderer1])
+                {
+                    if(item != null)
+                    item.SetColor("_GlowColor",enemyGlowColor);
+                }
+                renderer1.materials = enemyGlowMaterialDict[renderer1];
+            }
+        
+       
+        foreach (Renderer renderer in glowMaterialDict.Keys)
+        {
+            foreach (var item in glowMaterialDict[renderer])
+            {
+                item.SetColor("_GlowColor",originalGlowColor);
+            }
+            renderer.materials = glowMaterialDict[renderer];
+        }
+        
     }
     internal void ResetGlowHighlight()
     {   

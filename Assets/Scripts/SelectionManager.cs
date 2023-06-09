@@ -8,7 +8,7 @@ public class SelectionManager : MonoBehaviour
     [SerializeField] private Camera _mainCamera;
     public LayerMask selectionMask;
     
-    public UnityEvent<GameObject> OnUnitSelected,TerrainSelected,OnUnitSelectedRightClick,OnTerrainSelectedRightClick;
+    public UnityEvent<GameObject> OnUnitSelected,TerrainSelected,OnUnitSelectedRightClick,OnTerrainSelectedRightClick,OnBuildingSelected;
     private void Awake() {
         if(_mainCamera == null) _mainCamera = Camera.main;
     }
@@ -22,6 +22,10 @@ public class SelectionManager : MonoBehaviour
             {
                 OnUnitSelected?.Invoke(result);
             }
+            else if(BuildingSelected(result))
+            {
+                OnBuildingSelected?.Invoke(result);
+            }
             else
                 TerrainSelected?.Invoke(result);
 
@@ -32,7 +36,6 @@ public class SelectionManager : MonoBehaviour
         GameObject result;
         if(FindTarget(mousePosition,out result))
         {
-            Debug.Log("rightClick2");
             if(UnitSelected(result))
             {
                 OnUnitSelectedRightClick?.Invoke(result);
@@ -45,6 +48,11 @@ public class SelectionManager : MonoBehaviour
     {
         return result.GetComponent<Unit>() != null;
     }
+    private bool BuildingSelected(GameObject result)
+    {
+        return result.GetComponent<Building>() != null;
+    }
+    
     private bool FindTarget(Vector3 mousePosition,out GameObject result)
     {
         RaycastHit hit;
