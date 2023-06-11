@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-public class MovementSystem : Singleton<MovementSystem>
+public class MovementSystem : MonoBehaviour
 {
+    [SerializeField] private HexGrid hexGrid;
     public float h;
     public BFSResult movementRange = new BFSResult();
     [SerializeField] private List<Vector3Int> currentPath = new List<Vector3Int>();
-    public void HideRange(HexGrid hexGrid)
+    public void HideRange()
     {
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
@@ -19,7 +20,7 @@ public class MovementSystem : Singleton<MovementSystem>
         }
         movementRange = new BFSResult();
     }
-    public void ShowRange(Unit selectedUnit,HexGrid hexGrid)
+    public void ShowRange(Unit selectedUnit)
     {
         CalculateRange(selectedUnit,hexGrid);
         Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.transform.position);
@@ -53,7 +54,7 @@ public class MovementSystem : Singleton<MovementSystem>
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
                     Vector3Int? enemyHex = null;
-                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,range);
+                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,range);
                     foreach (Vector3Int hexPosition in currentPath)
                     {
                         hexGrid.GetTileAt(hexPosition).HighlightPath();                    
@@ -105,10 +106,10 @@ public class MovementSystem : Singleton<MovementSystem>
         }
         foreach (var item in movementRange.allNodesDict2 )
         {
-            Vector3 startPos = HexGrid.Instance.GetTileAt (item.Key).transform.position;
+            Vector3 startPos = hexGrid.GetTileAt (item.Key).transform.position;
             if( item.Value != null)
             {
-                Vector3 valuePos = HexGrid.Instance.GetTileAt ((Vector3Int)item.Value).transform.position;
+                Vector3 valuePos = hexGrid.GetTileAt ((Vector3Int)item.Value).transform.position;
                 DrawArrow.ForGizmo(valuePos + Vector3.up * h,(startPos-valuePos),Color.black,.5f,25);
             }
         }

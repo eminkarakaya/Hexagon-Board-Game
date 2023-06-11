@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class AttackSystem : MonoBehaviour
 {
+    [SerializeField] private HexGrid hexGrid;
     BFSResult rangeInfo;
     public void GetRange(Unit selectedUnit)
     {
         if(!selectedUnit.TryGetComponent(out Attack range))
             return;
         range = selectedUnit.GetComponent<Attack>();
-        rangeInfo = GraphSearch.GetRange(HexGrid.Instance,selectedUnit.Hex.HexCoordinates,range.range);
+        rangeInfo = GraphSearch.GetRange(hexGrid,selectedUnit.Hex.HexCoordinates,range.range);
     }
     public void ShowRange(Unit selectedUnit)
     {
@@ -18,14 +19,14 @@ public class AttackSystem : MonoBehaviour
         GetRange(selectedUnit);
         foreach (var item in rangeInfo.rangeNodesDict)
         {
-            HexGrid.Instance.GetTileAt(item.Key).EnableHighlighRange();
+            hexGrid.GetTileAt(item.Key).EnableHighlighRange();
         }
     }
     public void HideRange()
     {
         foreach (var item in rangeInfo.rangeNodesDict)
         {
-            HexGrid.Instance.GetTileAt(item.Key).DisableHighlighRange();
+            hexGrid.GetTileAt(item.Key).DisableHighlighRange();
         }
     }
     public bool CheckEnemyInRange(Hex enemyHex)

@@ -1,17 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class HexGrid : Singleton<HexGrid>
+using Mirror;
+public class HexGrid : NetworkBehaviour
 {
     Dictionary<Vector3Int,Hex> hexTileDict = new Dictionary<Vector3Int, Hex>();
     Dictionary<Vector3Int , List<Vector3Int>> hexTileNeighboursDict = new Dictionary<Vector3Int, List<Vector3Int>>();
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+    }
     private void Start() {
-        foreach (Hex hex in FindObjectsOfType<Hex>()) // dic e hexlerı atıyoruz
-        {
-            hexTileDict[hex.HexCoordinates] = hex;
-        }
         
+    }
+    private void Update() {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+
+            foreach (Hex hex in FindObjectsOfType<Hex>()) // dic e hexlerı atıyoruz
+            {
+                hexTileDict[hex.HexCoordinates] = hex;
+                Debug.Log(hex);
+            }
+        }
     }
     public void CloseVisible()
     {

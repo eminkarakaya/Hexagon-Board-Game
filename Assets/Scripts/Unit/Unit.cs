@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Mirror;
 [SelectionBase]
-public class Unit : MonoBehaviour
+public class Unit : NetworkBehaviour
 {
-    
+    [SerializeField] private PlayerManager playerManager;
+    [SerializeField] private HexGrid hexGrid;
     [SerializeField] private Hex hex;
     public Hex Hex {get => hex; set {hex = value;}}
     [SerializeField] private GameObject canvas;
@@ -43,8 +44,7 @@ public class Unit : MonoBehaviour
     {
         if(Side == Side.Enemy) return;
         // HideSight(hex);
-        sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance);
-        HexGrid hexGrid = HexGrid.Instance;
+        sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
         foreach (var item in sightRange.GetRangeSight())
         {
             if(hexGrid.GetTileAt(item) != null)
@@ -59,8 +59,7 @@ public class Unit : MonoBehaviour
     {
         if(Side == Side.Enemy) return;
         HideSight(hex);
-        sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance);
-        HexGrid hexGrid = HexGrid.Instance;
+        sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
         foreach (var item in sightRange.GetRangeSight())
         {
 
@@ -74,9 +73,9 @@ public class Unit : MonoBehaviour
     }
     public void HideSight(Hex hex)
     {
+        hexGrid = FindObjectOfType<HexGrid>();
         if(sightRange.sightNodesDict == null) return;
         if(Side == Side.Enemy) return;
-        HexGrid hexGrid = HexGrid.Instance;
         foreach (var item in sightRange.sightNodesDict)
         {
             Hex hex1 = hexGrid.GetTileAt(item.Key);
@@ -84,18 +83,20 @@ public class Unit : MonoBehaviour
             hex.isVisible = false;
         }
     }
-    private void Awake() {
+    private void Update() {
+        if(Input.GetKeyDown(KeyCode.X))
+        {
+            ShowSight1(hex);
+        }
+    }
+    public override void OnStartAuthority()
+    {
         glowHighlight = GetComponent<GlowHighlight>();
     }
-    
-    private void Start() {
-        // if(TryGetComponent(out Photon.Pun.PhotonView pw))
-        // {
-        //     if(pw.IsMine)
-        //         Select();
-        // }
-        ShowSight1(hex);
+    public override void OnStartClient()
+    {
     }
+   
     
     public int GetCurrentMovementPoints()
     {
@@ -114,6 +115,7 @@ public class Unit : MonoBehaviour
     {
         glowHighlight.ToggleGlow();
     }
+
     internal void MoveThroughPath(List<Vector3> currentPathTemp,List<Hex> currentPath ,Hex lastHex ,bool isMove = true)
     {
         pathPositions = new Queue<Vector3>(currentPathTemp);
@@ -123,6 +125,12 @@ public class Unit : MonoBehaviour
         Vector3 firstTarget = pathPositions.Dequeue();
         Hex firstHex = pathHexes.Dequeue();
         StartCoroutine(RotationCoroutine(firstTarget,firstHex,lastHex,rotationDuration,isMove));
+    }
+    [ClientRpc] private void RPCSetHex(Hex hex,Hex prevHex)
+    {
+        prevHex.Unit = null;
+        this.Hex = hex;
+        hex.Unit = this;
     }
     private IEnumerator RotationCoroutine(Vector3 endPos,Hex endHex,Hex hex, float rotationDuration,bool isMove = true)
     {
@@ -175,6 +183,10 @@ public class Unit : MonoBehaviour
         // }
         
     }
+    [Command] private void CMDSetHex(Hex hex,Hex prevHex)
+    {
+        RPCSetHex(hex,prevHex);
+    }
     private IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex)
     {
         Vector3 startPos = transform.position;
@@ -192,10 +204,13 @@ public class Unit : MonoBehaviour
             yield return null;
         }
 
-        Hex = endHex;
+        CMDSetHex(endHex,Hex);
+        // this.Hex = endHex;
+        
         transform.position = endPos;
         // HexChanges?.Invoke(endHex);
-        PlayerManager.Instance.SightAllUnits();
+        playerManager = FindObjectOfType<PlayerManager>();
+        playerManager.SightAllUnits();
 
         
         if(pathPositions.Count > 0)

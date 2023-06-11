@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class GlowHighlight : MonoBehaviour
+using Mirror;
+public class GlowHighlight : NetworkBehaviour
 {
     Dictionary<Renderer,Material[]> glowMaterialDict = new Dictionary<Renderer, Material[]>(); 
     Dictionary<Renderer,Material[]> enemyGlowMaterialDict = new Dictionary<Renderer, Material[]>(); 
@@ -13,11 +13,14 @@ public class GlowHighlight : MonoBehaviour
     public Material glowMaterial,enemyGlowMaterial,rangeGlowMaterial;
     private bool isGlowing = false;
     private Color validSpaceColor = Color.green;
-    private Color originalGlowColor,enemyGlowColor,rangeGlowColor;
-    private void Awake() {  
+    [SerializeField] private Color originalGlowColor,enemyGlowColor,rangeGlowColor;
+    public override void OnStartClient()
+    {
         PrepareMaterialDictionaries();
         originalGlowColor = glowMaterial.GetColor("_GlowColor");
         enemyGlowColor = enemyGlowMaterial.GetColor("_GlowColor");
+    }
+    private void Awake() {  
     }
     private void PrepareMaterialDictionaries()
     {

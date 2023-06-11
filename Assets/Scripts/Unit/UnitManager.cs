@@ -107,7 +107,7 @@ public class UnitManager : MonoBehaviour
         this.selectedUnit.Select();
 
         unitReference.OpenCanvas();
-        movementSystem.ShowRange(this.selectedUnit, this.hexGrid);
+        movementSystem.ShowRange(this.selectedUnit);
         attackSystem.ShowRange(selectedUnit);
     }
 
@@ -117,7 +117,7 @@ public class UnitManager : MonoBehaviour
         selectedUnit.CloseCanvas();
         previouslySelectedHex = null;
         this.selectedUnit.Deselect();
-        movementSystem.HideRange(this.hexGrid);
+        movementSystem.HideRange();
         attackSystem.HideRange();
         this.selectedUnit = null;
 

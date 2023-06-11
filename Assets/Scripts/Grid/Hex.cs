@@ -2,23 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using Mirror;
 [SelectionBase]
-public class Hex : MonoBehaviour
+public class Hex : NetworkBehaviour
 {
     public bool isVisible;
     [SerializeField] private Unit unit;
     [SerializeField] private Building building;
     [SerializeField] private GlowHighlight highlight;
     [SerializeField] private HexType hexType;
-    private HexCoordinates hexCoordinates;
-    public Building Building {get=>building;}
+    [SerializeField] private HexCoordinates hexCoordinates;
+    public Building Building {get=>building; set {building = value;}}
     public Unit Unit {get => unit;  set{unit = value;}}
     public Vector3Int HexCoordinates => hexCoordinates.GetHexCoords();
-    private void Awake() {
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
         hexCoordinates = GetComponent<HexCoordinates>();
         highlight = GetComponent<GlowHighlight>();
     }
+ 
     public int GetCost()
         =>hexType switch
         {

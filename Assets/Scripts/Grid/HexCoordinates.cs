@@ -1,16 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class HexCoordinates : MonoBehaviour
+using Mirror;
+public class HexCoordinates : NetworkBehaviour
 {
     
     public static float xOffset = 2f, yOffset = 1,zOffset = 1.73f; // gridin buyukluklerı
     [Header("Offset coordinates")]
     [SerializeField] Vector3Int offsetCoordinates; // index
-
-    private void Awake() {
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
         offsetCoordinates = ConverPositionToOffset(transform.position);
+    }
+    private void Awake() {
     }
     internal Vector3Int GetHexCoords()
         => offsetCoordinates;

@@ -5,6 +5,7 @@ using Mirror;
 
 public class Building : NetworkBehaviour
 {
+    [SerializeField] private PlayerManager playerManager;
     [SerializeField] private GameObject mc1;
     public Hex Hex;
     [SerializeField] private GameObject canvas;
@@ -23,69 +24,51 @@ public class Building : NetworkBehaviour
     {
         canvas.SetActive(false);
 
+    
     }
-    public override void OnStartClient()
+    [ClientRpc] private void RPCSetHex(Unit unit,Hex hex)
     {
-        base.OnStartClient();
-        // Debug.Log(PlayerManager.Instance.connectionToClient);
+        unit.Hex = hex;
+        hex.Unit = unit;
+    }
+    [TargetRpc] private void AddLiveUnits(Unit unit)
+    {
+        playerManager = FindObjectOfType<PlayerManager>();
+        Debug.Log(playerManager + " " + unit);
+        playerManager.liveUnits.Add(unit);
+    }
+    [Command]
+    private void CMDCreateMC1()
+    {
+        Unit unit = Instantiate(mc1,transform.position,Quaternion.identity).GetComponent<Unit>();
+        unit.Hex = Hex;
+        // RPCSetHex(unit,Hex);
+        NetworkServer.Spawn(unit.gameObject,connectionToClient);
+        AddLiveUnits(unit);
+        RPCCreateMC1(unit);
+    }
+    [ClientRpc]
+    private void RPCCreateMC1(Unit unit)
+    {
+        unit.Hex = Hex;
+        unit.Hex.Unit = unit;
+        if(unit.isOwned)
+        {
+            unit.SetSide(Side.Me);
+        }
+        else
+        {
+            unit.SetSide(Side.Enemy);
+
+        }
     }
     public void CreateMC1OnClick()
     {
+        CMDCreateMC1();
         if(!isOwned)
         {
             // NetworkServer.AddPlayerForConnection(PlayerManager.Instance.connectionToClient,this.gameObject);
         }
         if(!isLocalPlayer) return;
-        
-        // Unit unit = PhotonNetwork.Instantiate("MC1",transform.position,Quaternion.identity,0,null).GetComponent<Unit>();
-        // unit.SetSide(side);
-        // unit.Hex = Hex;
-        // unit.GetComponent<PhotonView>().Owner.NickName = GameManager.Instance.NickName;
-        // // unit.gameObject.GetComponent<PhotonView>().RPC("AssignSideForOtherPlayers",RpcTarget.All,null);
-        // AssignSideForOtherPlayers();
-        // qwe();
-    }
-    [Command]
-    public void AssignClient(NetworkConnectionToClient conn)
-    {
-        // Debug.Log(pm.connectionToClient + " connectionToClient");
-        NetworkServer.ReplacePlayerForConnection(PlayerManager.Instance.connectionToClient,this.gameObject);
-    }
-
-    public void qwe()
-    {
-        CMDCreateMC1();
-    }
-    
-    
-    [Server]
-    public void CreateMC1Server()
-    {
-        Unit unit = Instantiate(mc1,transform.position,Quaternion.identity).GetComponent<Unit>();
-        unit.Hex = Hex;
-        NetworkServer.Spawn(unit.gameObject,connectionToServer);
-    }
-    [Command]
-    public void CreateMC1Client()
-    {
-        Unit unit = Instantiate(mc1,transform.position,Quaternion.identity).GetComponent<Unit>();
-        unit.Hex = Hex;
-        NetworkServer.Spawn(unit.gameObject,connectionToServer);
-    }
-    
-    private void CMDCreateMC1()
-    {
-        NetworkIdentity networkIdentity = NetworkClient.connection.identity;
-        if(networkIdentity.isServer)
-        {
-            CreateMC1Server();
-        }
-
-        else
-        {
-            CreateMC1Client();
-        }
-        PlayerManager playerManager = networkIdentity.GetComponent<PlayerManager>();
-        
     }
 }

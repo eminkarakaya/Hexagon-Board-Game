@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class GameManager : SingletonMirror<GameManager>
+public class GameManager : NetworkBehaviour
 {
     [SyncVar] public  List<GameObject> buildingGO;
      public List<Hex > hexes;

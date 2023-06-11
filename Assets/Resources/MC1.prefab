@@ -97,9 +97,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2780b4d541220dd4d827784fc6d14d5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   glowMaterial: {fileID: 2100000, guid: d0782b5e0de9f244488f58f05ce43205, type: 2}
   enemyGlowMaterial: {fileID: 2100000, guid: 09b3855e0dfa95a4781907d5c50f2966, type: 2}
   rangeGlowMaterial: {fileID: 2100000, guid: 2235f5ac89c0ddf47a6535bf0548659b, type: 2}
+  originalGlowColor: {r: 0, g: 0, b: 0, a: 0}
+  enemyGlowColor: {r: 0, g: 0, b: 0, a: 0}
+  rangeGlowColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &1113163169887892027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,6 +118,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 201564487d66f7d49839d696de744d99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  playerManager: {fileID: 9022679455701560679, guid: b70eca05f5b434345a88f6b75cb4a59d, type: 3}
+  hexGrid: {fileID: 6415209383831887827, guid: 56919fa60e0e44240aa635b8ba3acf71, type: 3}
   hex: {fileID: 0}
   canvas: {fileID: 2154245641234665063}
   side: 0
@@ -2501,7 +2512,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 317.2876, y: -134.54114}
+  m_AnchoredPosition: {x: -140.69992, y: 107.73999}
   m_SizeDelta: {x: -634.5751, y: -269.0823}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5234441483570063622
