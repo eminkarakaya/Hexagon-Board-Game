@@ -8,7 +8,7 @@ public class Building : NetworkBehaviour
     public HP hp;
     [SerializeField] private PlayerManager playerManager;
     [SerializeField] private GameObject mc1;
-    public Hex Hex;
+    [SyncVar] public Hex Hex;
     [SerializeField] private GameObject canvas;
     [SerializeField] private Side side;
     public Side Side {get => side;}

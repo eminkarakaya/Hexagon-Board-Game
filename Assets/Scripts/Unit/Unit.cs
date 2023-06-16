@@ -54,7 +54,7 @@ public class Unit : NetworkBehaviour
         canvas.SetActive(false);
 
     }
-    public void ShowSight1(Hex hex)
+    public void ShowSight(Hex hex)
     {
         if(Side == Side.Enemy) return;
         // HideSight(hex);
@@ -69,22 +69,7 @@ public class Unit : NetworkBehaviour
             }
         }
     }
-    // public void ShowSight(Hex hex)
-    // {
-    //     if(Side == Side.Enemy) return;
-    //     HideSight(hex);
-    //     sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
-    //     foreach (var item in sightRange.GetRangeSight())
-    //     {
 
-    //         if(hexGrid.GetTileAt(item) != null)
-    //         {
-    //             Hex hex1 = hexGrid.GetTileAt(item);
-    //             hex1.OpenLinkedObjectSight();
-    //             hex1.isVisible=true;
-    //         }
-    //     }
-    // }
     public void HideSight(Hex hex)
     {
         hexGrid = FindObjectOfType<HexGrid>();
@@ -95,7 +80,8 @@ public class Unit : NetworkBehaviour
         // if(Side == Side.Enemy) return;
         foreach (var item in sightRange.sightNodesDict)
         {
-            
+            Hex [] hexes = FindObjectsOfType<Hex>();
+           
             Hex hex1 = hexGrid.GetTileAt(item.Key);
             hex1.CloseLinkedObjectSight();
             hex.isVisible = false;
@@ -104,7 +90,6 @@ public class Unit : NetworkBehaviour
    
     public override void OnStartAuthority()
     {
-        // glowHighlight = GetComponent<GlowHighlight>();
         outline = GetComponent<Outline>();
     }
     public override void OnStartClient()
@@ -123,13 +108,11 @@ public class Unit : NetworkBehaviour
     internal void Deselect()
     {
         outline.enabled = false;
-        // glowHighlight.ToggleGlow(false);
         
     }
     internal void Select()
     {
         outline.enabled = true;
-        // glowHighlight.ToggleGlow();
     }
 
     internal void MoveThroughPath(List<Vector3> currentPathTemp,List<Hex> currentPath ,Hex lastHex ,bool isMove = true)
@@ -196,12 +179,7 @@ public class Unit : NetworkBehaviour
                 }
             MovementFinished?.Invoke(this);
         }
-        // if(pathPositions.Count == 0)
-        // {
-        //    if(TryGetComponent(out Melee melee))
-        //             melee.AttackUnit(hex.Unit);
-        // }
-        
+
     }
     
     [Command] private void CMDSetHex(Hex hex,Hex prevHex)
@@ -227,11 +205,11 @@ public class Unit : NetworkBehaviour
 
         playerManager = FindObjectOfType<PlayerManager>();
         playerManager.CMDHideAllUnits();
+        
         CMDSetHex(endHex,Hex);
         this.Hex = endHex;
         
         transform.position = endPos;
-        // HexChanges?.Invoke(endHex);
         playerManager.CMDShowAllUnits();
 
         

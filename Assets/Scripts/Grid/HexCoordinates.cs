@@ -11,9 +11,9 @@ public class HexCoordinates : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        offsetCoordinates = ConverPositionToOffset(transform.position);
     }
     private void Awake() {
+        offsetCoordinates = ConverPositionToOffset(transform.position);
     }
     internal Vector3Int GetHexCoords()
         => offsetCoordinates;

@@ -16,10 +16,9 @@ public class Hex : NetworkBehaviour
     public Building Building {get=>building; set {building = value;}}
     public Unit Unit {get => unit;  set{unit = value;}}
     public Vector3Int HexCoordinates => hexCoordinates.GetHexCoords();
-   
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
+    
+    private void Awake() {
+        
         hexCoordinates = GetComponent<HexCoordinates>();
         highlight = GetComponent<GlowHighlight>();
     }

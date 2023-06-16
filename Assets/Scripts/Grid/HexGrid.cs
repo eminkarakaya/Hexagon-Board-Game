@@ -4,31 +4,13 @@ using UnityEngine;
 using Mirror;
 public class HexGrid : NetworkBehaviour
 {
-    Dictionary<Vector3Int,Hex> hexTileDict = new Dictionary<Vector3Int, Hex>();
+    public Dictionary<Vector3Int,Hex> hexTileDict = new Dictionary<Vector3Int, Hex>();
     Dictionary<Vector3Int , List<Vector3Int>> hexTileNeighboursDict = new Dictionary<Vector3Int, List<Vector3Int>>();
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-    }
     private void Start() {
         
-    }
-    private void Update() {
-        if(Input.GetKeyDown(KeyCode.Space))
+        foreach (Hex hex in FindObjectsOfType<Hex>()) // dic e hexlerı atıyoruz
         {
-
-            foreach (Hex hex in FindObjectsOfType<Hex>()) // dic e hexlerı atıyoruz
-            {
-                hexTileDict[hex.HexCoordinates] = hex;
-            }
-        }
-    }
-    public void VisibleOff()
-    {
-        foreach (var item in hexTileDict.Values)
-        {
-            item.isVisible = false;
+            hexTileDict[hex.HexCoordinates] = hex;
         }
     }
     public void CloseVisible()

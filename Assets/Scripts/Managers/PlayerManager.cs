@@ -30,39 +30,43 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
             if(!isLocalPlayer)
-                        return;
-                if(isServer)
+                return;
+            
+            CMDCreateBuilding();
+            
+        }
+    }
+    private void Start() {
+        
+        PlayerManager[] objs = FindObjectsOfType<PlayerManager>();
+            for (int i = 0; i < objs.Length; i++)
+            {
+                if(objs[i].isOwned == false)
                 {
-                    CreateBuilding();
+                    Destroy(objs[i]);
                 }
                 else
                 {
-                    CMDCreateBuilding(); 
+                    DontDestroyOnLoad(objs[i]);
+
                 }
-        }
+            }
+
+            if(!isLocalPlayer)
+                return;
+            
+            CMDCreateBuilding();
     }
-    
-    [Command]
-    private void CreateBuilding()
+
+    public override void OnStartClient()
     {
-        gameManager = FindObjectOfType<GameManager>();
-        int i = gameManager.buildings.Count-1;
-        if(i == -1)
-        {
-            i = 0;
-        }
-        Building unit = Instantiate(buildingPrefab,gameManager.hexes[i]. transform.position,Quaternion.identity).GetComponent<Building>();
-        NetworkServer.Spawn(unit.gameObject,connectionToClient);
-        RPCCreateBuilding(unit);
-      
+
     }
-   
     
     [Command] // client -> server
     private void CMDCreateBuilding()
     {
         gameManager = FindObjectOfType<GameManager>();
-        // gameManager.buildings.Add(null);
         int i = gameManager.buildings.Count-1;
         if(i == -1)
         {
@@ -71,9 +75,7 @@ public class PlayerManager : NetworkBehaviour
         AssignBuildings();
         Building unit = Instantiate(buildingPrefab).GetComponent<Building>();
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
-        
-
-        // team = gameManager.buildings.Count-1;
+    
         RPCCreateBuilding(unit);
     }
     
@@ -95,12 +97,9 @@ public class PlayerManager : NetworkBehaviour
         unit.transform.rotation = Quaternion.Euler(-90,0,0); 
         unit.Hex = gameManager.hexes[i];
         unit.Hex.Building = unit;
-        // NetworkServer.ReplacePlayerForConnection(connectionToClient,unit.gameObject);
-        // gameManager.buildings.Add(unit);
         foreach (var item in gameManager.buildings)
         {
             if(item == null) continue;
-            // Debug.Log(item);
             if(item.isOwned)
             {
                 item.SetSide(Side.Me,item.GetComponent<Outline>());
@@ -110,40 +109,8 @@ public class PlayerManager : NetworkBehaviour
         }
     }
     
-    public override void OnStartClient()
-    {
-        // base.OnStartClient();
-            // if(!isLocalPlayer)
-            //         return;
-            // if(isServer)
-            // {
-            //     Debug.Log(" server");
-            //     // GetRandom();
-            //     CreateBuilding();
-            // }
-            // else
-            // {
-            //     Debug.Log(" client");
-            //     // CmdGetRandom();   
-            //     CMDCreateBuilding();
-            // }
-    }
-    // public void SightAllUnits()
-    // {
-    //     hexGrid = FindObjectOfType<HexGrid>();
-    //     hexGrid.CloseVisible();
-    //     List<Unit> allUnits = FindObjectsOfType<Unit>().ToList();
-    //     foreach (var item in allUnits)
-    //     {
-    //         Debug.Log(item.Hex + " item.hex");
-    //         item.HideSight(item.Hex);
-    //     }
-    //     foreach (var item in allUnits)
-    //     {
-    //         item.ShowSight1(item.Hex);
-    //         Debug.Log(item.Hex + " item.hex");
-    //     }
-    // }
+
+        
     [Command]
     public void CMDHideAllUnits()
     {
@@ -172,27 +139,7 @@ public class PlayerManager : NetworkBehaviour
         List<Unit> allUnits = FindObjectsOfType<Unit>().ToList();
         foreach (var item in allUnits)
         {
-            item.ShowSight1(item.Hex);
+            item.ShowSight(item.Hex);
         }
     }
-
-    // [ClientRpc]
-    // public void RPCSightAllUnits()
-    // {
-    //     hexGrid = FindObjectOfType<HexGrid>();
-    //     hexGrid.CloseVisible();
-    //     List<Unit> allUnits = FindObjectsOfType<Unit>().ToList();
-    //     foreach (var item in allUnits)
-    //     {
-    //         Debug.Log(item + " hide", item);
-    //         item.HideSight(item.Hex);
-    //     }
-    //     foreach (var item in allUnits)
-    //     {
-    //         Debug.Log(item + " show", item);
-    //         item.ShowSight1(item.Hex);
-    //     }
-    // }
-    
-    
 }
