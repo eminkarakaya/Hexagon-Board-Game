@@ -13,6 +13,7 @@ public class UnitManager : MonoBehaviour
     [SerializeField] private AttackSystem attackSystem;
     [SerializeField] private bool playersTurn = true;
     public bool PlayersTurn { get => playersTurn; private set{} } 
+    
 
     [SerializeField]
     private Unit selectedUnit;
@@ -74,7 +75,12 @@ public class UnitManager : MonoBehaviour
         Hex selectedHex = hexGO.GetComponent<Hex>();
         if(attackSystem.CheckEnemyInRange(selectedHex))
         {
-            selectedUnit.GetComponent<Attack>().AttackUnit(selectedHex.Unit);
+            if(selectedHex.Building != null)
+            {
+                selectedUnit.GetComponent<Attack>().AttackUnit(selectedHex.Building.hp);
+            }
+            else
+                selectedUnit.GetComponent<Attack>().AttackUnit(selectedHex.Unit.hp);
             // selectedUnit.SetCurrentMovementPoints(0);
             ClearOldSelection();
             return;

@@ -21,8 +21,14 @@ public class HexGrid : NetworkBehaviour
             foreach (Hex hex in FindObjectsOfType<Hex>()) // dic e hexlerı atıyoruz
             {
                 hexTileDict[hex.HexCoordinates] = hex;
-                Debug.Log(hex);
             }
+        }
+    }
+    public void VisibleOff()
+    {
+        foreach (var item in hexTileDict.Values)
+        {
+            item.isVisible = false;
         }
     }
     public void CloseVisible()
@@ -30,6 +36,12 @@ public class HexGrid : NetworkBehaviour
         foreach (var item in hexTileDict.Values)
         {
             item.isVisible = false;
+            if(item.Unit != null)
+            {
+            if(item.Unit.Side == Side.Me)
+                continue;
+                item.Unit.HideSight(item);
+            }
         }
     }
     internal Vector3Int GetClosestHex(Vector3 worldPosition)

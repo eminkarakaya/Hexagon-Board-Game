@@ -41,11 +41,7 @@ public class GraphSearch
                 }
             }
         }
-        foreach (var item in allNodes)
-        {
-            Debug.Log(item);
-        
-        }
+       
         return new SightResult{sightNodesDict = allNodes};
     }
     public static BFSResult BfsGetAllRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)

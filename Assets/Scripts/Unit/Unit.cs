@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using TMPro;
 [SelectionBase]
 public class Unit : NetworkBehaviour
 {
+    Outline outline;
+    public HP hp;
     [SerializeField] private PlayerManager playerManager;
     [SerializeField] private HexGrid hexGrid;
     [SerializeField] private Hex hex;
@@ -12,9 +15,18 @@ public class Unit : NetworkBehaviour
     [SerializeField] private GameObject canvas;
     [SerializeField] private Side side;
     public Side Side {get => side;}
-    public void SetSide(Side side)
+    public void SetSide(Side side,Outline outline)
     {
-       this.side = side;
+        this.side = side;
+        if(outline == null) return;
+        if(side == Side.Me)
+        {
+            outline.OutlineColor = Color.white;
+        }
+        else if(side == Side.Enemy)
+        {
+            outline.OutlineColor = Color.red;
+        }
     }
     [SerializeField] private int sightDistance = 2;
     public int SightDistance {get => sightDistance;}
@@ -22,15 +34,17 @@ public class Unit : NetworkBehaviour
     public int MovementPoints {get => _movementPoints;}
     [SerializeField] private int _currentMovementPoints = 20;
     [SerializeField] private float movementDuration = 1, rotationDuration = .3f;
-    private GlowHighlight glowHighlight;
     private Queue<Vector3> pathPositions = new Queue<Vector3>();
     private Queue<Hex> pathHexes = new Queue<Hex>();
-    public event System.Action<Hex> HexChanges;
     public event System.Action<Unit> MovementFinished;    
     
     [SerializeField] private List<GameObject> sight;
     public List<GameObject> Sight{get => sight;}
     SightResult sightRange;
+    private void Start() {
+        hp = GetComponent<HP>();
+        
+    }
     public void OpenCanvas()
     {
         canvas.SetActive(true);
@@ -55,43 +69,43 @@ public class Unit : NetworkBehaviour
             }
         }
     }
-    public void ShowSight(Hex hex)
-    {
-        if(Side == Side.Enemy) return;
-        HideSight(hex);
-        sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
-        foreach (var item in sightRange.GetRangeSight())
-        {
+    // public void ShowSight(Hex hex)
+    // {
+    //     if(Side == Side.Enemy) return;
+    //     HideSight(hex);
+    //     sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
+    //     foreach (var item in sightRange.GetRangeSight())
+    //     {
 
-            if(hexGrid.GetTileAt(item) != null)
-            {
-                Hex hex1 = hexGrid.GetTileAt(item);
-                hex1.OpenLinkedObjectSight();
-                hex1.isVisible=true;
-            }
-        }
-    }
+    //         if(hexGrid.GetTileAt(item) != null)
+    //         {
+    //             Hex hex1 = hexGrid.GetTileAt(item);
+    //             hex1.OpenLinkedObjectSight();
+    //             hex1.isVisible=true;
+    //         }
+    //     }
+    // }
     public void HideSight(Hex hex)
     {
         hexGrid = FindObjectOfType<HexGrid>();
-        if(sightRange.sightNodesDict == null) return;
-        if(Side == Side.Enemy) return;
+        if(sightRange.sightNodesDict == null) 
+        {
+            sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
+        }
+        // if(Side == Side.Enemy) return;
         foreach (var item in sightRange.sightNodesDict)
         {
+            
             Hex hex1 = hexGrid.GetTileAt(item.Key);
             hex1.CloseLinkedObjectSight();
             hex.isVisible = false;
         }
     }
-    private void Update() {
-        if(Input.GetKeyDown(KeyCode.X))
-        {
-            ShowSight1(hex);
-        }
-    }
+   
     public override void OnStartAuthority()
     {
-        glowHighlight = GetComponent<GlowHighlight>();
+        // glowHighlight = GetComponent<GlowHighlight>();
+        outline = GetComponent<Outline>();
     }
     public override void OnStartClient()
     {
@@ -108,12 +122,14 @@ public class Unit : NetworkBehaviour
     }
     internal void Deselect()
     {
-        glowHighlight.ToggleGlow(false);
+        outline.enabled = false;
+        // glowHighlight.ToggleGlow(false);
         
     }
     internal void Select()
     {
-        glowHighlight.ToggleGlow();
+        outline.enabled = true;
+        // glowHighlight.ToggleGlow();
     }
 
     internal void MoveThroughPath(List<Vector3> currentPathTemp,List<Hex> currentPath ,Hex lastHex ,bool isMove = true)
@@ -171,9 +187,13 @@ public class Unit : NetworkBehaviour
             transform.rotation = endRotation;
 
             if(TryGetComponent(out Attack attack))
-            {
-                attack.AttackUnit(hex.Unit);
-            }
+                {
+                    if(hex.Building != null)
+                        attack.AttackUnit(hex.Building.hp);
+                    else
+                        attack.AttackUnit(hex.Unit.hp);
+
+                }
             MovementFinished?.Invoke(this);
         }
         // if(pathPositions.Count == 0)
@@ -183,6 +203,7 @@ public class Unit : NetworkBehaviour
         // }
         
     }
+    
     [Command] private void CMDSetHex(Hex hex,Hex prevHex)
     {
         RPCSetHex(hex,prevHex);
@@ -204,13 +225,14 @@ public class Unit : NetworkBehaviour
             yield return null;
         }
 
+        playerManager = FindObjectOfType<PlayerManager>();
+        playerManager.CMDHideAllUnits();
         CMDSetHex(endHex,Hex);
-        // this.Hex = endHex;
+        this.Hex = endHex;
         
         transform.position = endPos;
         // HexChanges?.Invoke(endHex);
-        playerManager = FindObjectOfType<PlayerManager>();
-        playerManager.SightAllUnits();
+        playerManager.CMDShowAllUnits();
 
         
         if(pathPositions.Count > 0)
@@ -235,7 +257,13 @@ public class Unit : NetworkBehaviour
                 }
                 transform.rotation = endRotation;
                 if(TryGetComponent(out Attack attack))
-                    attack.AttackUnit(hex.Unit);
+                {
+                    if(hex.Building != null)
+                        attack.AttackUnit(hex.Building.hp);
+                    else
+                        attack.AttackUnit(hex.Unit.hp);
+
+                }
             }
         }
     }

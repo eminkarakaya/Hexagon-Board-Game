@@ -6,6 +6,7 @@ using Mirror;
 [SelectionBase]
 public class Hex : NetworkBehaviour
 {
+    
     public bool isVisible;
     [SerializeField] private Unit unit;
     [SerializeField] private Building building;
@@ -15,6 +16,7 @@ public class Hex : NetworkBehaviour
     public Building Building {get=>building; set {building = value;}}
     public Unit Unit {get => unit;  set{unit = value;}}
     public Vector3Int HexCoordinates => hexCoordinates.GetHexCoords();
+   
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -64,7 +66,7 @@ public class Hex : NetworkBehaviour
     }
     public bool IsEnemy()
     {
-        return ( unit != null && Unit.Side == Side.Enemy);
+        return ((unit != null && Unit.Side == Side.Enemy) || (building != null && building.Side == Side.Enemy));
     }
     public bool IsBuilding()
     {

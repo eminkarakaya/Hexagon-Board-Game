@@ -3,19 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class Building : NetworkBehaviour
+public class Building : NetworkBehaviour 
 {
+    public HP hp;
     [SerializeField] private PlayerManager playerManager;
     [SerializeField] private GameObject mc1;
     public Hex Hex;
     [SerializeField] private GameObject canvas;
     [SerializeField] private Side side;
     public Side Side {get => side;}
-    public void SetSide(Side side)
-    {
-        
-       this.side = side;
+    private void Start() {
+        hp = GetComponent<HP>();
     }
+    public void SetSide(Side side,Outline outline)
+    {
+        this.side = side;
+        if(outline == null) return;
+        if(side == Side.Me)
+        {
+            outline.OutlineColor = Color.white;
+        }
+        else if(side == Side.Enemy)
+        {
+            outline.OutlineColor = Color.red;
+        }
+    }
+   
     public void OpenCanvas()
     {
         canvas.SetActive(true);
@@ -34,8 +47,11 @@ public class Building : NetworkBehaviour
     [TargetRpc] private void AddLiveUnits(Unit unit)
     {
         playerManager = FindObjectOfType<PlayerManager>();
-        Debug.Log(playerManager + " " + unit);
         playerManager.liveUnits.Add(unit);
+        HexGrid hexGrid = FindObjectOfType<HexGrid>();
+        // hexGrid.CloseVisible();
+        unit.Hex = Hex;
+        
     }
     [Command]
     private void CMDCreateMC1()
@@ -44,8 +60,8 @@ public class Building : NetworkBehaviour
         unit.Hex = Hex;
         // RPCSetHex(unit,Hex);
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
-        AddLiveUnits(unit);
         RPCCreateMC1(unit);
+        AddLiveUnits(unit);
     }
     [ClientRpc]
     private void RPCCreateMC1(Unit unit)
@@ -54,21 +70,19 @@ public class Building : NetworkBehaviour
         unit.Hex.Unit = unit;
         if(unit.isOwned)
         {
-            unit.SetSide(Side.Me);
+            unit.SetSide(Side.Me,unit.GetComponent<Outline>());
         }
         else
         {
-            unit.SetSide(Side.Enemy);
-
+            unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
         }
+        playerManager = FindObjectOfType<PlayerManager>();
+
+        playerManager.CMDHideAllUnits();
+        playerManager.CMDShowAllUnits();
     }
     public void CreateMC1OnClick()
     {
         CMDCreateMC1();
-        if(!isOwned)
-        {
-            // NetworkServer.AddPlayerForConnection(PlayerManager.Instance.connectionToClient,this.gameObject);
-        }
-        if(!isLocalPlayer) return;
     }
 }

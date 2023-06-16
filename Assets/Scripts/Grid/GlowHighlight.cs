@@ -16,17 +16,17 @@ public class GlowHighlight : NetworkBehaviour
     [SerializeField] private Color originalGlowColor,enemyGlowColor,rangeGlowColor;
     public override void OnStartClient()
     {
+    }
+    private void Awake() {  
         PrepareMaterialDictionaries();
         originalGlowColor = glowMaterial.GetColor("_GlowColor");
         enemyGlowColor = enemyGlowMaterial.GetColor("_GlowColor");
-    }
-    private void Awake() {  
     }
     private void PrepareMaterialDictionaries()
     {
         foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
         {
-            Material [] originalMaterials = renderer.materials;                 // once ilk materyallerını orıgınal materıale atıyoruz
+            Material [] originalMaterials = renderer.materials;              // once ilk materyallerını orıgınal materıale atıyoruz
             originalMaterialDict.Add(renderer,originalMaterials);               // dict e atıyorz
             Material [] newMaterials = new Material[renderer.materials.Length]; // yenı materıal olusturuyoruz
             Material [] enemyMaterials = new Material[renderer.materials.Length];
