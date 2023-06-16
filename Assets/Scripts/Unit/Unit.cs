@@ -10,7 +10,7 @@ public class Unit : NetworkBehaviour
     public HP hp;
     [SerializeField] private PlayerManager playerManager;
     [SerializeField] private HexGrid hexGrid;
-    [SerializeField] private Hex hex;
+    [SyncVar] [SerializeField] private Hex hex;
     public Hex Hex {get => hex; set {hex = value;}}
     [SerializeField] private GameObject canvas;
     [SerializeField] private Side side;
@@ -205,13 +205,14 @@ public class Unit : NetworkBehaviour
 
         playerManager = FindObjectOfType<PlayerManager>();
         playerManager.CMDHideAllUnits();
+        CMDHide();
         
         CMDSetHex(endHex,Hex);
         this.Hex = endHex;
         
         transform.position = endPos;
         playerManager.CMDShowAllUnits();
-
+        CMDShow();
         
         if(pathPositions.Count > 0)
         {
@@ -244,6 +245,29 @@ public class Unit : NetworkBehaviour
                 }
             }
         }
+    }
+  
+    [Command]
+    private void CMDShow()
+    {
+        RPCShow();
+    }
+    [ClientRpc]
+    private void RPCShow()
+    {
+        MovementSystem.Instance.RPCShowRange(UnitManager.Instance.selectedUnit,this);
+
+    }
+    [ClientRpc]
+    private void RPCHide()
+    {
+        MovementSystem.Instance.RPCHideRange(this);   
+        
+    }
+    [Command]
+    private void CMDHide()
+    {  
+        RPCHide();
     }
 }
 public enum Side

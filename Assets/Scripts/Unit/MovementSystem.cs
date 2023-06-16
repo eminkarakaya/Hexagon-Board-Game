@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-public class MovementSystem : MonoBehaviour
+using Mirror;
+public class MovementSystem : SingletonMirror<MovementSystem>
 {
+    
     [SerializeField] private HexGrid hexGrid;
     public float h;
     public BFSResult movementRange = new BFSResult();
@@ -20,8 +22,47 @@ public class MovementSystem : MonoBehaviour
         }
         movementRange = new BFSResult();
     }
+    
+    public void RPCHideRange(Unit unit)
+    {
+         if(!UnitManager.Instance.selectedUnit == unit)
+        {
+            return;
+        }
+        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        {
+            hexGrid.GetTileAt(hexPosition).DisableHighligh();
+        }
+        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
+        {
+            hexGrid.GetTileAt(hexPosition).DisableHighlighEnemy();
+        }
+        movementRange = new BFSResult();
+    }
+
     public void ShowRange(Unit selectedUnit)
     {
+        CalculateRange(selectedUnit,hexGrid);
+        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.transform.position);
+        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        {
+            if(unitPos == hexPosition) continue;
+            hexGrid.GetTileAt(hexPosition).EnableHighligh();
+        }
+        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
+        {
+            // hexGrid.GetTileAt(hexPosition).
+            hexGrid.GetTileAt(hexPosition).EnableHighlighEnemy();
+        }
+        
+    }
+    
+    public void RPCShowRange(Unit selectedUnit, Unit unit)
+    {
+        if(!UnitManager.Instance.selectedUnit == unit)
+        {
+            return;
+        }
         CalculateRange(selectedUnit,hexGrid);
         Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.transform.position);
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())

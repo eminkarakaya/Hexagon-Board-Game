@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-
-public class UnitManager : MonoBehaviour
+using Mirror;
+public class UnitManager : SingletonMirror<UnitManager>
 {
     [SerializeField]
     private HexGrid hexGrid;
@@ -16,8 +16,9 @@ public class UnitManager : MonoBehaviour
     
 
     [SerializeField]
-    private Unit selectedUnit;
+    public Unit selectedUnit;
     private Hex previouslySelectedHex;
+    
 
     public void HandleUnitSelected(GameObject unit)
     {
@@ -111,7 +112,6 @@ public class UnitManager : MonoBehaviour
 
         this.selectedUnit = unitReference;
         this.selectedUnit.Select();
-
         unitReference.OpenCanvas();
         movementSystem.ShowRange(this.selectedUnit);
         attackSystem.ShowRange(selectedUnit);
