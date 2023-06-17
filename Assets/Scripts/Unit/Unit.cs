@@ -284,8 +284,11 @@ public class Unit : NetworkBehaviour
     }
     public void ChangeHex(Unit firstUnit,Unit targetUnit)
     {
-       
-       
+        // BFSResult result = GraphSearch.GetRange(hexGrid,targetUnit.hex.HexCoordinates,targetUnit.MovementPoints);
+
+        if(MovementSystem.Instance.IsHexInRange(firstUnit.hex.HexCoordinates) && MovementSystem.Instance.IsHexInRange(targetUnit.hex.HexCoordinates,firstUnit.hex.HexCoordinates,targetUnit.GetCurrentMovementPoints()))
+        {
+
         Vector3 startPos = firstUnit.hex.transform.position;
         startPos.y = 1;
         Vector3 endPos = targetUnit.hex.transform.position;
@@ -304,6 +307,7 @@ public class Unit : NetworkBehaviour
         
         playerManager.CMDShowAllUnits();
         CMDShow();
+        }   
         
     }
     private IEnumerator RotationUnit(Unit firstUnit,Unit targetUnit,Vector3 endPos,Vector3 startPos, float rotationDuration)

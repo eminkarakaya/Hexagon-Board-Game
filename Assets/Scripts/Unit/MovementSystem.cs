@@ -183,13 +183,11 @@ public class MovementSystem : SingletonMirror<MovementSystem>
         {
             if(currentPath.Count == 0 && hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy)
             {
-                Debug.Log("234");
                 selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,false);
             }
             
             else
             {
-                Debug.Log("23");
                 selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex);
             }
 
@@ -198,19 +196,16 @@ public class MovementSystem : SingletonMirror<MovementSystem>
         {
             if(currentPath.Count == 0 && hex.Unit != null && hex.Unit.Side == Side.Me)
             {
-                Debug.Log("0");
                 selectedUnit.ChangeHex(selectedUnit,hex.Unit);
                 return;
             }
             else
             {
-                Debug.Log("1");
                 selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex);
             }
         }
         else
         {
-                Debug.Log("2");
             selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex);
         }
     }
