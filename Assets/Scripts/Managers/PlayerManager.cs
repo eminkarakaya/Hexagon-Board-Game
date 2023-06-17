@@ -96,20 +96,21 @@ public class PlayerManager : NetworkBehaviour
     {
         hexGrid = FindObjectOfType<HexGrid>();
         hexGrid.CloseVisible();
-        List<Unit> allUnits = FindObjectsOfType<Unit>().ToList();
+        List<Sight> allUnits = FindObjectsOfType<Sight>().ToList();
         foreach (var item in allUnits)
         {
-            item.HideSight(item.Hex);
+            item.HideSight(item.unit.Hex);
         }
     }
     [ClientRpc] private void ShowAllUnits()
     {
+        
         hexGrid = FindObjectOfType<HexGrid>();
         hexGrid.CloseVisible();
-        List<Unit> allUnits = FindObjectsOfType<Unit>().ToList();
+        List<Sight> allUnits = FindObjectsOfType<Sight>().Where(x=>x.isOwned == true).ToList();
         foreach (var item in allUnits)
         {
-            item.ShowSight(item.Hex);
+            item.ShowSight(item.unit.Hex);
         }
     }
 }

@@ -15,7 +15,7 @@ public class AttackSystem : MonoBehaviour
     }
     public void ShowRange(Unit selectedUnit)
     {
-        if(selectedUnit.GetCurrentMovementPoints() == 0) return;
+        if(selectedUnit.GetComponent<Movement>().GetCurrentMovementPoints() == 0) return;
         GetRange(selectedUnit);
         foreach (var item in rangeInfo.rangeNodesDict)
         {

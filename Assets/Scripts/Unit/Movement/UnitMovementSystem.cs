@@ -1,87 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
-using Mirror;
-public class MovementSystem : SingletonMirror<MovementSystem>
+using UnityEngine;
+
+public class UnitMovementSystem : MovementSystem
 {
     
-    [SerializeField] private HexGrid hexGrid;
-    public float h;
-    public BFSResult movementRange = new BFSResult();
-    [SerializeField] private List<Vector3Int> currentPath = new List<Vector3Int>();
-    public void HideRange()
+    public UnitMovementSystem()
     {
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
-        {
-            hexGrid.GetTileAt(hexPosition).DisableHighligh();
-        }
-        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
-        {
-            hexGrid.GetTileAt(hexPosition).DisableHighlighEnemy();
-        }
-        movementRange = new BFSResult();
-    }
-    
-    public void RPCHideRange(Unit unit)
-    {
-         if(!UnitManager.Instance.selectedUnit == unit)
-        {
-            return;
-        }
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
-        {
-            hexGrid.GetTileAt(hexPosition).DisableHighligh();
-        }
-        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
-        {
-            hexGrid.GetTileAt(hexPosition).DisableHighlighEnemy();
-        }
-        movementRange = new BFSResult();
-    }
-
-    public void ShowRange(Unit selectedUnit)
-    {
-        CalculateRange(selectedUnit,hexGrid);
-        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.transform.position);
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
-        {
-            if(unitPos == hexPosition) continue;
-            hexGrid.GetTileAt(hexPosition).EnableHighligh();
-        }
-        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
-        {
-            // hexGrid.GetTileAt(hexPosition).
-            hexGrid.GetTileAt(hexPosition).EnableHighlighEnemy();
-        }
         
     }
-    
-    public void RPCShowRange(Unit selectedUnit, Unit unit)
+    public override void CalculateRange(Movement selectedUnit,HexGrid hexGrid)
     {
-        if(!UnitManager.Instance.selectedUnit == unit)
-        {
-            return;
-        }
-        CalculateRange(selectedUnit,hexGrid);
-        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.transform.position);
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
-        {
-            if(unitPos == hexPosition) continue;
-            hexGrid.GetTileAt(hexPosition).EnableHighligh();
-        }
-        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
-        {
-            // hexGrid.GetTileAt(hexPosition).
-            hexGrid.GetTileAt(hexPosition).EnableHighlighEnemy();
-        }
-        
-    }
-    public void CalculateRange(Unit selectedUnit,HexGrid hexGrid)
-    {
+        Debug.Log(hexGrid + " hexgrid");
+        Debug.Log(selectedUnit + " selectedUnit");
         movementRange = GraphSearch.BsfGetRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.transform.position),selectedUnit.GetCurrentMovementPoints());
     }
-    public void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid, int range = 1)
+    public override void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid)
     {
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
         if(hex.isVisible)
@@ -95,7 +30,7 @@ public class MovementSystem : SingletonMirror<MovementSystem>
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
                     Vector3Int? enemyHex = null;
-                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,range);
+                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid);
                     foreach (Vector3Int hexPosition in currentPath)
                     {
                         hexGrid.GetTileAt(hexPosition).HighlightPath();                    
@@ -109,6 +44,8 @@ public class MovementSystem : SingletonMirror<MovementSystem>
             }
             else if(hex.Unit != null && hex.Unit.Side == Side.Me)
             {
+                Debug.Log(movementRange + " movementRange " );
+                Debug.Log(selectedHexPosition + " selectedHexPosition " );
                 if(movementRange.GetRangeMePositions().Contains(selectedHexPosition))
                 {
                     foreach (Vector3Int hexPosition in currentPath)
@@ -116,7 +53,7 @@ public class MovementSystem : SingletonMirror<MovementSystem>
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
                     Vector3Int? meHex = null;
-                    currentPath = movementRange.GetPathMeGrid(selectedHexPosition,out meHex,hexGrid,range);
+                    currentPath = movementRange.GetPathMeGrid(selectedHexPosition,out meHex,hexGrid);
                     foreach (Vector3Int hexPosition in currentPath)
                     {
                         hexGrid.GetTileAt(hexPosition).HighlightPath();
@@ -170,7 +107,7 @@ public class MovementSystem : SingletonMirror<MovementSystem>
             }
         }
     }
-    public void MoveUnit(Unit selectedUnit,HexGrid hexGrid, Hex hex,int range = 1)
+    public override void MoveUnit(Movement selectedUnit,HexGrid hexGrid, Hex hex,int range = 1)
     {
         if(selectedUnit.GetCurrentMovementPoints() == 0) 
             return;
@@ -183,12 +120,12 @@ public class MovementSystem : SingletonMirror<MovementSystem>
         {
             if(currentPath.Count == 0 && hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy)
             {
-                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,false);
+                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes , hex,false);
             }
             
             else
             {
-                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex);
+                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes, hex);
             }
 
         }
@@ -196,30 +133,19 @@ public class MovementSystem : SingletonMirror<MovementSystem>
         {
             if(currentPath.Count == 0 && hex.Unit != null && hex.Unit.Side == Side.Me)
             {
-                selectedUnit.ChangeHex(selectedUnit,hex.Unit);
+                selectedUnit.GetComponent<Movement>().ChangeHex(selectedUnit.GetComponent<Movement>(),hex.Unit.GetComponent<Movement>());
                 return;
             }
             else
             {
-                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex);
+                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes, hex);
             }
         }
         else
         {
-            selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex);
+            selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes ,hex);
         }
-    }
-    public bool IsHexInRange(Vector3Int start,Vector3Int hexPosition,int movementPoints)
-    {
-        BFSResult result = GraphSearch.BsfGetRange(hexGrid,start,movementPoints);
-
-        return result.IsHecPositionInRange(hexPosition);
-    }
-    public bool IsHexInRange(Vector3Int hexPosition)
-    {
-        return movementRange.IsHecPositionInRange(hexPosition);
     }
     
     
 }
-

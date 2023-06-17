@@ -22,7 +22,7 @@ public class HexGrid : NetworkBehaviour
             {
             if(item.Unit.Side == Side.Me)
                 continue;
-                item.Unit.HideSight(item);
+                item.Unit.GetComponent<Sight>().HideSight(item);
             }
         }
     }

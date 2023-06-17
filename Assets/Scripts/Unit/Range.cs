@@ -7,7 +7,7 @@ public class Range : Attack
 
     public override void AttackUnit(HP hp)
     {
-        if(GetComponent<Unit>().GetCurrentMovementPoints()==0) return;
+        if(GetComponent<Movement>().GetCurrentMovementPoints()==0) return;
         Debug.Log("range attack to : "  + hp);
     }
 }

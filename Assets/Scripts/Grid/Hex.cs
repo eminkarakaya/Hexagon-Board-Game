@@ -9,10 +9,12 @@ public class Hex : NetworkBehaviour
     
     public bool isVisible;
     [SerializeField] private Unit unit;
+    [SerializeField] private Settler settler;
     [SerializeField] private Building building;
     [SerializeField] private GlowHighlight highlight;
     [SerializeField] private HexType hexType;
     [SerializeField] private HexCoordinates hexCoordinates;
+    public Settler Settler { get; set; }
     public Building Building {get=>building; set {building = value;}}
     public Unit Unit {get => unit;  set{unit = value;}}
     public Vector3Int HexCoordinates => hexCoordinates.GetHexCoords();
@@ -70,7 +72,18 @@ public class Hex : NetworkBehaviour
     public bool IsMe()
     {
         return ((unit != null && Unit.Side == Side.Me) || (building != null && building.Side == Side.Me));
-
+    }
+    public bool IsEnemySettler()
+    {
+        return settler != null && settler.side == Side.Enemy;
+    }
+    public bool IsMeSettler()
+    {
+        return settler != null && settler.side == Side.Me;
+    }
+    public bool IsSettler()
+    {
+        return settler != null;
     }
     public bool IsBuilding()
     {
