@@ -10,32 +10,7 @@ public class PlayerManager : NetworkBehaviour
     [SerializeField] private GameObject buildingPrefab;
     public int team;
     public List<Unit> liveUnits;
-    private void Awake() {
-    }
-    private void Update() {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            PlayerManager[] objs = FindObjectsOfType<PlayerManager>();
-
-            for (int i = 0; i < objs.Length; i++)
-            {
-                if(objs[i].isOwned == false)
-                {
-                    Destroy(objs[i]);
-                }
-                else
-                {
-                    DontDestroyOnLoad(objs[i]);
-
-                }
-            }
-            if(!isLocalPlayer)
-                return;
-            
-            CMDCreateBuilding();
-            
-        }
-    }
+    
     private void Start() {
         
         PlayerManager[] objs = FindObjectsOfType<PlayerManager>();
@@ -56,11 +31,6 @@ public class PlayerManager : NetworkBehaviour
                 return;
             
             CMDCreateBuilding();
-    }
-
-    public override void OnStartClient()
-    {
-
     }
     
     [Command] // client -> server

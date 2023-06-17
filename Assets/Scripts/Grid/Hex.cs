@@ -67,6 +67,11 @@ public class Hex : NetworkBehaviour
     {
         return ((unit != null && Unit.Side == Side.Enemy) || (building != null && building.Side == Side.Enemy));
     }
+    public bool IsMe()
+    {
+        return ((unit != null && Unit.Side == Side.Me) || (building != null && building.Side == Side.Me));
+
+    }
     public bool IsBuilding()
     {
         return (building != null);

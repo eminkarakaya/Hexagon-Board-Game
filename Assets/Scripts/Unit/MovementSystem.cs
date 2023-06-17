@@ -107,7 +107,22 @@ public class MovementSystem : SingletonMirror<MovementSystem>
                     }
                 }
             }
-
+            else if(hex.Unit != null && hex.Unit.Side == Side.Me)
+            {
+                if(movementRange.GetRangeMePositions().Contains(selectedHexPosition))
+                {
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    }
+                    Vector3Int? meHex = null;
+                    currentPath = movementRange.GetPathMeGrid(selectedHexPosition,out meHex,hexGrid,range);
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                    }
+                }
+            }
             else
             {
                 if(movementRange.GetRangePositions().Contains(selectedHexPosition))
@@ -126,18 +141,18 @@ public class MovementSystem : SingletonMirror<MovementSystem>
         }
         else
         {
-                if(movementRange.GetRangePositions().Contains(selectedHexPosition))
+            if(movementRange.GetRangePositions().Contains(selectedHexPosition))
+            {
+                foreach (Vector3Int hexPosition in currentPath)
                 {
-                    foreach (Vector3Int hexPosition in currentPath)
-                    {
-                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
-                    }
-                    currentPath = movementRange.GetPathTo(selectedHexPosition);
-                    foreach (Vector3Int hexPosition in currentPath)
-                    {
-                        hexGrid.GetTileAt(hexPosition).HighlightPath();
-                    }
+                    hexGrid.GetTileAt(hexPosition).ResetHighlight();
                 }
+                currentPath = movementRange.GetPathTo(selectedHexPosition);
+                foreach (Vector3Int hexPosition in currentPath)
+                {
+                    hexGrid.GetTileAt(hexPosition).HighlightPath();
+                }
+            }
         }
     }
     private void OnDrawGizmos() {
@@ -163,27 +178,53 @@ public class MovementSystem : SingletonMirror<MovementSystem>
         
         List<Vector3> currentPathTemp = currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList(); 
         List<Hex> currentHexes = currentPath.Select(pos => hexGrid.GetTileAt(pos)).ToList(); 
-            if(hex.IsEnemy())
+        
+        if(hex.IsEnemy())
+        {
+            if(currentPath.Count == 0 && hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy)
             {
-                if(currentPath.Count == 1 && hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy)
-                {
-                    selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,false);
-                }
-                else
-                {
-                    selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex);
-                }
+                Debug.Log("234");
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,false);
+            }
+            
+            else
+            {
+                Debug.Log("23");
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex);
+            }
 
+        }
+        else if(hex.IsMe())
+        {
+            if(currentPath.Count == 0 && hex.Unit != null && hex.Unit.Side == Side.Me)
+            {
+                Debug.Log("0");
+                selectedUnit.ChangeHex(selectedUnit,hex.Unit);
+                return;
             }
             else
             {
-                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex);
+                Debug.Log("1");
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex);
             }
+        }
+        else
+        {
+                Debug.Log("2");
+            selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex);
+        }
+    }
+    public bool IsHexInRange(Vector3Int start,Vector3Int hexPosition,int movementPoints)
+    {
+        BFSResult result = GraphSearch.BsfGetRange(hexGrid,start,movementPoints);
+
+        return result.IsHecPositionInRange(hexPosition);
     }
     public bool IsHexInRange(Vector3Int hexPosition)
     {
         return movementRange.IsHecPositionInRange(hexPosition);
     }
+    
     
 }
 

@@ -56,6 +56,7 @@ public class Building : NetworkBehaviour
     [Command]
     private void CMDCreateMC1()
     {
+        if(Hex.Unit != null) return;
         Unit unit = Instantiate(mc1,transform.position,Quaternion.identity).GetComponent<Unit>();
         unit.Hex = Hex;
         // RPCSetHex(unit,Hex);

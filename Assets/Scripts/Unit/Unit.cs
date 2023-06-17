@@ -131,6 +131,12 @@ public class Unit : NetworkBehaviour
         this.Hex = hex;
         hex.Unit = this;
     }
+     [ClientRpc] private void RPCChangeHex(Hex hex,Hex prevHex)
+    {
+        Hex tempHex = hex;
+        hex = prevHex;
+        prevHex = tempHex;
+    }
     private IEnumerator RotationCoroutine(Vector3 endPos,Hex endHex,Hex hex, float rotationDuration,bool isMove = true)
     {
         Quaternion startRotation = transform.rotation;
@@ -186,6 +192,10 @@ public class Unit : NetworkBehaviour
     {
         RPCSetHex(hex,prevHex);
     }
+    [Command] private void CMDChangeHex(Hex hex1,Hex hex2)
+    {
+        RPCChangeHex(hex1,hex2);
+    }
     private IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex)
     {
         Vector3 startPos = transform.position;
@@ -194,6 +204,8 @@ public class Unit : NetworkBehaviour
         {
             yield break;
         }
+
+        // Movementstart
         float timeElapsed = 0f;
         while(timeElapsed<movementDuration)
         {
@@ -202,7 +214,13 @@ public class Unit : NetworkBehaviour
             transform.position = Vector3.Lerp(startPos,endPos,lerpStep);
             yield return null;
         }
+        // MovementFinish
 
+
+
+
+
+        // MovementFinishEvents
         playerManager = FindObjectOfType<PlayerManager>();
         playerManager.CMDHideAllUnits();
         CMDHide();
@@ -220,6 +238,7 @@ public class Unit : NetworkBehaviour
         }
         else
         {
+            
             MovementFinished?.Invoke(this);
             if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
@@ -246,7 +265,88 @@ public class Unit : NetworkBehaviour
             }
         }
     }
-  
+    [Command]
+    private void CMDChangeHexes(Hex hex1, Hex hex2)
+    {
+        ChangeHexes(hex1,hex2);
+    }
+
+    [ClientRpc]
+    private void ChangeHexes(Hex hex1, Hex hex2)
+    {
+        Unit tempUnit = hex1.Unit;
+        hex1.Unit = hex2.Unit;
+        hex2.Unit = tempUnit;
+
+
+        hex1.Unit.hex = hex1;
+        hex2.Unit.hex = hex2;   
+    }
+    public void ChangeHex(Unit firstUnit,Unit targetUnit)
+    {
+       
+       
+        Vector3 startPos = firstUnit.hex.transform.position;
+        startPos.y = 1;
+        Vector3 endPos = targetUnit.hex.transform.position;
+        endPos.y = 1;
+        StartCoroutine(RotationUnit(firstUnit,targetUnit,endPos,startPos,rotationDuration));
+        StartCoroutine(RotationUnit(targetUnit,firstUnit,startPos,endPos,rotationDuration));
+        // StartCoroutine(MoveUnit(firstUnit,endPos,startPos,movementDuration));
+        // StartCoroutine(MoveUnit(targetUnit,startPos,endPos,movementDuration));
+        
+        CMDChangeHexes(firstUnit.hex,targetUnit.hex);
+        playerManager = FindObjectOfType<PlayerManager>();
+        playerManager.CMDHideAllUnits();
+        CMDHide();
+        
+        // CMDChangeHex(firstUnit.hex,targetUnit.hex);
+        
+        playerManager.CMDShowAllUnits();
+        CMDShow();
+        
+    }
+    private IEnumerator RotationUnit(Unit firstUnit,Unit targetUnit,Vector3 endPos,Vector3 startPos, float rotationDuration)
+    {
+        Quaternion startRotation = firstUnit.transform.rotation;
+        endPos.y = firstUnit.transform.position.y;
+        Vector3 direction = endPos - firstUnit.transform.position;
+        Quaternion endRotation = Quaternion.LookRotation(direction,Vector3.up);
+
+        // Quaternion startRotation = firstUnit.transform.rotation;
+        // Vector3 endPos = firstUnit.transform.position;
+        // endPos.y = targetUnit.transform.position.y;
+        // Vector3 direction = endPos - firstUnit.transform.position;
+        // Quaternion endRotation = Quaternion.LookRotation(direction,Vector3.up);
+
+        // if(Mathf.Approximately(Mathf.Abs(Quaternion.Dot(startRotation,endRotation)),1f) == false)
+        // {
+            float timeElapsed = 0;
+            while(timeElapsed < rotationDuration)
+            {
+                timeElapsed += Time.deltaTime;
+                float lerpStep = timeElapsed / rotationDuration;
+                firstUnit.transform.rotation = Quaternion.Lerp(startRotation,endRotation,lerpStep);
+                yield return null;
+            }
+            
+            StartCoroutine(MoveUnit(firstUnit,endPos,startPos,movementDuration));
+            
+        // }
+    }
+    private IEnumerator MoveUnit(Unit unit,Vector3 endPos,Vector3 startPos,float movementDuration )
+    {
+        //  startPos = unit.transform.position;
+        float timeElapsed = 0f;
+        while(timeElapsed<movementDuration)
+        {
+            timeElapsed += Time.deltaTime;
+            float lerpStep = timeElapsed / movementDuration;
+            unit.transform.position = Vector3.Lerp(startPos,endPos,lerpStep);
+            yield return null;
+        }
+            
+    }
     [Command]
     private void CMDShow()
     {
