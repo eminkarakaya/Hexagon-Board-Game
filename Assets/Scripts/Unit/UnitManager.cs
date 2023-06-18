@@ -16,7 +16,7 @@ public class UnitManager : SingletonMirror<UnitManager>
 
 
     [SerializeField]
-    public ISelectable selectedUnit;
+    public Unit selectedUnit;
     private Hex previouslySelectedHex;
 
 
@@ -24,7 +24,7 @@ public class UnitManager : SingletonMirror<UnitManager>
     {
         if (PlayersTurn == false)
             return;
-        ISelectable selectableReference = unit.GetComponent<ISelectable>();
+        Unit selectableReference = unit.GetComponent<Unit>();
         if(selectableReference.Side == Side.Enemy)
         {
             return;
@@ -50,7 +50,7 @@ public class UnitManager : SingletonMirror<UnitManager>
         {
         }
     }
-    private bool CheckIfTheSameUnitSelected(ISelectable selectableReference)
+    private bool CheckIfTheSameUnitSelected(Unit selectableReference)
     {
         if (this.selectedUnit == selectableReference)
         {
@@ -103,7 +103,7 @@ public class UnitManager : SingletonMirror<UnitManager>
         //     return;
         // HandleTargetHexSelected(hexGrid.GetTileAt(GraphSearch.GetCloseseteHex(movementSystem.movementRange.allNodesDict,selectedHex.HexCoordinates)));
     }
-    private void PrepareUnitForMovement(ISelectable selectableReference)
+    private void PrepareUnitForMovement(Unit selectableReference)
     {
         if (this.selectedUnit != null)
         {
@@ -111,9 +111,9 @@ public class UnitManager : SingletonMirror<UnitManager>
         }
 
         this.selectedUnit = selectableReference;
-        this.selectedUnit.Select();
+        // this.selectedUnit.Select();
         selectableReference.OpenCanvas();
-        selectedUnit.Select();
+        selectedUnit.LeftClick();
         // attackSystem.ShowRange(selectedUnit);
     }
 
@@ -124,7 +124,7 @@ public class UnitManager : SingletonMirror<UnitManager>
         previouslySelectedHex = null;
         this.selectedUnit.Deselect();
         // movementSystem.HideRange();
-        attackSystem.HideRange();
+        // attackSystem.HideRange();
         this.selectedUnit = null;
 
     }
@@ -134,31 +134,33 @@ public class UnitManager : SingletonMirror<UnitManager>
         if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
         {
             previouslySelectedHex = selectedHex;
-            selectedUnit.Select();
+            // selectedUnit.Select();
+            selectedUnit.RightClick(selectedHex);
             // movementSystem.ShowPath(selectedHex.HexCoordinates, this.hexGrid,selectedUnit.GetComponent<Attack>().range);
         }
-        // else if()
-        // {
-        //     // if(selectedUnit.Hex.IsEnemy())
-        //     // {
-        //     //     movementSystem.MoveUnit(selectedUnit, this.hexGrid,selectedHex);
-        //     // }
-        //     // selectedUnit.Hex.Unit = null;
+        else
+        {
 
-        //         movementSystem.MoveUnit(selectedUnit.GetComponent<Movement>(), this.hexGrid,selectedHex,selectedUnit.GetComponent<Attack>().range);
+            selectedUnit.RightClick2(selectedHex);
+            // if(selectedUnit.Hex.IsEnemy())
+            // {
+            //     movementSystem.MoveUnit(selectedUnit, this.hexGrid,selectedHex);
+            // }
+            // selectedUnit.Hex.Unit = null;
+
+            //     movementSystem.MoveUnit(selectedUnit.GetComponent<Movement>(), this.hexGrid,selectedHex,selectedUnit.GetComponent<Attack>().range);
 
 
-        //     PlayersTurn = false;
-        //     selectedUnit.GetComponent<Movement>().MovementFinished += ResetTurn;
-        //     ClearOldSelection();
-        // }
+            // PlayersTurn = false;
+            // selectedUnit.GetComponent<Movement>().MovementFinished += ResetTurn;
+            ClearOldSelection();
+        }
     }
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)
     {
         if (hexPosition == hexGrid.GetClosestHex(selectedUnit.Position))
         {
-            selectedUnit.Deselect();
             ClearOldSelection();
             return true;
         }

@@ -1248,9 +1248,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  attackSystem: {fileID: 595820217}
   playersTurn: 1
-  selectedUnit: {fileID: 0}
 --- !u!4 &375664487
 Transform:
   m_ObjectHideFlags: 0
@@ -1603,7 +1601,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 595820218}
-  - component: {fileID: 595820217}
   - component: {fileID: 595820219}
   m_Layer: 0
   m_Name: AttackSystem
@@ -1612,19 +1609,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &595820217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 595820216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94a651ad9aef682498e674b117a54d64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hexGrid: {fileID: 1189800794}
 --- !u!4 &595820218
 Transform:
   m_ObjectHideFlags: 0

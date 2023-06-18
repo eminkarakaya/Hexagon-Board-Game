@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class SettlerMovementSystem : MovementSystem
 {
-    public SettlerMovementSystem()
+    public SettlerMovementSystem(Movement movement) : base(movement)
     {
-        
     }
+
     public override void CalculateRange(Movement selectedUnit, HexGrid hexGrid)
     {
         movementRange = GraphSearch.BfsSettlerRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.transform.position),selectedUnit.GetCurrentMovementPoints());
@@ -87,7 +87,7 @@ public class SettlerMovementSystem : MovementSystem
             }
         }
     }
-    public override void MoveUnit(Movement selectedUnit,HexGrid hexGrid, Hex hex,int range = 1)
+    public override void MoveUnit(Movement selectedUnit,HexGrid hexGrid, Hex hex)
     {
          if(selectedUnit.GetCurrentMovementPoints() == 0) 
             return;
@@ -96,34 +96,34 @@ public class SettlerMovementSystem : MovementSystem
         List<Vector3> currentPathTemp = currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList(); 
         List<Hex> currentHexes = currentPath.Select(pos => hexGrid.GetTileAt(pos)).ToList(); 
         
-        if(hex.IsEnemy() && hex.IsEnemySettler())
-        {
-            if(currentPath.Count == 0 && (hexGrid.GetTileAt (currentPath[0]).Settler != null && hexGrid.GetTileAt (currentPath[0]).Settler.side == Side.Enemy)  || (hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy))
-            {
-                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes , hex,false);
-            }
+        // if(hex.IsEnemy() && hex.IsEnemySettler())
+        // {
+        //     if(currentPath.Count == 0 && (hexGrid.GetTileAt (currentPath[0]).Settler != null && hexGrid.GetTileAt (currentPath[0]).Settler.side == Side.Enemy)  || (hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy))
+        //     {
+        //         selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,this,false);
+        //     }
             
-            else
-            {
-                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes, hex);
-            }
+        //     else
+        //     {
+        //         selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
+        //     }
 
-        }
-        else if(hex.IsMe())
-        {
-            if(currentPath.Count == 0 && hex.Settler != null && hex.Settler.side == Side.Me)
-            {
-                selectedUnit.GetComponent<Movement>().ChangeHex(selectedUnit.GetComponent<Movement>(),hex.Unit.GetComponent<Movement>());
-                return;
-            }
-            else
-            {
-                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes, hex);
-            }
-        }
-        else
-        {
-            selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes ,hex);
-        }
+        // }
+        // else if(hex.IsMe())
+        // {
+        //     if(currentPath.Count == 0 && hex.Settler != null && hex.Settler.side == Side.Me)
+        //     {
+        //         selectedUnit.ChangeHex(selectedUnit,hex.Settler.GetComponent<Movement>(),this);
+        //         return;
+        //     }
+        //     else
+        //     {
+        //         selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
+        //     }
+        // }
+        // else
+        // {
+        //     selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex,this);
+        // }
     }
 }

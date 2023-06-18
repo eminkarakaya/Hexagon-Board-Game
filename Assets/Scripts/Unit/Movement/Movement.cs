@@ -5,7 +5,6 @@ using Mirror;
 
 public class Movement : NetworkBehaviour
 {
-    [SerializeField] public MovementSystem movementSystem;
     Unit Unit;
     Settler settler;
     [SerializeField] private PlayerManager playerManager;
@@ -44,54 +43,19 @@ public class Movement : NetworkBehaviour
     {
         RPCSetHex(hex,prevHex);
     }
-    [Command] private void CMDChangeHex(Hex hex1,Hex hex2)
-    {
-        RPCChangeHex(hex1,hex2);
-    }
-    [Command]
-    private void CMDShowRange()
-    {
-        RPCShowRange();
-    }
-    [ClientRpc]
-    private void RPCShowRange()
-    {
-        if(UnitManager.Instance.selectedUnit != null)
-        if(TryGetComponent(out Unit unit))
-        {
-            
-            movementSystem = new UnitMovementSystem();
-        }
-        else if(TryGetComponent(out Settler settler))
-        {
-            movementSystem = new SettlerMovementSystem();
 
-        }
-        // MovementSystem.Instance.RPCShowRange(UnitManager.Instance.selectedUnit.GetComponent<Movement>(),this);
 
-    }
-    [ClientRpc]
-    private void RPCHideRange()
-    {
-        movementSystem.RPCHideRange(this);   
-        
-    }
-    [Command]
-    private void CMDHideRange()
-    {  
-        RPCHideRange();
-    }
-    internal void MoveThroughPath(List<Vector3> currentPathTemp,List<Hex> currentPath ,Hex lastHex ,bool isMove = true)
+    internal void MoveThroughPath(List<Vector3> currentPathTemp,List<Hex> currentPath ,Hex lastHex,MovementSystem movementSystem ,bool isMove = true)
     {
         pathPositions = new Queue<Vector3>(currentPathTemp);
         pathHexes = new Queue<Hex>(currentPath);
-        
+
         if(currentPathTemp.Count == 0) return;
         Vector3 firstTarget = pathPositions.Dequeue();
         Hex firstHex = pathHexes.Dequeue();
-        StartCoroutine(RotationCoroutine(firstTarget,firstHex,lastHex,rotationDuration,isMove));
+        StartCoroutine(RotationCoroutine(firstTarget,firstHex,lastHex,rotationDuration,movementSystem,isMove));
     }
-    private IEnumerator RotationCoroutine(Vector3 endPos,Hex endHex,Hex hex, float rotationDuration,bool isMove = true)
+    private IEnumerator RotationCoroutine(Vector3 endPos,Hex endHex,Hex hex, float rotationDuration,MovementSystem movementSystem,bool isMove = true)
     {
         Quaternion startRotation = transform.rotation;
         endPos.y = transform.position.y;
@@ -112,7 +76,7 @@ public class Movement : NetworkBehaviour
         }
         if(isMove)
         {
-            StartCoroutine(MovementCoroutine(endPos,endHex,hex));
+            StartCoroutine(MovementCoroutine(endPos,endHex,hex,movementSystem));
         }
         else
         {
@@ -141,11 +105,11 @@ public class Movement : NetworkBehaviour
         }
 
     }
-    private IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex)
+    private IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem)
     {
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
-        if(endHex.IsEnemy()) 
+        if(endHex.IsEnemy())
         {
             yield break;
         }
@@ -168,22 +132,22 @@ public class Movement : NetworkBehaviour
         // MovementFinishEvents
         playerManager = FindObjectOfType<PlayerManager>();
         playerManager.CMDHideAllUnits();
-        CMDHideRange();
         
+        CMDHide(this);
         CMDSetHex(endHex,Unit.Hex);
         this.Unit.Hex = endHex;
-        
+
         transform.position = endPos;
         playerManager.CMDShowAllUnits();
-        CMDShowRange();
+        CMDShow();
         
         if(pathPositions.Count > 0)
         {
-            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),hex,rotationDuration));
+            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),hex,rotationDuration,movementSystem));
         }
         else
         {
-            
+
             MovementFinished?.Invoke(this);
             if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
@@ -210,6 +174,41 @@ public class Movement : NetworkBehaviour
             }
         }
     }
+    [Command]
+    private void CMDShow()
+    {
+        RPCShow();
+    }
+    [ClientRpc]
+    private void RPCShow()
+    {
+        
+        MovementSystem movementSystem = new UnitMovableResult(this);
+        movementSystem.ShowRange(UnitManager.Instance.selectedUnit,this);
+
+        
+        
+
+    }
+    [ClientRpc]
+    private void RPCHide()
+    {
+       
+
+        MovementSystem movementSystem = new UnitMovableResult(this);
+        movementSystem.HideRange(this);
+
+        
+    }
+    [Command]
+    private void CMDHide(Movement movement)
+    {
+       RPCHide();
+    }
+
+
+
+
      [Command]
     private void CMDChangeHexes(Hex hex1, Hex hex2)
     {
@@ -225,35 +224,35 @@ public class Movement : NetworkBehaviour
 
 
         hex1.Unit.Hex = hex1;
-        hex2.Unit.Hex = hex2;   
+        hex2.Unit.Hex = hex2;
     }
-    public void ChangeHex(Movement firstUnit,Movement targetUnit)
+    public void ChangeHex(Movement firstUnit,Movement targetUnit,MovementSystem movementSystem)
     {
         // BFSResult result = GraphSearch.GetRange(hexGrid,targetUnit.hex.HexCoordinates,targetUnit.MovementPoints);
 
         if(movementSystem.IsHexInRange(firstUnit.Unit.Hex.HexCoordinates) && movementSystem.IsHexInRange(targetUnit.Unit.Hex.HexCoordinates,firstUnit.Unit.Hex.HexCoordinates,targetUnit.GetCurrentMovementPoints()))
         {
 
-        Vector3 startPos = firstUnit.Unit.Hex.transform.position;
-        startPos.y = 1;
-        Vector3 endPos = targetUnit.Unit.Hex.transform.position;
-        endPos.y = 1;
-        StartCoroutine(RotationUnit(firstUnit,targetUnit,endPos,startPos,rotationDuration));
-        StartCoroutine(RotationUnit(targetUnit,firstUnit,startPos,endPos,rotationDuration));
-        // StartCoroutine(MoveUnit(firstUnit,endPos,startPos,movementDuration));
-        // StartCoroutine(MoveUnit(targetUnit,startPos,endPos,movementDuration));
-        
-        CMDChangeHexes(firstUnit.Unit.Hex,targetUnit.Unit.Hex);
-        playerManager = FindObjectOfType<PlayerManager>();
-        playerManager.CMDHideAllUnits();
-        CMDHideRange();
-        
-        // CMDChangeHex(firstUnit.hex,targetUnit.hex);
-        
-        playerManager.CMDShowAllUnits();
-        CMDShowRange();
-        }   
-        
+            Vector3 startPos = firstUnit.Unit.Hex.transform.position;
+            startPos.y = 1;
+            Vector3 endPos = targetUnit.Unit.Hex.transform.position;
+            endPos.y = 1;
+            StartCoroutine(RotationUnit(firstUnit,targetUnit,endPos,startPos,rotationDuration));
+            StartCoroutine(RotationUnit(targetUnit,firstUnit,startPos,endPos,rotationDuration));
+            // StartCoroutine(MoveUnit(firstUnit,endPos,startPos,movementDuration));
+            // StartCoroutine(MoveUnit(targetUnit,startPos,endPos,movementDuration));
+
+            CMDChangeHexes(firstUnit.Unit.Hex,targetUnit.Unit.Hex);
+            playerManager = FindObjectOfType<PlayerManager>();
+            playerManager.CMDHideAllUnits();
+
+
+            // CMDChangeHex(firstUnit.hex,targetUnit.hex);
+
+            playerManager.CMDShowAllUnits();
+
+        }
+
     }
     private IEnumerator RotationUnit(Movement firstUnit,Movement targetUnit,Vector3 endPos,Vector3 startPos, float rotationDuration)
     {
@@ -278,9 +277,9 @@ public class Movement : NetworkBehaviour
                 firstUnit.transform.rotation = Quaternion.Lerp(startRotation,endRotation,lerpStep);
                 yield return null;
             }
-            
+
             StartCoroutine(MoveUnit(firstUnit,endPos,startPos,movementDuration));
-            
+
         // }
     }
     private IEnumerator MoveUnit(Movement unit,Vector3 endPos,Vector3 startPos,float movementDuration )
@@ -294,6 +293,6 @@ public class Movement : NetworkBehaviour
             unit.transform.position = Vector3.Lerp(startPos,endPos,lerpStep);
             yield return null;
         }
-            
+
     }
 }

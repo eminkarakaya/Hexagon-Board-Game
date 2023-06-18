@@ -6,7 +6,6 @@ using Mirror;
 [SelectionBase]
 public class Hex : NetworkBehaviour
 {
-    
     public bool isVisible;
     [SerializeField] private Unit unit;
     [SerializeField] private Settler settler;

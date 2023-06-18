@@ -2,20 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackSystem : MonoBehaviour
+public class AttackSystem 
 {
     [SerializeField] private HexGrid hexGrid;
     BFSResult rangeInfo;
-    public void GetRange(Unit selectedUnit)
+    public void GetRange(IAttackable selectedUnit)
     {
-        if(!selectedUnit.TryGetComponent(out Attack range))
+        if(selectedUnit.Attack == null)
             return;
-        range = selectedUnit.GetComponent<Attack>();
-        rangeInfo = GraphSearch.GetRange(hexGrid,selectedUnit.Hex.HexCoordinates,range.range);
+        hexGrid = GameObject.FindObjectOfType<HexGrid>();
+        rangeInfo = GraphSearch.GetRange(hexGrid,selectedUnit.Position,selectedUnit.Attack.range);
     }
-    public void ShowRange(Unit selectedUnit)
+    public void ShowRange(IAttackable selectedUnit)
     {
-        if(selectedUnit.GetComponent<Movement>().GetCurrentMovementPoints() == 0) return;
+        // if(selectedUnit.GetComponent<Movement>().GetCurrentMovementPoints() == 0) return;
         GetRange(selectedUnit);
         foreach (var item in rangeInfo.rangeNodesDict)
         {
@@ -24,6 +24,7 @@ public class AttackSystem : MonoBehaviour
     }
     public void HideRange()
     {
+
         foreach (var item in rangeInfo.rangeNodesDict)
         {
             hexGrid.GetTileAt(item.Key).DisableHighlighRange();

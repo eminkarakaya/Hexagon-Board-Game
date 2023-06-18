@@ -5,15 +5,14 @@ using UnityEngine;
 
 public class UnitMovementSystem : MovementSystem
 {
-    
-    public UnitMovementSystem()
+    public UnitMovementSystem(Movement movement) : base(movement)
     {
-        
+        CalculateRange(movement,hexGrid);
     }
+
     public override void CalculateRange(Movement selectedUnit,HexGrid hexGrid)
     {
-        Debug.Log(hexGrid + " hexgrid");
-        Debug.Log(selectedUnit + " selectedUnit");
+        hexGrid = GameObject.FindObjectOfType<HexGrid>();
         movementRange = GraphSearch.BsfGetRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.transform.position),selectedUnit.GetCurrentMovementPoints());
     }
     public override void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid)
@@ -44,8 +43,6 @@ public class UnitMovementSystem : MovementSystem
             }
             else if(hex.Unit != null && hex.Unit.Side == Side.Me)
             {
-                Debug.Log(movementRange + " movementRange " );
-                Debug.Log(selectedHexPosition + " selectedHexPosition " );
                 if(movementRange.GetRangeMePositions().Contains(selectedHexPosition))
                 {
                     foreach (Vector3Int hexPosition in currentPath)
@@ -107,7 +104,7 @@ public class UnitMovementSystem : MovementSystem
             }
         }
     }
-    public override void MoveUnit(Movement selectedUnit,HexGrid hexGrid, Hex hex,int range = 1)
+    public override void MoveUnit(Movement selectedUnit,HexGrid hexGrid, Hex hex)
     {
         if(selectedUnit.GetCurrentMovementPoints() == 0) 
             return;
@@ -120,12 +117,12 @@ public class UnitMovementSystem : MovementSystem
         {
             if(currentPath.Count == 0 && hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy)
             {
-                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes , hex,false);
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,this,false);
             }
             
             else
             {
-                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes, hex);
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
             }
 
         }
@@ -133,17 +130,17 @@ public class UnitMovementSystem : MovementSystem
         {
             if(currentPath.Count == 0 && hex.Unit != null && hex.Unit.Side == Side.Me)
             {
-                selectedUnit.GetComponent<Movement>().ChangeHex(selectedUnit.GetComponent<Movement>(),hex.Unit.GetComponent<Movement>());
+                selectedUnit.ChangeHex(selectedUnit,hex.Unit.GetComponent<Movement>(),this);
                 return;
             }
             else
             {
-                selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes, hex);
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
             }
         }
         else
         {
-            selectedUnit.GetComponent<Movement>().MoveThroughPath(currentPathTemp,currentHexes ,hex);
+            selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex,this);
         }
     }
     
