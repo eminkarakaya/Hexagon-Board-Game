@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror;
 public class Sight : NetworkBehaviour
 {
-    public Unit unit;
+    public IMovable movable;
     Side side;
     private HexGrid hexGrid;
     [SerializeField] private List<GameObject> _sight;
@@ -13,8 +13,8 @@ public class Sight : NetworkBehaviour
     SightResult sightRange;
     [SerializeField] private int sightDistance = 2;
     public int SightDistance {get => sightDistance;}
-    private void Start() {
-        unit = GetComponent<Unit>();
+    private void Awake() {
+        movable = GetComponent<IMovable>();
     }
     public void ShowSight(Hex hex)
     {

@@ -74,7 +74,7 @@ public class GraphSearch
                     {
                         continue;   
                     }
-                    if (hexGrid.GetTileAt(neighbourPosition).IsMe())
+                    if (hexGrid.GetTileAt(neighbourPosition).IsMeSettler())
                     {
                         continue;   
                     }
@@ -111,7 +111,7 @@ public class GraphSearch
                     {
                         continue;
                     }
-                    if(hexGrid.GetTileAt(currentNode).IsMe() &&currentNode != startPoint )
+                    if(hexGrid.GetTileAt(currentNode).IsMeSettler() &&currentNode != startPoint )
                     {
                         continue;
                     }
@@ -128,7 +128,7 @@ public class GraphSearch
                     {
                         if(!meNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsMe())
+                            if (hexGrid.GetTileAt(neighbourPosition).IsMeSettler())
                             {
                                 meNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -144,7 +144,7 @@ public class GraphSearch
                             }
                             
                         }
-                            if (hexGrid.GetTileAt(neighbourPosition).IsMe())
+                            if (hexGrid.GetTileAt(neighbourPosition).IsMeSettler())
                             {
                                 continue;
                             }

@@ -5,7 +5,7 @@ using Mirror;
 
 public class Movement : NetworkBehaviour
 {
-    Unit Unit;
+    IMovable Moveable;
     Settler settler;
     [SerializeField] private PlayerManager playerManager;
     [SerializeField] private float movementDuration = 1, rotationDuration = .3f;
@@ -16,7 +16,7 @@ public class Movement : NetworkBehaviour
     [SerializeField] private int _currentMovementPoints = 20;
     private Queue<Vector3> pathPositions = new Queue<Vector3>();
     private void Start() {
-        Unit = GetComponent<Unit>();
+        Moveable = GetComponent<IMovable>();
     }
      public void SetCurrentMovementPoints(int value)
     {
@@ -27,11 +27,22 @@ public class Movement : NetworkBehaviour
     {
         return _currentMovementPoints;
     }
-    [ClientRpc] private void RPCSetHex(Hex hex,Hex prevHex)
+    [ClientRpc] private void RPCSetHex(Hex hex,Hex prevHex) // parametreler hex degıl IMoveable olcak
     {
-        prevHex.Unit = null;
-        this.Unit.Hex = hex;
-        hex.Unit = this.GetComponent<Unit>();
+        
+        if(TryGetComponent(out Unit unit))
+        {
+            prevHex.Unit = null;
+            this.Moveable.Hex = hex;
+            hex.Unit = unit;
+        }
+        else if(TryGetComponent(out Settler settler))
+        {
+            prevHex.Settler = null;
+            this.Moveable.Hex = hex;
+            hex.Settler = settler;            
+        }
+
     }
      [ClientRpc] private void RPCChangeHex(Hex hex,Hex prevHex)
     {
@@ -134,8 +145,8 @@ public class Movement : NetworkBehaviour
         playerManager.CMDHideAllUnits();
         
         CMDHide(this);
-        CMDSetHex(endHex,Unit.Hex);
-        this.Unit.Hex = endHex;
+        CMDSetHex(endHex,Moveable.Hex);
+        this.Moveable.Hex = endHex;
 
         transform.position = endPos;
         playerManager.CMDShowAllUnits();
@@ -183,33 +194,21 @@ public class Movement : NetworkBehaviour
     private void RPCShow()
     {
         
-        MovementSystem movementSystem = new UnitMovableResult(this);
-        movementSystem.ShowRange(UnitManager.Instance.selectedUnit,this);
-
-        
-        
-
+        MovementSystem movementSystem = new UnitMovableResult(Moveable);
+        movementSystem.ShowRange(GetComponent<IMovable>(),this);
     }
     [ClientRpc]
     private void RPCHide()
     {
-       
-
-        MovementSystem movementSystem = new UnitMovableResult(this);
-        movementSystem.HideRange(this);
-
-        
+        MovementSystem movementSystem = new UnitMovableResult(Moveable);
+        movementSystem.HideRange(Moveable,this);
     }
     [Command]
     private void CMDHide(Movement movement)
     {
        RPCHide();
     }
-
-
-
-
-     [Command]
+    [Command]
     private void CMDChangeHexes(Hex hex1, Hex hex2)
     {
         ChangeHexes(hex1,hex2);
@@ -218,31 +217,46 @@ public class Movement : NetworkBehaviour
     [ClientRpc]
     private void ChangeHexes(Hex hex1, Hex hex2)
     {
-        Unit tempUnit = hex1.Unit;
-        hex1.Unit = hex2.Unit;
-        hex2.Unit = tempUnit;
+        if(TryGetComponent(out Unit unit))
+        {
+            
+            Unit tempUnit = hex1.Unit;
+            hex1.Unit = hex2.Unit;
+            hex2.Unit = tempUnit;
 
 
-        hex1.Unit.Hex = hex1;
-        hex2.Unit.Hex = hex2;
+            hex1.Unit.Hex = hex1;
+            hex2.Unit.Hex = hex2;
+        }
+        else if(TryGetComponent(out Settler settler))
+        {
+            Settler tempUnit = hex1.Settler;
+            hex1.Settler = hex2.Settler;
+            hex2.Settler = tempUnit;
+
+
+            hex1.Settler.Hex = hex1;
+            hex2.Settler.Hex = hex2;
+
+        }
     }
     public void ChangeHex(Movement firstUnit,Movement targetUnit,MovementSystem movementSystem)
     {
         // BFSResult result = GraphSearch.GetRange(hexGrid,targetUnit.hex.HexCoordinates,targetUnit.MovementPoints);
 
-        if(movementSystem.IsHexInRange(firstUnit.Unit.Hex.HexCoordinates) && movementSystem.IsHexInRange(targetUnit.Unit.Hex.HexCoordinates,firstUnit.Unit.Hex.HexCoordinates,targetUnit.GetCurrentMovementPoints()))
+        if(movementSystem.IsHexInRange(firstUnit.Moveable.Hex.HexCoordinates) && movementSystem.IsHexInRange(targetUnit.Moveable.Hex.HexCoordinates,firstUnit.Moveable.Hex.HexCoordinates,targetUnit.GetCurrentMovementPoints()))
         {
 
-            Vector3 startPos = firstUnit.Unit.Hex.transform.position;
+            Vector3 startPos = firstUnit.Moveable.Hex.transform.position;
             startPos.y = 1;
-            Vector3 endPos = targetUnit.Unit.Hex.transform.position;
+            Vector3 endPos = targetUnit.Moveable.Hex.transform.position;
             endPos.y = 1;
             StartCoroutine(RotationUnit(firstUnit,targetUnit,endPos,startPos,rotationDuration));
             StartCoroutine(RotationUnit(targetUnit,firstUnit,startPos,endPos,rotationDuration));
             // StartCoroutine(MoveUnit(firstUnit,endPos,startPos,movementDuration));
             // StartCoroutine(MoveUnit(targetUnit,startPos,endPos,movementDuration));
 
-            CMDChangeHexes(firstUnit.Unit.Hex,targetUnit.Unit.Hex);
+            CMDChangeHexes(firstUnit.Moveable.Hex,targetUnit.Moveable.Hex);
             playerManager = FindObjectOfType<PlayerManager>();
             playerManager.CMDHideAllUnits();
 

@@ -20,9 +20,16 @@ public class HexGrid : NetworkBehaviour
             item.isVisible = false;
             if(item.Unit != null)
             {
-            if(item.Unit.Side == Side.Me)
-                continue;
-                item.Unit.GetComponent<Sight>().HideSight(item);
+                if(item.Unit.Side == Side.Me)
+                    continue;
+                    item.Unit.GetComponent<Sight>().HideSight(item);
+            }
+            else if(item.Settler != null)
+            {
+                if(item.Settler.Side == Side.Me)
+                    continue;
+                    item.Settler.GetComponent<Sight>().HideSight(item);
+
             }
         }
     }

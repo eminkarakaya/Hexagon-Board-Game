@@ -10,17 +10,17 @@ public abstract class MovementSystem
     public float h;
     public BFSResult movementRange = new BFSResult();
     [SerializeField] protected List<Vector3Int> currentPath = new List<Vector3Int>();
-    public MovementSystem(Movement movement)
+    public MovementSystem(IMovable movement)
     {
         
     }
-    public void ShowRange(Unit selectedUnit,Movement unit)
+    public void ShowRange(IMovable selectedUnit,Movement unit)
     {
-        if(!UnitManager.Instance.selectedUnit == unit.GetComponent<Unit>()) return;
+        if(UnitManager.Instance.selectedUnit != unit.GetComponent<ISelectable>()) return;
 
         HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
-        CalculateRange(selectedUnit.GetComponent<Movement>(),hexGrid);
-        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.transform.position);
+        CalculateRange(selectedUnit,hexGrid);
+        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.Movement.transform.position);
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
             if(unitPos == hexPosition) continue;
@@ -34,14 +34,14 @@ public abstract class MovementSystem
     }
     
 
-    public void HideRange(Movement unit)
+    public void HideRange(IMovable movable,Movement unit)
     {
-        if(!UnitManager.Instance.selectedUnit == unit.GetComponent<Unit>()) 
+        if(UnitManager.Instance.selectedUnit != unit.GetComponent<ISelectable>()) 
         {
             return;
         }
         HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
-        // CalculateRange(selectedUnit,hexGrid);
+        CalculateRange(movable,hexGrid);
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
             hexGrid.GetTileAt(hexPosition).DisableHighligh();
@@ -52,35 +52,8 @@ public abstract class MovementSystem
         }
         movementRange = new BFSResult();
     }
-    [Command]
-    public void CMDHideRange(Movement selectedUnit)
-    {
-        RPCHideRange(selectedUnit);
-    }
-    [ClientRpc]
-    public void RPCHideRange(Movement selectedUnit)
-    {
-        // if(UnitManager.Instance.selectedUnit != selectable) return;
-        if(movementRange.allNodesDict ==null) return;
-        HideRange(selectedUnit);
-    }
     
-    
-    // [Command]
-    // public void CMDShowRange(Movement selectedUnit)
-    // {
-    //     RPCShowRange(selectedUnit);
-    // }
-
-    // [ClientRpc]
-    // public void RPCShowRange(Movement selectedUnit)
-    // {
-    //     // if(UnitManager.Instance.selectedUnit != selectable) return;
-    //     HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
-    //     ShowRange(selectedUnit,);
-    // }
-    
-    public abstract void CalculateRange(Movement selectedUnit,HexGrid hexGrid);
+    public abstract void CalculateRange(IMovable selectedUnit,HexGrid hexGrid);
         
     public abstract void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid);
     

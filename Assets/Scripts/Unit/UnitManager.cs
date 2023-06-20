@@ -16,7 +16,7 @@ public class UnitManager : SingletonMirror<UnitManager>
 
 
     [SerializeField]
-    public Unit selectedUnit;
+    public ISelectable selectedUnit;
     private Hex previouslySelectedHex;
 
 
@@ -24,7 +24,7 @@ public class UnitManager : SingletonMirror<UnitManager>
     {
         if (PlayersTurn == false)
             return;
-        Unit selectableReference = unit.GetComponent<Unit>();
+        ISelectable selectableReference = unit.GetComponent<ISelectable>();
         if(selectableReference.Side == Side.Enemy)
         {
             return;
@@ -50,9 +50,9 @@ public class UnitManager : SingletonMirror<UnitManager>
         {
         }
     }
-    private bool CheckIfTheSameUnitSelected(Unit selectableReference)
+    private bool CheckIfTheSameUnitSelected(ISelectable selectableReference)
     {
-        if (this.selectedUnit == selectableReference)
+        if ((object)this.selectedUnit == selectableReference)
         {
             ClearOldSelection();
             selectableReference.CloseCanvas();
@@ -103,7 +103,7 @@ public class UnitManager : SingletonMirror<UnitManager>
         //     return;
         // HandleTargetHexSelected(hexGrid.GetTileAt(GraphSearch.GetCloseseteHex(movementSystem.movementRange.allNodesDict,selectedHex.HexCoordinates)));
     }
-    private void PrepareUnitForMovement(Unit selectableReference)
+    private void PrepareUnitForMovement(ISelectable selectableReference)
     {
         if (this.selectedUnit != null)
         {

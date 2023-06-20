@@ -9,7 +9,7 @@ public class PlayerManager : NetworkBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private GameObject buildingPrefab;
     public int team;
-    public List<Unit> liveUnits;
+    public List<IMovable> liveUnits;
     
     private void Start() {
         
@@ -72,10 +72,10 @@ public class PlayerManager : NetworkBehaviour
             if(item == null) continue;
             if(item.isOwned)
             {
-                item.SetSide(Side.Me,item.GetComponent<Outline>());
+                item.GetComponent<ISelectable>().SetSide(Side.Me,item.GetComponent<Outline>());
             }
             else
-                item.SetSide(Side.Enemy,item.GetComponent<Outline>());  
+                item.GetComponent<ISelectable>().SetSide(Side.Enemy,item.GetComponent<Outline>());  
         }
     }
     
@@ -99,7 +99,8 @@ public class PlayerManager : NetworkBehaviour
         List<Sight> allUnits = FindObjectsOfType<Sight>().ToList();
         foreach (var item in allUnits)
         {
-            item.HideSight(item.unit.Hex);
+            Debug.Log(item + " a " + item.GetComponent<IMovable>() + " a  " + item.GetComponent<IMovable>().Hex,item.GetComponent<IMovable>().Movement);
+            item.HideSight(item.GetComponent<IMovable>().Hex);
         }
     }
     [ClientRpc] private void ShowAllUnits()
@@ -110,7 +111,7 @@ public class PlayerManager : NetworkBehaviour
         List<Sight> allUnits = FindObjectsOfType<Sight>().Where(x=>x.isOwned == true).ToList();
         foreach (var item in allUnits)
         {
-            item.ShowSight(item.unit.Hex);
+            item.ShowSight(item.movable.Hex);
         }
     }
 }

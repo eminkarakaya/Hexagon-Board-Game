@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class UnitMovementSystem : MovementSystem
 {
-    public UnitMovementSystem(Movement movement) : base(movement)
+    public UnitMovementSystem(IMovable movement) : base(movement)
     {
-        CalculateRange(movement,hexGrid);
+        // CalculateRange(movement,hexGrid);
     }
 
-    public override void CalculateRange(Movement selectedUnit,HexGrid hexGrid)
+    public override void CalculateRange(IMovable selectedUnit,HexGrid hexGrid)
     {
         hexGrid = GameObject.FindObjectOfType<HexGrid>();
-        movementRange = GraphSearch.BsfGetRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.transform.position),selectedUnit.GetCurrentMovementPoints());
+        movementRange = GraphSearch.BsfGetRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.Movement.transform.position),selectedUnit.Movement.GetCurrentMovementPoints());
     }
     public override void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid)
     {

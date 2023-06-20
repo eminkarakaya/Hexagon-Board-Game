@@ -105,13 +105,13 @@ MonoBehaviour:
   syncInterval: 0
   hp: {fileID: 0}
   hex: {fileID: 0}
-  canvas: {fileID: 2154245641234665063}
   side: 2
   sight:
   - {fileID: 1299313750934944699}
   - {fileID: 6185995075040117193}
   - {fileID: 6192000830055002033}
   - {fileID: 671811955279829656}
+  canvas: {fileID: 5917179755658358129}
 --- !u!114 &1113163169887892024
 MonoBehaviour:
   m_ObjectHideFlags: 0

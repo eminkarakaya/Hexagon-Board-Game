@@ -4,20 +4,24 @@ using UnityEngine;
 using TMPro;
 using Mirror;
 [SelectionBase]
-public class Hex : NetworkBehaviour
+public class Hex : NetworkBehaviour, IHexHandler
 {
     public bool isVisible;
-    [SerializeField] private Unit unit;
-    [SerializeField] private Settler settler;
-    [SerializeField] private Building building;
+    
     [SerializeField] private GlowHighlight highlight;
     [SerializeField] private HexType hexType;
     [SerializeField] private HexCoordinates hexCoordinates;
-    public Settler Settler { get; set; }
-    public Building Building {get=>building; set {building = value;}}
-    public Unit Unit {get => unit;  set{unit = value;}}
+    // public Settler Settler { get; set; }
+    // public Building Building {get=>building; set {building = value;}}
+    // public Unit Unit {get => unit;  set{unit = value;}}
     public Vector3Int HexCoordinates => hexCoordinates.GetHexCoords();
-    
+    [SerializeField] private Unit unit;
+    [SerializeField] private Settler settler;
+    [SerializeField] private Building building;
+    public Unit Unit { get => unit; set{unit = value;} }
+    public Settler Settler { get => settler; set{settler = value;} }
+    public Building Building { get => building; set{building = value;} }
+
     private void Awake() {
         
         hexCoordinates = GetComponent<HexCoordinates>();
@@ -66,19 +70,19 @@ public class Hex : NetworkBehaviour
     }
     public bool IsEnemy()
     {
-        return ((unit != null && Unit.Side == Side.Enemy) || (building != null && building.Side == Side.Enemy));
+        return ((Unit != null && Unit.Side == Side.Enemy) || (Building != null && Building.Side == Side.Enemy));
     }
     public bool IsMe()
     {
-        return ((unit != null && Unit.Side == Side.Me) || (building != null && building.Side == Side.Me));
+        return ((Unit != null && Unit.Side == Side.Me) || (Building != null && Building.Side == Side.Me));
     }
     public bool IsEnemySettler()
     {
-        return settler != null && settler.side == Side.Enemy;
+        return settler != null && settler.Side == Side.Enemy;
     }
     public bool IsMeSettler()
     {
-        return settler != null && settler.side == Side.Me;
+        return settler != null && settler.Side == Side.Me;
     }
     public bool IsSettler()
     {
@@ -88,7 +92,7 @@ public class Hex : NetworkBehaviour
     {
         return (building != null);
     }
-    internal void ResetHighlight()
+    public void ResetHighlight()
     {
         highlight.ResetGlowHighlight();
     }

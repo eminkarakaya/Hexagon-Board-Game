@@ -46,11 +46,11 @@ public class SelectionManager : MonoBehaviour
     }
     private bool UnitSelected(GameObject result)
     {
-        return result.GetComponent<Unit>() != null;
+        return result.GetComponent<ISelectable>() != null;
     }
     private bool BuildingSelected(GameObject result)
     {
-        return result.GetComponent<Building>() != null;
+        return result.GetComponent<ISelectable>() != null;
     }
     
     private bool FindTarget(Vector3 mousePosition,out GameObject result)

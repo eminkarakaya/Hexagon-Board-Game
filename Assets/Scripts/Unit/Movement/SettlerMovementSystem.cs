@@ -5,20 +5,21 @@ using UnityEngine;
 
 public class SettlerMovementSystem : MovementSystem
 {
-    public SettlerMovementSystem(Movement movement) : base(movement)
+    public SettlerMovementSystem(IMovable movement) : base(movement)
     {
     }
 
-    public override void CalculateRange(Movement selectedUnit, HexGrid hexGrid)
+    public override void CalculateRange(IMovable selectedUnit, HexGrid hexGrid)
     {
-        movementRange = GraphSearch.BfsSettlerRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.transform.position),selectedUnit.GetCurrentMovementPoints());
+        hexGrid = GameObject.FindObjectOfType<HexGrid>();
+        movementRange = GraphSearch.BfsSettlerRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.Movement.transform.position),selectedUnit.Movement.GetCurrentMovementPoints());
     }
     public override void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid)
     {
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
         if(hex.isVisible)
         {
-            if((hex.Unit != null && hex.Unit.Side == Side.Enemy) || (hex.Settler != null && hex.Settler.side == Side.Enemy))
+            if((hex.Unit != null && hex.Unit.Side == Side.Enemy) || (hex.Settler != null && hex.Settler.Side == Side.Enemy))
             {
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
@@ -39,7 +40,7 @@ public class SettlerMovementSystem : MovementSystem
                     }
                 }
             }
-            else if(hex.Settler != null && hex.Settler.side == Side.Me)
+            else if(hex.Settler != null && hex.Settler.Side == Side.Me)
             {
                 if(movementRange.GetRangeMePositions().Contains(selectedHexPosition))
                 {
@@ -96,34 +97,36 @@ public class SettlerMovementSystem : MovementSystem
         List<Vector3> currentPathTemp = currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList(); 
         List<Hex> currentHexes = currentPath.Select(pos => hexGrid.GetTileAt(pos)).ToList(); 
         
-        // if(hex.IsEnemy() && hex.IsEnemySettler())
-        // {
-        //     if(currentPath.Count == 0 && (hexGrid.GetTileAt (currentPath[0]).Settler != null && hexGrid.GetTileAt (currentPath[0]).Settler.side == Side.Enemy)  || (hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy))
-        //     {
-        //         selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,this,false);
-        //     }
+        if(hex.IsEnemy() && hex.IsEnemySettler())
+        {
+            if(currentPath.Count == 0 && (hexGrid.GetTileAt (currentPath[0]).Settler != null && hexGrid.GetTileAt (currentPath[0]).Settler.Side == Side.Enemy)  || (hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy))
+            {
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,this,false);
+            }
             
-        //     else
-        //     {
-        //         selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
-        //     }
+            else
+            {
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
+            }
 
-        // }
-        // else if(hex.IsMe())
-        // {
-        //     if(currentPath.Count == 0 && hex.Settler != null && hex.Settler.side == Side.Me)
-        //     {
-        //         selectedUnit.ChangeHex(selectedUnit,hex.Settler.GetComponent<Movement>(),this);
-        //         return;
-        //     }
-        //     else
-        //     {
-        //         selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
-        //     }
-        // }
-        // else
-        // {
-        //     selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex,this);
-        // }
+        }
+        else if(hex.IsMeSettler())
+        {
+            if(currentPath.Count == 0 && hex.Settler != null && hex.Settler.Side == Side.Me)
+            {
+                selectedUnit.ChangeHex(selectedUnit,hex.Settler.GetComponent<Movement>(),this);
+                return;
+            }
+            else
+            {
+                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
+            }
+        }
+        else
+        {
+            selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex,this);
+        }
     }
+
+   
 }

@@ -1,58 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Mirror;
 
-public class Building : NetworkBehaviour 
+public class Building : NetworkBehaviour , ISelectable 
 {
     public HP hp;
     [SerializeField] private PlayerManager playerManager;
-    [SerializeField] private GameObject mc1;
+    [SerializeField] private GameObject mc1,settler;
     [SyncVar] public Hex Hex;
-    [SerializeField] private GameObject canvas;
     [SerializeField] private Side side;
-    public Side Side {get => side;}
+    public Side Side {get => side;set{side = value;}}
+
+    public Vector3Int Position { get; set; }
+    public Canvas Canvas { get => _canvas; set{_canvas = value;} }
+    [SerializeField] UnityEngine.Canvas _canvas;
+
     private void Start() {
         hp = GetComponent<HP>();
     }
-    public void SetSide(Side side,Outline outline)
-    {
-        this.side = side;
-        if(outline == null) return;
-        if(side == Side.Me)
-        {
-            outline.OutlineColor = Color.white;
-        }
-        else if(side == Side.Enemy)
-        {
-            outline.OutlineColor = Color.red;
-        }
-    }
-   
     public void OpenCanvas()
     {
-        canvas.SetActive(true);
+        Canvas.gameObject.SetActive(true);
     }
     public void CloseCanvas()
     {
-        canvas.SetActive(false);
-
-    
+        Canvas.gameObject.SetActive(false);
     }
     [ClientRpc] private void RPCSetHex(Unit unit,Hex hex)
     {
         unit.Hex = hex;
         hex.Unit = unit;
     }
-    [TargetRpc] private void AddLiveUnits(Unit unit)
-    {
-        playerManager = FindObjectOfType<PlayerManager>();
-        playerManager.liveUnits.Add(unit);
-        HexGrid hexGrid = FindObjectOfType<HexGrid>();
-        // hexGrid.CloseVisible();
-        unit.Hex = Hex;
-        
-    }
+    // private void AddLiveUnits(IMovable unit)
+    // {
+    //     playerManager = FindObjectOfType<PlayerManager>();
+    //     playerManager.liveUnits.Add(unit);
+    //     HexGrid hexGrid = FindObjectOfType<HexGrid>();
+    //     // hexGrid.CloseVisible();
+    //     // unit.Hex = Hex;
+    // }
     [Command]
     private void CMDCreateMC1()
     {
@@ -62,7 +50,7 @@ public class Building : NetworkBehaviour
         // RPCSetHex(unit,Hex);
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
         RPCCreateMC1(unit);
-        AddLiveUnits(unit);
+        // AddLiveUnits(unit);
     }
     [ClientRpc]
     private void RPCCreateMC1(Unit unit)
@@ -71,11 +59,11 @@ public class Building : NetworkBehaviour
         unit.Hex.Unit = unit;
         if(unit.isOwned)
         {
-            unit.SetSide(Side.Me,unit.GetComponent<Outline>());
+            unit.GetComponent<ISelectable>().SetSide(Side.Me,unit.GetComponent<Outline>());
         }
         else
         {
-            unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
+            unit.GetComponent<ISelectable>().SetSide(Side.Enemy,unit.GetComponent<Outline>());
         }
         playerManager = FindObjectOfType<PlayerManager>();
 
@@ -85,5 +73,59 @@ public class Building : NetworkBehaviour
     public void CreateMC1OnClick()
     {
         CMDCreateMC1();
+    }
+    [ClientRpc]
+    private void RPCCreateSettler(Settler unit)
+    {
+        unit.Hex = Hex;
+        unit.Hex.Settler = unit;
+        if(unit.isOwned)
+        {
+            unit.GetComponent<ISelectable>().SetSide(Side.Me,unit.GetComponent<Outline>());
+        }
+        else
+        {
+            unit.GetComponent<ISelectable>().SetSide(Side.Enemy,unit.GetComponent<Outline>());
+        }
+        playerManager = FindObjectOfType<PlayerManager>();
+
+        playerManager.CMDHideAllUnits();
+        playerManager.CMDShowAllUnits();
+    }
+    [Command]
+    private void CMDCreateSettler()
+    {
+        if(Hex.Unit != null) return;
+        Settler unit = Instantiate(settler,transform.position,Quaternion.identity).GetComponent<Settler>();
+        unit.Hex = Hex;
+        // RPCSetHex(unit,Hex);
+        NetworkServer.Spawn(unit.gameObject,connectionToClient);
+        RPCCreateSettler(unit);
+        // AddLiveUnits(unit.GetComponent<IMovable>());
+    }
+    
+    public void CreateSettlerOnClick()
+    {
+        CMDCreateSettler();
+    }
+
+    public void LeftClick()
+    {
+        OpenCanvas();
+    }
+
+    public void RightClick(Hex selectedHex)
+    {
+        
+    }
+
+    public void RightClick2(Hex selectedHex)
+    {
+        
+    }
+
+    public void Deselect()
+    {
+        
     }
 }
