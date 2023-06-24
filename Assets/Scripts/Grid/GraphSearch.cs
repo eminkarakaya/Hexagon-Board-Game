@@ -70,7 +70,7 @@ public class GraphSearch
                 int currentCost = costSoFar[currentNode];
                 int newCost = currentCost + nodeCost;
         
-                    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy())
+                    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy()  || hexGrid.GetTileAt(neighbourPosition).IsEnemySettler() )
                     {
                         continue;   
                     }
@@ -107,7 +107,7 @@ public class GraphSearch
             {
                 if(hexGrid.GetTileAt(currentNode).isVisible)
                 {
-                    if(hexGrid.GetTileAt(currentNode).IsEnemy())
+                    if(hexGrid.GetTileAt(currentNode).IsEnemy() || hexGrid.GetTileAt(currentNode).IsEnemySettler())
                     {
                         continue;
                     }
@@ -137,7 +137,7 @@ public class GraphSearch
                         }
                         if(!enemiesNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy())
+                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemySettler())
                             {
                                 enemiesNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -148,7 +148,7 @@ public class GraphSearch
                             {
                                 continue;
                             }
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy())
+                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemySettler())
                             {
                                 // enemiesNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -288,9 +288,9 @@ public class GraphSearch
                 int currentCost = costSoFar[currentNode];
                 int newCost = currentCost + nodeCost;
         
-                    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy())
+                    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding() )
                     {
-                        continue;   
+                        continue;
                     }
                     if (hexGrid.GetTileAt(neighbourPosition).IsMe())
                     {
@@ -325,7 +325,7 @@ public class GraphSearch
             {
                 if(hexGrid.GetTileAt(currentNode).isVisible)
                 {
-                    if(hexGrid.GetTileAt(currentNode).IsEnemy())
+                    if(hexGrid.GetTileAt(currentNode).IsEnemy() || hexGrid.GetTileAt(currentNode).IsEnemyBuilding())
                     {
                         continue;
                     }
@@ -335,11 +335,14 @@ public class GraphSearch
                     }
                    
                 }
+
                 if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
                     continue;
                 int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
                 int currentCost = costSoFar1[currentNode];
                 int newCost = currentCost + nodeCost;
+
+
                 if (newCost <= movementPoints)
                 {
                     if(hexGrid.GetTileAt(neighbourPosition).isVisible)
@@ -355,22 +358,23 @@ public class GraphSearch
                         }
                         if(!enemiesNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy())
+                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
                             {
                                 enemiesNodes[neighbourPosition] = currentNode;
                                 continue;
                             }
                             
                         }
-                            if (hexGrid.GetTileAt(neighbourPosition).IsMe())
-                            {
-                                continue;
-                            }
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy())
-                            {
-                                // enemiesNodes[neighbourPosition] = currentNode;
-                                continue;
-                            }
+                        
+                        if (hexGrid.GetTileAt(neighbourPosition).IsMe())
+                        {
+                            continue;
+                        }
+                        if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
+                        {
+                            // enemiesNodes[neighbourPosition] = currentNode;
+                            continue;
+                        }
                     }                        
                     if (!visitedNodes.ContainsKey(neighbourPosition))
                     {
@@ -544,7 +548,10 @@ public struct BFSResult
             
         return costDict[pos];
     }
-
+    public List<Vector3Int> GetPathBuildingGrid(Vector3Int destination ,HexGrid hexGrid, int rangePoint = 1)
+    {
+        return GraphSearch.GneratePathBFS(destination,allNodesDict);
+    }
     public List<Vector3Int> GetPathMeGrid(Vector3Int destination, out Vector3Int? meGrid ,HexGrid hexGrid, int rangePoint = 1)
     {
         if (allNodesDict.ContainsKey(destination) == false)

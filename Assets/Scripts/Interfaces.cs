@@ -2,6 +2,17 @@ using UnityEngine;
 using Mirror;
 using System.Collections.Generic;
 using System.Linq;
+public interface IDamagable
+{
+    public HP hp { get; set; }
+    public Hex Hex { get; set; }
+}
+public interface ISightable
+{
+    public List<GameObject> Sights{get;}
+    public Sight Sight { get; set; }
+    public Hex Hex { get; set; }
+}
 public interface IMovable
 {
     public Movement Movement { get; set; }

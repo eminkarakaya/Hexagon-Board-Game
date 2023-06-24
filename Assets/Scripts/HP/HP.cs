@@ -12,6 +12,14 @@ public class HP : NetworkBehaviour
     private void Start() {
         Hp = _maxHp;
     }
-    
-
+    public void Death()
+    {   
+        if(_hp <= 0 )
+        {
+            PlayerManager manager = FindObjectOfType<PlayerManager>();
+            manager.DestroyObj(gameObject);
+            KillUnit?.Invoke();
+        } 
+    }
+    public System.Action KillUnit;
 }

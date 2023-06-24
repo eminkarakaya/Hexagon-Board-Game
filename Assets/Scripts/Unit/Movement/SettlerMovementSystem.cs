@@ -56,6 +56,23 @@ public class SettlerMovementSystem : MovementSystem
                     }
                 }
             }
+            else if(hex.Building != null && hex.Building.Side == Side.Enemy)
+            {
+                
+                if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
+                {
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    }
+                    Vector3Int? enemyHex = null;
+                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid);
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                    }
+                }
+            }
             else
             {
                 if(movementRange.GetRangePositions().Contains(selectedHexPosition))
@@ -96,7 +113,6 @@ public class SettlerMovementSystem : MovementSystem
         
         List<Vector3> currentPathTemp = currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList(); 
         List<Hex> currentHexes = currentPath.Select(pos => hexGrid.GetTileAt(pos)).ToList(); 
-        
         if(hex.IsEnemy() && hex.IsEnemySettler())
         {
             if(currentPath.Count == 0 && (hexGrid.GetTileAt (currentPath[0]).Settler != null && hexGrid.GetTileAt (currentPath[0]).Settler.Side == Side.Enemy)  || (hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy))

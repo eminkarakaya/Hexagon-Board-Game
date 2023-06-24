@@ -5,18 +5,26 @@ using Mirror;
 public class Melee : Attack
 {
     
-    public override void AttackUnit(HP hp)
+    public override void AttackUnit(IDamagable damagable)
     {
         if(GetComponent<Movement>().GetCurrentMovementPoints()==0) return;
         if(isServer)
         {
-            Attack(hp);
+            Attack(damagable.hp);            
         }
         else
         {
-            CMDAttack(hp);
+            CMDAttack(damagable.hp);
         }
+        if(TryGetComponent(out UnitMovement movement))
+        {
+            StartCoroutine(movement.MoveKill(damagable.Hex,damagable.hp.Hp<=0));
+        }
+        damagable.hp.Death();
+        
     }
+
+    
     [Command]
     private void CMDAttack(HP hp)
     {
@@ -25,9 +33,13 @@ public class Melee : Attack
     [ClientRpc]
     public void Attack(HP hp)
     {
-
+        if(hp != null)
+        {
             hp.Hp -= _damagePower;
         Debug.Log("melee attack to : "  + hp);
+
+        }
+
         // InflictDamage(hp);
     }
 }

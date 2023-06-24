@@ -32,6 +32,10 @@ public class PlayerManager : NetworkBehaviour
             
             CMDCreateBuilding();
     }
+    [Command] public void DestroyObj(GameObject obj)
+    {
+        Destroy(obj);
+    }
     
     [Command] // client -> server
     private void CMDCreateBuilding()
@@ -99,8 +103,8 @@ public class PlayerManager : NetworkBehaviour
         List<Sight> allUnits = FindObjectsOfType<Sight>().ToList();
         foreach (var item in allUnits)
         {
-            Debug.Log(item + " a " + item.GetComponent<IMovable>() + " a  " + item.GetComponent<IMovable>().Hex,item.GetComponent<IMovable>().Movement);
-            item.HideSight(item.GetComponent<IMovable>().Hex);
+            // Debug.Log(item + " a " + item.GetComponent<IMovable>() + " a  " + item.GetComponent<IMovable>().Hex,item.GetComponent<IMovable>().Movement);
+            item.HideSight(item.GetComponent<ISightable>().Hex);
         }
     }
     [ClientRpc] private void ShowAllUnits()
@@ -111,7 +115,7 @@ public class PlayerManager : NetworkBehaviour
         List<Sight> allUnits = FindObjectsOfType<Sight>().Where(x=>x.isOwned == true).ToList();
         foreach (var item in allUnits)
         {
-            item.ShowSight(item.movable.Hex);
+            item.ShowSight(item.sightable.Hex);
         }
     }
 }

@@ -7,6 +7,8 @@ public abstract class Attack : NetworkBehaviour
 {
     [SerializeField] private TextMeshProUGUI _damageText;
     [SerializeField] protected int _damagePower;
+    public System.Action AttackEvent;
+    public System.Action<Hex> KillEvent;
     protected int DamagePower { get; set; }
     public int range = 1;
     private void Start() {
@@ -18,7 +20,7 @@ public abstract class Attack : NetworkBehaviour
         _damageText.text = _damagePower.ToString();
     }
     
-    public abstract void AttackUnit(HP hp);
+    public abstract void AttackUnit(IDamagable damagable);
     // [Command]
     // protected virtual void CMDInflictDamage(HP hp)
     // {

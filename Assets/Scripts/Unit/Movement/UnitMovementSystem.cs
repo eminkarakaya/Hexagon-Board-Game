@@ -15,6 +15,7 @@ public class UnitMovementSystem : MovementSystem
         hexGrid = GameObject.FindObjectOfType<HexGrid>();
         movementRange = GraphSearch.BsfGetRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.Movement.transform.position),selectedUnit.Movement.GetCurrentMovementPoints());
     }
+    
     public override void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid)
     {
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
@@ -34,11 +35,7 @@ public class UnitMovementSystem : MovementSystem
                     {
                         hexGrid.GetTileAt(hexPosition).HighlightPath();                    
                     }
-                    if(currentPath.Count == 0)
-                    {
-                        currentPath.Add((Vector3Int)enemyHex);
-                        // hexGrid.GetTileAt((Vector3Int)enemyHex).HighlightPath();                    
-                    }
+                    
                 }
             }
             else if(hex.Unit != null && hex.Unit.Side == Side.Me)
@@ -55,6 +52,39 @@ public class UnitMovementSystem : MovementSystem
                     {
                         hexGrid.GetTileAt(hexPosition).HighlightPath();
                     }
+                }
+            }
+            else if(hex.Building != null && hex.Building.Side == Side.Me)
+            {
+                if(movementRange.GetRangeAllPositions().Contains(selectedHexPosition))
+                {
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    }
+                    currentPath = movementRange.GetPathBuildingGrid(selectedHexPosition,hexGrid);
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                    }
+                }
+            }
+            else if(hex.Building != null && hex.Building.Side == Side.Enemy)
+            {
+                
+                if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
+                {
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    }
+                    Vector3Int? enemyHex = null;
+                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid);
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                    }
+                    
                 }
             }
             else
@@ -112,12 +142,12 @@ public class UnitMovementSystem : MovementSystem
         
         List<Vector3> currentPathTemp = currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList(); 
         List<Hex> currentHexes = currentPath.Select(pos => hexGrid.GetTileAt(pos)).ToList(); 
-        
-        if(hex.IsEnemy())
+        if(hex.IsEnemy() || hex.IsEnemyBuilding())
         {
-            if(currentPath.Count == 0 && hexGrid.GetTileAt (currentPath[0]).Unit != null && hexGrid.GetTileAt (currentPath[0]).Unit.Side == Side.Enemy)
+            if(currentPath.Count == 0)
             {
-                selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,this,false);
+                // selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,this,false);
+                selectedUnit.StartCoroutineRotationUnit(selectedUnit,hex.transform.position,hex);
             }
             
             else
@@ -128,12 +158,13 @@ public class UnitMovementSystem : MovementSystem
         }
         else if(hex.IsMe())
         {
-            if(currentPath.Count == 0 && hex.Unit != null && hex.Unit.Side == Side.Me)
+            
+            if(currentPath.Count == 0)
             {
                 selectedUnit.ChangeHex(selectedUnit,hex.Unit.GetComponent<Movement>(),this);
                 return;
             }
-            else
+            else if(currentPath.Count == 0 && hex.Unit != null && hex.Unit.Side == Side.Me)
             {
                 selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
             }
@@ -143,6 +174,5 @@ public class UnitMovementSystem : MovementSystem
             selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex,this);
         }
     }
-    
     
 }

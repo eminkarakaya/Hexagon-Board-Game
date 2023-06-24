@@ -4,12 +4,11 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 [SelectionBase]
-public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable 
+public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , ISightable,IDamagable
 {
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
     public Movement Movement { get; set; }
-    public HP hp;
     [SyncVar] [SerializeField] private Hex hex;
     public Hex Hex {get => hex; set {hex = value;}}
     [SerializeField] private Side side;
@@ -27,8 +26,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable
         }
     }
     
-    [SerializeField] private List<GameObject> sight;
-    public List<GameObject> Sight{get => sight;}
+   
     public MovementSystem Result { get ; set ; }
     public Vector3Int Position { get ; set ; }
     [SerializeField] Canvas canvas;
@@ -36,6 +34,11 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable
     public int Range { get; set; }
     public Outline outline { get; set; }
     public Side Side { get => side; set {side = value;} }
+    [SerializeField] private List<GameObject> sights;
+    public List<GameObject> Sights=>sights;
+
+    public Sight Sight { get; set; }
+    public HP hp { get; set; }
 
     private void Start() {
         hp = GetComponent<HP>();
@@ -62,7 +65,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable
     public void RightClick(Hex selectedHex)
     {
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
-        Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
+        // Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
         Result.CalculateRange(this,hexGrid);
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
     } 

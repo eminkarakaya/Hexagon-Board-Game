@@ -7,7 +7,7 @@ using Mirror;
 public class Hex : NetworkBehaviour, IHexHandler
 {
     public bool isVisible;
-    
+    public bool isEnemy;
     [SerializeField] private GlowHighlight highlight;
     [SerializeField] private HexType hexType;
     [SerializeField] private HexCoordinates hexCoordinates;
@@ -15,9 +15,9 @@ public class Hex : NetworkBehaviour, IHexHandler
     // public Building Building {get=>building; set {building = value;}}
     // public Unit Unit {get => unit;  set{unit = value;}}
     public Vector3Int HexCoordinates => hexCoordinates.GetHexCoords();
-    [SerializeField] private Unit unit;
-    [SerializeField] private Settler settler;
-    [SerializeField] private Building building;
+    [SyncVar] [SerializeField] private Unit unit;
+    [SyncVar] [SerializeField] private Settler settler;
+    [SyncVar] [SerializeField] private Building building;
     public Unit Unit { get => unit; set{unit = value;} }
     public Settler Settler { get => settler; set{settler = value;} }
     public Building Building { get => building; set{building = value;} }
@@ -42,7 +42,21 @@ public class Hex : NetworkBehaviour, IHexHandler
         List<GameObject> list = new List<GameObject>();
         if(unit != null)
         {
-            foreach (var item in unit.Sight)
+            foreach (var item in unit.Sights)
+            {
+                list.Add(item);
+            }
+        }
+        if(settler != null)
+        {
+            foreach (var item in settler.Sights)
+            {
+                list.Add(item);
+            }
+        }
+        if(building != null)
+        {
+            foreach (var item in building.Sights)
             {
                 list.Add(item);
             }
@@ -68,13 +82,22 @@ public class Hex : NetworkBehaviour, IHexHandler
     {
         return this.hexType == HexType.Obstacle;
     }
+    public bool IsEnemyBuilding()
+    {
+        return Building != null && Building.Side == Side.Enemy;
+    }
     public bool IsEnemy()
     {
-        return ((Unit != null && Unit.Side == Side.Enemy) || (Building != null && Building.Side == Side.Enemy));
+        return Unit != null && Unit.Side == Side.Enemy;
+    }
+    public bool IsMeBuilding()
+    {
+        return Building != null && Building.Side == Side.Me;
+
     }
     public bool IsMe()
     {
-        return ((Unit != null && Unit.Side == Side.Me) || (Building != null && Building.Side == Side.Me));
+        return Unit != null && Unit.Side == Side.Me;
     }
     public bool IsEnemySettler()
     {
