@@ -6,6 +6,7 @@ using TMPro;
 [SelectionBase]
 public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , ISightable,IDamagable
 {
+    public CivManager civManager;
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
     public Movement Movement { get; set; }
@@ -46,6 +47,11 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
         Attack = GetComponent<Attack>();
         AttackSystem = new MeeleAttack();
         Result = new UnitMovableResult(this);
+        if(civManager == null)
+            civManager = PlayerManager.FindPlayerManager();
+            
+        civManager.SetTeamColor(this.gameObject);
+        outline = GetComponent<Outline>();
         
     }
     public void OpenCanvas()
@@ -60,7 +66,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
    
     public override void OnStartAuthority()
     {
-        outline = GetComponent<Outline>();
     }
     public void RightClick(Hex selectedHex)
     {
@@ -89,8 +94,47 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
         
     }
 
-    
+
+
+    [Command] private void CMDSetSide(NetworkIdentity identity, Hex hex)
+    {
+        RPGSetSide(identity,hex,civManager);
+    }
+    [ClientRpc] private void RPGSetSide(NetworkIdentity identity,Hex hex,CivManager civManager)
+    {
+        hex.Settler.civManager = civManager;
+        if(hex.Settler.isOwned)
+        {
+            hex.Settler.SetSide(Side.Me,hex.Settler.outline);
+        }
+        else
+        {
+            hex.Settler.SetSide(Side.Enemy,hex.Settler.outline);
+        }
+    }
+    public void Capture(NetworkIdentity identity,Hex hex)
+    {
+        civManager.Capture(identity);
+        
+        TeamColor [] teamColors = hex.Settler.transform.GetComponentsInChildren<TeamColor>();
+        foreach (var item in teamColors)
+        {
+            item.SetColor(civManager.data);
+        }
+        StartCoroutine(wait(hex.Settler,identity,hex));
+    }
+    IEnumerator wait(Settler settler,NetworkIdentity identity,Hex hex)
+    {
+        while(settler.isOwned == false)
+        {
+            Debug.Log("kekw");
+            yield return null;
+            
+        }
+        CMDSetSide(identity,hex);
+    }
 }
+
 public enum Side
 {
     Ally,

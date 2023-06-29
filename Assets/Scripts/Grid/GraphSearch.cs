@@ -288,7 +288,7 @@ public class GraphSearch
                 int currentCost = costSoFar[currentNode];
                 int newCost = currentCost + nodeCost;
         
-                    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding() )
+                    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding()|| hexGrid.GetTileAt(neighbourPosition).IsEnemySettler() )
                     {
                         continue;
                     }
@@ -325,7 +325,7 @@ public class GraphSearch
             {
                 if(hexGrid.GetTileAt(currentNode).isVisible)
                 {
-                    if(hexGrid.GetTileAt(currentNode).IsEnemy() || hexGrid.GetTileAt(currentNode).IsEnemyBuilding())
+                    if(hexGrid.GetTileAt(currentNode).IsEnemy() || hexGrid.GetTileAt(currentNode).IsEnemyBuilding()||hexGrid.GetTileAt(currentNode).IsEnemyBuilding())
                     {
                         continue;
                     }
@@ -358,7 +358,7 @@ public class GraphSearch
                         }
                         if(!enemiesNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
+                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding()||hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
                             {
                                 enemiesNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -370,7 +370,7 @@ public class GraphSearch
                         {
                             continue;
                         }
-                        if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
+                        if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding() ||hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
                         {
                             // enemiesNodes[neighbourPosition] = currentNode;
                             continue;

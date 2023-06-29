@@ -6,10 +6,10 @@ using Mirror;
 
 public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
 {
-    [SerializeField] private PlayerManager playerManager;
+    [SyncVar] [SerializeField] public CivManager civManager;
     [SerializeField] private GameObject mc1,settler;
     public Hex Hex { get => hex; set{hex = value;} }
-    [SyncVar] private Hex hex;
+    [SyncVar] [SerializeField] private Hex hex = null;
     [SerializeField] private Side side;
     public Side Side {get => side;set{side = value;}}
 
@@ -22,7 +22,12 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
     public HP hp { get; set; }
 
     [SerializeField] UnityEngine.Canvas _canvas;
-
+    public override void OnStartClient()
+    {
+        if(civManager == null)
+            civManager = PlayerManager.FindPlayerManager();
+        civManager.SetTeamColor(this.gameObject);
+    }
     private void Start() {
         hp = GetComponent<HP>();
         Sight = GetComponent<Sight>();
@@ -56,6 +61,9 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
         unit.Hex = Hex;
         // RPCSetHex(unit,Hex);
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
+        if(civManager == null)
+            civManager = PlayerManager.FindPlayerManager();
+        civManager.ownedObjs.Add(unit.gameObject);
         RPCCreateMC1(unit);
         // AddLiveUnits(unit);
     }
@@ -72,10 +80,10 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
         {
             unit.GetComponent<ISelectable>().SetSide(Side.Enemy,unit.GetComponent<Outline>());
         }
-        playerManager = FindObjectOfType<PlayerManager>();
-
-        playerManager.CMDHideAllUnits();
-        playerManager.CMDShowAllUnits();
+        
+       
+        civManager.CMDHideAllUnits();
+        civManager.CMDShowAllUnits();
     }
     public void CreateMC1OnClick()
     {
@@ -94,14 +102,16 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
         {
             unit.GetComponent<ISelectable>().SetSide(Side.Enemy,unit.GetComponent<Outline>());
         }
-        playerManager = FindObjectOfType<PlayerManager>();
+        
 
-        playerManager.CMDHideAllUnits();
-        playerManager.CMDShowAllUnits();
+        civManager.CMDHideAllUnits();
+        civManager.CMDShowAllUnits();
     }
     [Command]
     private void CMDCreateSettler()
     {
+        if(civManager == null)
+            civManager = PlayerManager.FindPlayerManager();
         if(Hex.Unit != null) return;
         Settler unit = Instantiate(settler,transform.position,Quaternion.identity).GetComponent<Settler>();
         unit.Hex = Hex;

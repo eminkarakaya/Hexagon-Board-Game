@@ -25,7 +25,7 @@ public class UnitMovement : Movement
         // MovementFinish
 
         // MovementFinishEvents
-        playerManager = FindObjectOfType<PlayerManager>();
+        
         playerManager.CMDHideAllUnits();
         
         CMDHide(this);
@@ -61,11 +61,11 @@ public class UnitMovement : Movement
             }
         }
     }
+    
     public IEnumerator MoveKill(Hex hex,bool state)
     {
         if(state)
         {
-            playerManager = FindObjectOfType<PlayerManager>();
             playerManager.CMDHideAllUnits();
             
             CMDHide(this);
@@ -84,10 +84,6 @@ public class UnitMovement : Movement
                 transform.position = Vector3.Lerp(startPos,new Vector3(hex.transform.position.x , 1 , hex.transform.position.z),lerpStep);
                 yield return null;
             }
-            // MovementFinish
-
-            // MovementFinishEvents
-        
         }
     }
 }

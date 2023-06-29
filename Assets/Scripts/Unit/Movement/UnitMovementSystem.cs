@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Mirror;
 
 public class UnitMovementSystem : MovementSystem
 {
@@ -155,6 +156,12 @@ public class UnitMovementSystem : MovementSystem
                 selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
             }
 
+        }
+        else if(hex.IsEnemySettler())
+        {
+            Debug.Log("enemySettler ",hex.Settler);
+            selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
+            selectedUnit.GetComponent<Unit>().Capture(hex.Settler.GetComponent<NetworkIdentity>(),hex);
         }
         else if(hex.IsMe())
         {

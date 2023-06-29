@@ -5,7 +5,6 @@ using Mirror;
 public class Sight : NetworkBehaviour
 {
     public ISightable sightable;
-    Side side;
     private HexGrid hexGrid;
 
     SightResult sightRange;
@@ -16,7 +15,7 @@ public class Sight : NetworkBehaviour
     }
     public void ShowSight(Hex hex)
     {
-        if(side == Side.Enemy) return;
+        if(hex.IsEnemy() ||hex.IsEnemyBuilding()|| hex.IsEnemySettler()) return;
         hexGrid = FindObjectOfType<HexGrid>();
         // HideSight(hex);
         sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);

@@ -25,7 +25,6 @@ public class SettlerMovement : Movement
         // MovementFinish
 
         // MovementFinishEvents
-        playerManager = FindObjectOfType<PlayerManager>();
         playerManager.CMDHideAllUnits();
         
         CMDHide(this);

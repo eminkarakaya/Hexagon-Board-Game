@@ -6,7 +6,7 @@ using Mirror;
 public abstract class Movement : NetworkBehaviour
 {
     protected IMovable Moveable;
-    [SerializeField] protected PlayerManager playerManager;
+    [SerializeField] protected CivManager playerManager;
     [SerializeField] protected float movementDuration = 1, rotationDuration = .3f;
     public event System.Action<Movement> MovementFinished;
     protected Queue<Hex> pathHexes = new Queue<Hex>();
@@ -16,6 +16,8 @@ public abstract class Movement : NetworkBehaviour
     protected Queue<Vector3> pathPositions = new Queue<Vector3>();
     
     protected void Start() {
+        if(playerManager == null)
+            playerManager = PlayerManager.FindPlayerManager();
         Moveable = GetComponent<IMovable>();
     }
      public void SetCurrentMovementPoints(int value)
