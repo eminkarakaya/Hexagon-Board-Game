@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Mirror;
-public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable 
+public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,ISideable
 {
-    public CivManager civManager;
+        [SyncVar] [SerializeField] private  CivManager civManager;
+    public CivManager CivManager {get => civManager;set {civManager = value;}}
+
     [SerializeField] private GameObject buildingPrefab;
     public Hex Hex { get => _hex; set{_hex = value;} }
     [SerializeField] private Hex _hex;
@@ -14,7 +16,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable
     public Vector3Int Position { get; set; }
     [SerializeField] Canvas canvas;
     public Canvas Canvas { get => canvas; set{canvas = value;} }
-    public Outline outline { get; set; }
+    public Outline Outline { get; set; }
     public Side Side { get =>_side; set{_side = value;} }
     [SerializeField] private List<GameObject> sights;
     public List<GameObject> Sights=>sights;
@@ -22,31 +24,15 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable
     public Sight Sight { get; set; }
 
     [SerializeField] private Side _side;
-     public void SetSide(Side side,Outline outline)
-    {
-        this.Side = side;
-        if(outline == null) return;
-        Debug.Log(side + " side");
-        if(side == Side.Me)
-        {
-            outline.OutlineColor = Color.white;
-        }
-        else if(side == Side.Enemy)
-        {
-            outline.OutlineColor = Color.red;
-        }
-    }
+   
 
     private void Awake() {
 
     }
     private void Start() {
-        outline = GetComponent<Outline>();
+        Outline = GetComponent<Outline>();
         Movement = GetComponent<Movement>();
         Result = new SettlerMovableResult(this);
-        if(civManager == null)
-            civManager = PlayerManager.FindPlayerManager();
-        civManager.SetTeamColor(this.gameObject);
     }
     public void CloseCanvas()
     {
@@ -62,8 +48,8 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable
 
     public void LeftClick()
     {
-        outline.enabled = true;
-        // Result.ShowRange(this,Movement);
+        Outline.enabled = true;
+        Result.ShowRange(this,Movement);
         Result.ShowRange(this,Movement);
     }
 
@@ -77,7 +63,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable
     {
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
-        // Result = new UnitMovableResult(this);
+        Result = new UnitMovableResult(this);
         Result.CalculateRange(this,hexGrid);
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
     }
@@ -109,10 +95,56 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable
             if(item == null) continue;
             if(item.isOwned)
             {
-                item.GetComponent<ISelectable>().SetSide(Side.Me,item.GetComponent<Outline>());
+                item.SetSide(Side.Me,item.GetComponent<Outline>());
             }
             else
-                item.GetComponent<ISelectable>().SetSide(Side.Enemy,item.GetComponent<Outline>());
+                item.SetSide(Side.Enemy,item.GetComponent<Outline>());
         }
+    }
+     [Command] public void CMDSetSide(NetworkIdentity identity, GameObject _gameObject)
+    {
+        RPGSetSide(identity,_gameObject,CivManager);
+    }
+    [ClientRpc] private void RPGSetSide(NetworkIdentity identity,GameObject _gameObject,CivManager civManager)
+    {
+        ISideable sideable = _gameObject.GetComponent<ISideable>();
+        sideable.CivManager = civManager;
+        if(identity.isOwned)
+        {
+            sideable.SetSide(Side.Me,sideable.Outline);
+        }
+        else
+        {
+            sideable.SetSide(Side.Enemy,sideable.Outline);
+        }
+    }
+    public IEnumerator wait(NetworkIdentity identity,GameObject sideable)
+    {
+        while(sideable.GetComponent<NetworkIdentity>().isOwned == false)
+        {
+            Debug.Log("kekw settler");
+            yield return null;
+            
+        }
+        civManager.SetTeamColor(this.gameObject);
+        CMDSetSide(identity,sideable);
+    }
+    public void SetSide(Side side, Outline outline)
+    {
+        this.Side = side;
+        if(outline == null) return;
+        if(side == Side.Me)
+        {
+            outline.OutlineColor = Color.white;
+        }
+        else if(side == Side.Enemy)
+        {
+            outline.OutlineColor = Color.red;
+        }
+    }
+    public void StartCoroutine1(NetworkIdentity identity,GameObject sideable)
+    {
+        // civManager.Capture(identity);
+        StartCoroutine(wait(identity,sideable));
     }
 }

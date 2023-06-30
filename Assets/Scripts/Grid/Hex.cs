@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 using Mirror;
 [SelectionBase]
-public class Hex : NetworkBehaviour, IHexHandler
+public class Hex : NetworkBehaviour
 {
     public bool isVisible;
     public bool isEnemy;

@@ -167,10 +167,7 @@ public class NetworkManagerGdd : NetworkManager
         LocalPlayers[conn] = player.GetComponent<NetworkIdentity>();
 
         NetworkServer.AddPlayerForConnection(conn, player);
-        foreach (var item in LocalPlayers)
-        {
-            Debug.Log(item.Key + " " + item.Value,item.Value.gameObject);
-        }
+        
     }
 
     /// <summary>

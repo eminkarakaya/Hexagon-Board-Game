@@ -159,9 +159,11 @@ public class UnitMovementSystem : MovementSystem
         }
         else if(hex.IsEnemySettler())
         {
-            Debug.Log("enemySettler ",hex.Settler);
-            selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);
-            selectedUnit.GetComponent<Unit>().Capture(hex.Settler.GetComponent<NetworkIdentity>(),hex);
+            
+            selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);   
+            selectedUnit.GetComponent<Unit>().CivManager.Capture(hex.Settler.GetComponent<NetworkIdentity>());     
+            hex.Settler.StartCoroutine1(hex.Settler.GetComponent<NetworkIdentity>(),hex.Settler.gameObject);
+            // selectedUnit.GetComponent<Unit>().Capture(hex.Settler.GetComponent<NetworkIdentity>(),hex.Settler.gameObject);
         }
         else if(hex.IsMe())
         {

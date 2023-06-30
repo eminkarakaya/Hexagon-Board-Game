@@ -4,9 +4,11 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 [SelectionBase]
-public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , ISightable,IDamagable
+public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , ISightable,IDamagable, ISideable
 {
-    public CivManager civManager;
+        [SyncVar] [SerializeField] private  CivManager civManager;
+    public CivManager CivManager {get => civManager;set {civManager = value;}}
+
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
     public Movement Movement { get; set; }
@@ -33,7 +35,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
     [SerializeField] Canvas canvas;
     public Canvas Canvas { get => canvas; set {canvas = value;} }
     public int Range { get; set; }
-    public Outline outline { get; set; }
+    public Outline Outline { get; set; }
     public Side Side { get => side; set {side = value;} }
     [SerializeField] private List<GameObject> sights;
     public List<GameObject> Sights=>sights;
@@ -47,13 +49,10 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
         Attack = GetComponent<Attack>();
         AttackSystem = new MeeleAttack();
         Result = new UnitMovableResult(this);
-        if(civManager == null)
-            civManager = PlayerManager.FindPlayerManager();
-            
-        civManager.SetTeamColor(this.gameObject);
-        outline = GetComponent<Outline>();
-        
+        Outline = GetComponent<Outline>();
     }
+
+   
     public void OpenCanvas()
     {
         Canvas.gameObject.SetActive(true);
@@ -70,7 +69,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
     public void RightClick(Hex selectedHex)
     {
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
-        // Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
+        Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
         Result.CalculateRange(this,hexGrid);
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
     } 
@@ -81,14 +80,14 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
     
     public void LeftClick()
     {
-        outline.enabled = true;
-        // Result = new UnitMovableResult(Movement);
+        Outline.enabled = true;
+        Result = new UnitMovableResult(this);
         Result.ShowRange(this,Movement);
         AttackSystem.GetRange(this);
     }
     public void Deselect()
     {
-        outline.enabled = false;
+        Outline.enabled = false;
         Result.HideRange(this,Movement);
         AttackSystem.HideRange();
         
@@ -96,42 +95,47 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
 
 
 
-    [Command] private void CMDSetSide(NetworkIdentity identity, Hex hex)
+    [Command] private void CMDSetSide(NetworkIdentity identity,GameObject sideable)
     {
-        RPGSetSide(identity,hex,civManager);
+        RPGSetSide(identity,CivManager,sideable);
     }
-    [ClientRpc] private void RPGSetSide(NetworkIdentity identity,Hex hex,CivManager civManager)
+    [ClientRpc] private void RPGSetSide(NetworkIdentity identity,CivManager civManager,GameObject sideable)
     {
-        hex.Settler.civManager = civManager;
-        if(hex.Settler.isOwned)
+        ISideable sideable1 = sideable.GetComponent<ISideable>();
+        sideable1.CivManager = civManager;
+        if(identity.isOwned)
         {
-            hex.Settler.SetSide(Side.Me,hex.Settler.outline);
+            sideable1.SetSide(Side.Me,sideable1.Outline);
         }
         else
         {
-            hex.Settler.SetSide(Side.Enemy,hex.Settler.outline);
+            sideable1.SetSide(Side.Enemy,sideable1.Outline);
         }
     }
-    public void Capture(NetworkIdentity identity,Hex hex)
+    public void Capture(NetworkIdentity identity,GameObject _gameObject)
     {
-        civManager.Capture(identity);
+        CivManager.Capture(identity);
         
-        TeamColor [] teamColors = hex.Settler.transform.GetComponentsInChildren<TeamColor>();
+        TeamColor [] teamColors = _gameObject.transform.GetComponentsInChildren<TeamColor>();
         foreach (var item in teamColors)
         {
-            item.SetColor(civManager.data);
+            item.SetColor(CivManager.data);
         }
-        StartCoroutine(wait(hex.Settler,identity,hex));
+        StartCoroutine(wait(identity,_gameObject));
     }
-    IEnumerator wait(Settler settler,NetworkIdentity identity,Hex hex)
+    public IEnumerator wait(NetworkIdentity identity,GameObject sideable)
     {
-        while(settler.isOwned == false)
+        while(GetComponent<NetworkIdentity>().isOwned == false)
         {
-            Debug.Log("kekw");
+            Debug.Log("kekw1");
             yield return null;
             
         }
-        CMDSetSide(identity,hex);
+        CMDSetSide(identity,sideable);
+    }
+    public void StartCoroutine1(NetworkIdentity identity,GameObject sideable)
+    {
+        StartCoroutine(wait(identity,sideable));
     }
 }
 

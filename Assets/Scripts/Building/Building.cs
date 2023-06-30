@@ -4,9 +4,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 
-public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
+public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,ISideable
 {
-    [SyncVar] [SerializeField] public CivManager civManager;
+    
+    #region Properties
+
+    [SyncVar] [SerializeField] private  CivManager civManager;
+    public CivManager CivManager {get => civManager;set {civManager = value;}}
+
+    
+    [Header("Prefabs")]
+
     [SerializeField] private GameObject mc1,settler;
     public Hex Hex { get => hex; set{hex = value;} }
     [SyncVar] [SerializeField] private Hex hex = null;
@@ -20,39 +28,21 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
 
     public Sight Sight { get; set; }
     public HP hp { get; set; }
+    public Outline Outline { get; set; }
 
     [SerializeField] UnityEngine.Canvas _canvas;
-    public override void OnStartClient()
-    {
-        if(civManager == null)
-            civManager = PlayerManager.FindPlayerManager();
-        civManager.SetTeamColor(this.gameObject);
-    }
+    #endregion
+
+    #region Mirror and Unity Callback
+   
     private void Start() {
+        Outline = GetComponent<Outline>();
         hp = GetComponent<HP>();
         Sight = GetComponent<Sight>();
     }
-    public void OpenCanvas()
-    {
-        Canvas.gameObject.SetActive(true);
-    }
-    public void CloseCanvas()
-    {
-        // Canvas.gameObject.SetActive(false);
-    }
-    [ClientRpc] private void RPCSetHex(Unit unit,Hex hex)
-    {
-        unit.Hex = hex;
-        hex.Unit = unit;
-    }
-    // private void AddLiveUnits(IMovable unit)
-    // {
-    //     playerManager = FindObjectOfType<PlayerManager>();
-    //     playerManager.liveUnits.Add(unit);
-    //     HexGrid hexGrid = FindObjectOfType<HexGrid>();
-    //     // hexGrid.CloseVisible();
-    //     // unit.Hex = Hex;
-    // }
+    #endregion
+   
+    #region  CREATE Unit
     [Command]
     private void CMDCreateMC1()
     {
@@ -61,12 +51,29 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
         unit.Hex = Hex;
         // RPCSetHex(unit,Hex);
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
-        if(civManager == null)
-            civManager = PlayerManager.FindPlayerManager();
-        civManager.ownedObjs.Add(unit.gameObject);
+        if(CivManager == null)
+            CivManager = PlayerManager.FindPlayerManager();
+        CivManager.ownedObjs.Add(unit.gameObject);
         RPCCreateMC1(unit);
+        FindPlayerManager(unit);
         // AddLiveUnits(unit);
     }
+    [ClientRpc] private void FindPlayerManager(Unit unit)
+    {
+       
+        unit.CivManager = this.civManager;
+        StartCoroutine(FindPlayerManagerIE(unit));
+    }
+     private IEnumerator FindPlayerManagerIE(Unit unit)
+    {
+        while(unit.CivManager == null)
+        {
+            yield return null;
+        }
+        unit.CivManager.SetTeamColor(this.gameObject);
+
+    }
+    
     [ClientRpc]
     private void RPCCreateMC1(Unit unit)
     {
@@ -74,20 +81,81 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
         unit.Hex.Unit = unit;
         if(unit.isOwned)
         {
-            unit.GetComponent<ISelectable>().SetSide(Side.Me,unit.GetComponent<Outline>());
+            unit.SetSide(Side.Me,unit.GetComponent<Outline>());
         }
         else
         {
-            unit.GetComponent<ISelectable>().SetSide(Side.Enemy,unit.GetComponent<Outline>());
+            unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
         }
         
        
-        civManager.CMDHideAllUnits();
-        civManager.CMDShowAllUnits();
+        CivManager.CMDHideAllUnits();
+        CivManager.CMDShowAllUnits();
     }
     public void CreateMC1OnClick()
     {
         CMDCreateMC1();
+    }
+    #endregion
+    #region  SetSide
+    [Command] public void CMDSetSide(NetworkIdentity identity, GameObject _gameObject)
+    {
+        RPGSetSide(identity,_gameObject,CivManager);
+    }
+    [ClientRpc] private void RPGSetSide(NetworkIdentity identity,GameObject _gameObject,CivManager civManager)
+    {
+        ISideable sideable = _gameObject.GetComponent<ISideable>();
+        sideable.CivManager = civManager;
+        if(identity.isOwned)
+        {
+            sideable.SetSide(Side.Me,sideable.Outline);
+        }
+        else
+        {
+            sideable.SetSide(Side.Enemy,sideable.Outline);
+        }
+    }
+    public IEnumerator wait(NetworkIdentity identity,GameObject sideable)
+    {
+        while(sideable.GetComponent<NetworkIdentity>().isOwned == false)
+        {
+            Debug.Log("kekw building");
+            yield return null;
+            
+        }
+        CMDSetSide(identity,sideable);
+    }
+    public void SetSide(Side side, Outline outline)
+    {
+        this.side = side;
+        if(outline == null) return;
+        if(side == Side.Me)
+        {
+            outline.OutlineColor = Color.white;
+        }
+        else if(side == Side.Enemy)
+        {
+            outline.OutlineColor = Color.red;
+        }
+    }
+
+    #endregion
+    #region  CREATE SETTLER
+
+    [ClientRpc] private void FindPlayerManager(Settler unit)
+    {
+       
+        unit.CivManager = this.civManager;
+        StartCoroutine(FindPlayerManagerIE(unit));
+    }
+     private IEnumerator FindPlayerManagerIE(Settler unit)
+    {
+        while(unit.CivManager == null)
+        {
+            yield return null;
+        }
+        unit.CivManager.SetTeamColor(this.gameObject);
+
     }
     [ClientRpc]
     private void RPCCreateSettler(Settler unit)
@@ -96,28 +164,29 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
         unit.Hex.Settler = unit;
         if(unit.isOwned)
         {
-            unit.GetComponent<ISelectable>().SetSide(Side.Me,unit.GetComponent<Outline>());
+            unit.SetSide(Side.Me,unit.GetComponent<Outline>());
         }
         else
         {
-            unit.GetComponent<ISelectable>().SetSide(Side.Enemy,unit.GetComponent<Outline>());
+            unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
         }
         
 
-        civManager.CMDHideAllUnits();
-        civManager.CMDShowAllUnits();
+        CivManager.CMDHideAllUnits();
+        CivManager.CMDShowAllUnits();
     }
     [Command]
     private void CMDCreateSettler()
     {
-        if(civManager == null)
-            civManager = PlayerManager.FindPlayerManager();
+        if(CivManager == null)
+            CivManager = PlayerManager.FindPlayerManager();
         if(Hex.Unit != null) return;
         Settler unit = Instantiate(settler,transform.position,Quaternion.identity).GetComponent<Settler>();
         unit.Hex = Hex;
         // RPCSetHex(unit,Hex);
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
         RPCCreateSettler(unit);
+        FindPlayerManager(unit);
         // AddLiveUnits(unit.GetComponent<IMovable>());
     }
     
@@ -125,6 +194,8 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
     {
         CMDCreateSettler();
     }
+    #endregion
+    #region  SELECTABLE METHODS
 
     public void LeftClick()
     {
@@ -145,4 +216,14 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable
     {
         
     }
+     public void OpenCanvas()
+    {
+        Canvas.gameObject.SetActive(true);
+    }
+    public void CloseCanvas()
+    {
+        // Canvas.gameObject.SetActive(false);
+    }
+    #endregion
+    
 }

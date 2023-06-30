@@ -38,7 +38,7 @@ public class AIManager : CivManager
     
     private void RPCCreateBuilding(Building unit,int i)
     {
-        unit.civManager = this;
+        unit.CivManager = this;
         unit.transform.position = new Vector3 (NetworkManagerGdd.singleton.npcHexes[i]. transform.position.x , 1 , NetworkManagerGdd.singleton.npcHexes[i]. transform.position.z );
         unit.transform.rotation = Quaternion.Euler(-90,0,0); 
         unit.Hex = NetworkManagerGdd.singleton.npcHexes[i];
@@ -48,10 +48,10 @@ public class AIManager : CivManager
             if(item == null) continue;
             if(item.isOwned)
             {
-                item.GetComponent<ISelectable>().SetSide(Side.Me,item.GetComponent<Outline>());
+                item.SetSide(Side.Me,item.GetComponent<Outline>());
             }
             else
-                item.GetComponent<ISelectable>().SetSide(Side.Enemy,item.GetComponent<Outline>());  
+                item.SetSide(Side.Enemy,item.GetComponent<Outline>());  
         }
     }
     

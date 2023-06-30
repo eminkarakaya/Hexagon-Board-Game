@@ -11,7 +11,7 @@ public class CivManager : NetworkBehaviour
     [SerializeField] public List<GameObject> ownedObjs = new List<GameObject>();
     [SerializeField] private HexGrid hexGrid;
     public CivData data;
-    [Command]
+    [Command()]
     public void Capture(NetworkIdentity identity)
     {
         // NetworkServer.ReplacePlayerForConnection(connectionToClient,)

@@ -17,7 +17,7 @@ public interface IMovable
 {
     public Movement Movement { get; set; }
     public MovementSystem Result { get; set; }
-    public Outline outline { get; set; } 
+    public Outline Outline { get; set; } 
     public Hex Hex { get; set; }
     
 }
@@ -29,7 +29,7 @@ public class UnitMovableResult : UnitMovementSystem,IMovable
     }
     public Movement Movement { get; set; }
     public MovementSystem Result { get ; set ; }
-    public Outline outline { get; set; }
+    public Outline Outline { get; set; }
     public Hex Hex { get; set; }
 }
 
@@ -42,7 +42,7 @@ public class SettlerMovableResult :SettlerMovementSystem, IMovable
     public Hex Hex { get; set; }
     public Movement Movement { get; set; }
     public MovementSystem Result { get;  set; }
-    public Outline outline { get; set; }
+    public Outline Outline { get; set; }
 }
 
 public interface ISelectable
@@ -56,57 +56,10 @@ public interface ISelectable
     public void RightClick(Hex selectedHex);
     public void RightClick2(Hex selectedHex);
     public void Deselect();
-    public void SetSide(Side side,Outline outline)
-    {
-        Side = side;
-        if(outline == null) return;
-        if(side == Side.Me)
-        {
-            outline.OutlineColor = Color.white;
-        }
-        else if(side == Side.Enemy)
-        {
-            outline.OutlineColor = Color.red;
-        }
-    }
+    
     // public System.Action SelectEvent { get; set; }
 }
-public class SelectableResult : ISelectable
-{
-    public Vector3Int Position { get;  set;  }
-    public Canvas Canvas { get;  set;  }
-    public Side Side { get; set; }
-    public void CloseCanvas()
-    {
-        Canvas.gameObject.SetActive(false);
-    }
 
-    public void Deselect()
-    {
-        
-    }
-
-    public void LeftClick()
-    {
-        
-    }
-
-    public void OpenCanvas()
-    {
-        Canvas.gameObject.SetActive(true);
-        
-    }
-
-    public void RightClick(Hex selectedHex)
-    {
-        
-    }
-
-    public void RightClick2(Hex selectedHex)
-    {
-        
-    }
-}
 public interface IAttackable
 {
     public Vector3Int Position { get; set; }
@@ -120,28 +73,11 @@ public class MeeleAttack : AttackSystem,IAttackable
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
 }
-
-public interface IHexHandler
+public interface ISideable
 {
-    public Unit Unit { get; set; }
-    public Settler Settler { get; set; }
-    public Building Building { get; set; }
-}
-
-public class SideableResult
-{
+    public Hex Hex { get; set; }
+    public CivManager CivManager { get; set; }
     public Side Side { get; set; }
-    public void SetSide(Side side,Outline outline)
-    {
-        Side = side;
-        if(outline == null) return;
-        if(side == Side.Me)
-        {
-            outline.OutlineColor = Color.white;
-        }
-        else if(side == Side.Enemy)
-        {
-            outline.OutlineColor = Color.red;
-        }
-    }
+    public Outline Outline { get; set; }
+    public void SetSide(Side side , Outline outline);
 }
