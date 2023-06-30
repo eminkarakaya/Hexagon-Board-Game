@@ -16,8 +16,9 @@ public abstract class MovementSystem
     }
     public void ShowRange(IMovable selectedUnit,Movement unit)
     {
+        if(UnitManager.Instance.selectedUnit  == null) return;
         if(UnitManager.Instance.selectedUnit != unit.GetComponent<ISelectable>()) return;
-
+        Debug.Log(unit,unit);
         HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
         CalculateRange(selectedUnit,hexGrid);
         Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.Movement.transform.position);
@@ -40,6 +41,8 @@ public abstract class MovementSystem
         {
             return;
         }
+        if(UnitManager.Instance.selectedUnit == null) return;
+        Debug.Log(unit,unit);
         HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
         CalculateRange(movable,hexGrid);
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())

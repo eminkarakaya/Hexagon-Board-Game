@@ -42,6 +42,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
 
     public Sight Sight { get; set; }
     public HP hp { get; set; }
+    [SerializeField] private IMovable movable;
+    public IMovable Movable { get => movable; set{movable = value;} }
 
     private void Start() {
         hp = GetComponent<HP>();
@@ -50,6 +52,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
         AttackSystem = new MeeleAttack();
         Result = new UnitMovableResult(this);
         Outline = GetComponent<Outline>();
+        Movable = GetComponent<IMovable>();
     }
 
    

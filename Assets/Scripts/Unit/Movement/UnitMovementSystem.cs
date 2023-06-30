@@ -8,7 +8,7 @@ public class UnitMovementSystem : MovementSystem
 {
     public UnitMovementSystem(IMovable movement) : base(movement)
     {
-        // CalculateRange(movement,hexGrid);
+        CalculateRange(movement,hexGrid);
     }
 
     public override void CalculateRange(IMovable selectedUnit,HexGrid hexGrid)
@@ -24,6 +24,7 @@ public class UnitMovementSystem : MovementSystem
         {
             if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
+
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
                     foreach (Vector3Int hexPosition in currentPath)

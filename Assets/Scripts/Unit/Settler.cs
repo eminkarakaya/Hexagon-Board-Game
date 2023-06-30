@@ -22,6 +22,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     public List<GameObject> Sights=>sights;
 
     public Sight Sight { get; set; }
+    public IMovable Movable { get; set; }
 
     [SerializeField] private Side _side;
    
@@ -49,7 +50,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     public void LeftClick()
     {
         Outline.enabled = true;
-        Result.ShowRange(this,Movement);
+        // Result.ShowRange(this,Movement);
         Result.ShowRange(this,Movement);
     }
 

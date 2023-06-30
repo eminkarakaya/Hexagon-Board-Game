@@ -29,6 +29,7 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
     public Sight Sight { get; set; }
     public HP hp { get; set; }
     public Outline Outline { get; set; }
+    public IMovable Movable { get; set; }
 
     [SerializeField] UnityEngine.Canvas _canvas;
     #endregion

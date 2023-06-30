@@ -34,13 +34,13 @@ public class CivManager : NetworkBehaviour
     [Command]
     public virtual void CMDHideAllUnits()
     {
-        
+        HideAllUnits();
     }
    
     [Command]
     public virtual void CMDShowAllUnits()
     {
-        
+        ShowAllUnits();
     }
     [ClientRpc] protected void HideAllUnits()
     {

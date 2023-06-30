@@ -158,6 +158,8 @@ public abstract class Movement : NetworkBehaviour
         // }
     }
     
+
+
     protected abstract IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem);
     [Command]
     protected void CMDShow()
@@ -167,15 +169,44 @@ public abstract class Movement : NetworkBehaviour
     [ClientRpc]
     protected void RPCShow()
     {
-        
         MovementSystem movementSystem = new UnitMovableResult(Moveable);
-        movementSystem.ShowRange(GetComponent<IMovable>(),this);
+        // movementSystem.CalculateRange(Moveable,FindObjectOfType<HexGrid>());
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        {
+            // Debug.Log("true");
+            // Debug.Log(UnitManager.Instance.selectedUnit + " UnitManager.Instance.selectedUnit");
+            // if(UnitManager.Instance.selectedUnit != null)
+                // Debug.Log(UnitManager.Instance.selectedUnit.Movable + " UnitManager.Instance.selectedUnit.moveable");
+            movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+        }
+        else{
+            // Debug.Log(UnitManager.Instance.selectedUnit + " UnitManager.Instance.selectedUnit");
+            // if(UnitManager.Instance.selectedUnit != null)
+                // Debug.Log(UnitManager.Instance.selectedUnit.Movable + " UnitManager.Instance.selectedUnit.moveable");
+        }
     }
     [ClientRpc]
     protected void RPCHide()
     {
         MovementSystem movementSystem = new UnitMovableResult(Moveable);
-        movementSystem.HideRange(Moveable,this);
+        // movementSystem.CalculateRange(Moveable,FindObjectOfType<HexGrid>());
+        // // Debug.Log(UnitManager.Instance);
+        // // Debug.Log(UnitManager.Instance.selectedUnit);
+        // // Debug.Log(UnitManager.Instance.selectedUnit.Movable +  " UnitManager.Instance.selectedUnit.Movable ");
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        {
+            // Debug.Log("true");
+            movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+            // Debug.Log(UnitManager.Instance.selectedUnit + " UnitManager.Instance.selectedUnit");
+            // if(UnitManager.Instance.selectedUnit != null)
+                // Debug.Log(UnitManager.Instance.selectedUnit.Movable + " UnitManager.Instance.selectedUnit.moveable");
+        }
+        else
+        {
+            // Debug.Log(UnitManager.Instance.selectedUnit + " UnitManager.Instance.selectedUnit");
+            // if(UnitManager.Instance.selectedUnit != null)
+                // Debug.Log(UnitManager.Instance.selectedUnit.Movable + " UnitManager.Instance.selectedUnit.moveable");
+        }
     }
     [Command]
     protected void CMDHide(Movement movement)
@@ -193,7 +224,6 @@ public abstract class Movement : NetworkBehaviour
     {
         if(TryGetComponent(out Unit unit))
         {
-            
             Unit tempUnit = hex1.Unit;
             hex1.Unit = hex2.Unit;
             hex2.Unit = tempUnit;

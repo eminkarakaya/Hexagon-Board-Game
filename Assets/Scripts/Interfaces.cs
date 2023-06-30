@@ -56,6 +56,7 @@ public interface ISelectable
     public void RightClick(Hex selectedHex);
     public void RightClick2(Hex selectedHex);
     public void Deselect();
+    public IMovable Movable { get; set; }
     
     // public System.Action SelectEvent { get; set; }
 }
