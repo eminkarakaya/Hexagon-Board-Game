@@ -5,6 +5,7 @@ using TMPro;
 using Mirror;
 public abstract class Attack : NetworkBehaviour
 {
+    protected IAttackable attackable;
     [SerializeField] private TextMeshProUGUI _damageText;
     [SerializeField] protected int _damagePower;
     public System.Action AttackEvent;
@@ -13,6 +14,7 @@ public abstract class Attack : NetworkBehaviour
     public int range = 1;
     private void Start() {
         SetDamage(_damagePower);
+        attackable = GetComponent<IAttackable>();
     }
     void SetDamage(int value)
     {

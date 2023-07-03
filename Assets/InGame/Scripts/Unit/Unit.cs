@@ -6,6 +6,7 @@ using TMPro;
 [SelectionBase]
 public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , ISightable,IDamagable, ISideable
 {
+    #region PROPERTiES
         [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
 
@@ -15,19 +16,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
     [SyncVar] [SerializeField] private Hex hex;
     public Hex Hex {get => hex; set {hex = value;}}
     [SerializeField] private Side side;
-    public void SetSide(Side side,Outline outline)
-    {
-        this.side = side;
-        if(outline == null) return;
-        if(side == Side.Me)
-        {
-            outline.OutlineColor = Color.white;
-        }
-        else if(side == Side.Enemy)
-        {
-            outline.OutlineColor = Color.red;
-        }
-    }
+   
     
    
     public MovementSystem Result { get ; set ; }
@@ -44,7 +33,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
     public HP hp { get; set; }
     [SerializeField] private IMovable movable;
     public IMovable Movable { get => movable; set{movable = value;} }
-
+    #endregion
+    #region Mirror and Unity Callback
     private void Start() {
         hp = GetComponent<HP>();
         Movement = GetComponent<Movement>();
@@ -54,8 +44,18 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
         Outline = GetComponent<Outline>();
         Movable = GetComponent<IMovable>();
     }
+    public override void OnStopAuthority()
+    {
+        // CloseCanvas();
+        // civManager.CMDHideAllUnits();
+        // Movement.HideRangeStopAuthority();
+        UnitManager.Instance.ClearOldSelection();
+    }
+    #endregion
 
-   
+    #region  SELECTABLE METHODS
+    
+    
     public void OpenCanvas()
     {
         Canvas.gameObject.SetActive(true);
@@ -66,15 +66,13 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
     }
    
    
-    public override void OnStartAuthority()
-    {
-    }
+   
     public void RightClick(Hex selectedHex)
     {
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
-        Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
+        Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
         Result.CalculateRange(this,hexGrid);
-        Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
+        Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
     } 
     public void RightClick2(Hex selectedHex)
     {
@@ -86,18 +84,34 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
         Outline.enabled = true;
         Result = new UnitMovableResult(this);
         Result.ShowRange(this,Movement);
-        AttackSystem.GetRange(this);
+        // AttackSystem.GetRange(this);
+        AttackSystem.ShowRange(this);
     }
     public void Deselect()
     {
-        Outline.enabled = false;
+        // Outline.enabled = false;
         Result.HideRange(this,Movement);
-        AttackSystem.HideRange();
+        AttackSystem.HideRange(this);
         
     }
 
+    #endregion
 
+    #region  SETSIDE
 
+     public void SetSide(Side side,Outline outline)
+    {
+        this.side = side;
+        if(outline == null) return;
+        if(side == Side.Me)
+        {
+            outline.OutlineColor = Color.white;
+        }
+        else if(side == Side.Enemy)
+        {
+            outline.OutlineColor = Color.red;
+        }
+    }
     [Command] private void CMDSetSide(NetworkIdentity identity,GameObject sideable)
     {
         RPGSetSide(identity,CivManager,sideable);
@@ -122,7 +136,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
         TeamColor [] teamColors = _gameObject.transform.GetComponentsInChildren<TeamColor>();
         foreach (var item in teamColors)
         {
-            item.SetColor(CivManager.data);
+            item.SetColor(CivManager.civData);
         }
         StartCoroutine(wait(identity,_gameObject));
     }
@@ -134,12 +148,15 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
             yield return null;
             
         }
+
+        civManager.CMDHideAllUnits();
         CMDSetSide(identity,sideable);
     }
     public void StartCoroutine1(NetworkIdentity identity,GameObject sideable)
     {
         StartCoroutine(wait(identity,sideable));
     }
+    #endregion
 }
 
 public enum Side

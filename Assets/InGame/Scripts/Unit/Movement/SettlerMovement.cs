@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Mirror;
 public class SettlerMovement : Movement
-{
+{ 
+    MovementSystem movementSystem;
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem)
     {
         Vector3 startPos = transform.position;
@@ -27,7 +28,7 @@ public class SettlerMovement : Movement
         // MovementFinishEvents
         playerManager.CMDHideAllUnits();
         
-        CMDHide(this);
+        CMDHide();
         CMDSetHex(endHex,Moveable.Hex);
         this.Moveable.Hex = endHex;
 
@@ -58,6 +59,47 @@ public class SettlerMovement : Movement
                 }
                 transform.rotation = endRotation;
             }
+        }
+    }
+     [Command]
+    protected override void CMDShow()
+    {
+        RPCShow();
+    }
+    [ClientRpc]
+    protected void RPCShow()
+    {
+        movementSystem = new SettlerMovementSystem(Moveable);
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        {
+            movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+        }
+        else{
+        }
+    }
+    [ClientRpc]
+    protected void RPCHide()
+    {
+        movementSystem = new SettlerMovementSystem(Moveable);
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        {
+            movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+        }
+        else
+        {
+        }
+    }
+    [Command]
+    protected override void CMDHide()
+    {
+       RPCHide();
+    }
+    public override void HideRangeStopAuthority()
+    {
+        if(movementSystem == null) return;
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit == Moveable)
+        {
+            movementSystem.HideRangeStopAuthority(Moveable);
         }
     }
 }

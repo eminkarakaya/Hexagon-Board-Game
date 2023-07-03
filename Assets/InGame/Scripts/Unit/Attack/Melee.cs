@@ -20,7 +20,7 @@ public class Melee : Attack
         {
             StartCoroutine(movement.MoveKill(damagable.Hex,damagable.hp.Hp<=0));
         }
-        damagable.hp.Death();
+        damagable.hp.Death(damagable);
         
     }
 

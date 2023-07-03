@@ -83,13 +83,13 @@ public class PlayerManager : CivManager
     [Command]
     public override void CMDHideAllUnits()
     {
-        HideAllUnits();
+        RPCHideAllUnits();
     }
    
     [Command]
     public override void CMDShowAllUnits()
     {
-        ShowAllUnits();
+        RPCShowAllUnits();
     }
     
     

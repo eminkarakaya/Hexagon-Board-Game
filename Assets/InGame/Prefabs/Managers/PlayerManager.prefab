@@ -65,9 +65,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  data: {fileID: 11400000, guid: ecc1986c615d2354a9b5f63208e13a83, type: 2}
-  hexGrid: {fileID: 6415209383831887827, guid: 56919fa60e0e44240aa635b8ba3acf71, type: 3}
-  gameManagerPrefab: {fileID: 270059685851880820, guid: b7b092293cb59c84990473ddd4694eff, type: 3}
-  gameManager: {fileID: 0}
   buildingPrefab: {fileID: 899474852993721947, guid: 2da110e74f8705a488bdb1271ce2eae4, type: 3}
-  team: 0
+  ownedObjs: []
+  hexGrid: {fileID: 6415209383831887827, guid: 56919fa60e0e44240aa635b8ba3acf71, type: 3}
+  civData: {fileID: 11400000, guid: ecc1986c615d2354a9b5f63208e13a83, type: 2}

@@ -4,11 +4,17 @@ using UnityEngine;
 using Mirror;
 public class UnitMovement : Movement
 {
-    protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem)
+    MovementSystem movementSystem;
+    protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex nextHex,Hex lastHex,MovementSystem movementSystem)
     {
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
-        if(endHex.IsEnemy() ||endHex.IsEnemyBuilding())
+        if(lastHex != nextHex && nextHex.IsEnemySettler())
+            yield break;
+        // if(lastHex != nextHex && nextHex.IsEnemyBuilding())
+        //     yield break;
+        
+        if(nextHex.IsEnemy() || nextHex.IsEnemyBuilding())
         {
             yield break;
         }
@@ -28,9 +34,9 @@ public class UnitMovement : Movement
         
         playerManager.CMDHideAllUnits();
         
-        CMDHide(this);
-        CMDSetHex(endHex,Moveable.Hex);
-        this.Moveable.Hex = endHex;
+        CMDHide();
+        CMDSetHex(nextHex,Moveable.Hex);
+        this.Moveable.Hex = nextHex;
 
         transform.position = endPos;
         playerManager.CMDShowAllUnits();
@@ -38,16 +44,15 @@ public class UnitMovement : Movement
         
         if(pathPositions.Count > 0)
         {
-            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),hex,rotationDuration,movementSystem));
+            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),lastHex,rotationDuration,movementSystem));
         }
         else
-        {
-
+        {  
             MovementFinsihEvent(this);
-            if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
+            if(lastHex.IsEnemy() ||lastHex.IsEnemyBuilding())
             {
                 Quaternion startRotation = transform.rotation;
-                Vector3 direction = new Vector3(hex.transform.position.x,transform.position.y,hex.transform.position.z) - transform.position;
+                Vector3 direction = new Vector3(lastHex.transform.position.x,transform.position.y,lastHex.transform.position.z) - transform.position;
                 Quaternion endRotation = Quaternion.LookRotation(direction,Vector3.up);
                 timeElapsed = 0;
                 while(timeElapsed < rotationDuration)
@@ -58,6 +63,13 @@ public class UnitMovement : Movement
                     yield return null;
                 }
                 transform.rotation = endRotation;
+                AttackUnit(lastHex);
+            }
+            else if(lastHex.IsEnemySettler())
+            {
+                GetComponent<Unit>().CivManager.Capture(lastHex.Settler.GetComponent<NetworkIdentity>());     
+                lastHex.Settler.StartCoroutine1(lastHex.Settler.GetComponent<NetworkIdentity>(),lastHex.Settler.gameObject,GetComponent<Unit>().CivManager);
+
             }
         }
     }
@@ -68,7 +80,7 @@ public class UnitMovement : Movement
         {
             playerManager.CMDHideAllUnits();
             
-            CMDHide(this);
+            CMDHide();
             CMDSetHex(hex,Moveable.Hex);
             this.Moveable.Hex = hex;
 
@@ -84,6 +96,44 @@ public class UnitMovement : Movement
                 transform.position = Vector3.Lerp(startPos,new Vector3(hex.transform.position.x , 1 , hex.transform.position.z),lerpStep);
                 yield return null;
             }
+        }
+    }
+     [Command]
+    protected  override void CMDShow()
+    {
+        RPCShow();
+    }
+    [ClientRpc]
+    protected void RPCShow()
+    {
+        movementSystem = new UnitMovableResult(Moveable);
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        {
+            movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+        }
+       
+    }
+    [ClientRpc]
+    protected void RPCHide()
+    {
+        movementSystem = new UnitMovableResult(Moveable);
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        {
+            movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+        }
+        
+    }
+    [Command]
+    protected  override void CMDHide()
+    {
+       RPCHide();
+    }
+    public override void HideRangeStopAuthority()
+    {
+        if(movementSystem == null) return;
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit == Moveable)
+        {
+            movementSystem.HideRangeStopAuthority(Moveable);    
         }
     }
 }

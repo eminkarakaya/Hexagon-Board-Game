@@ -17,14 +17,13 @@ public class UnitMovementSystem : MovementSystem
         movementRange = GraphSearch.BsfGetRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.Movement.transform.position),selectedUnit.Movement.GetCurrentMovementPoints());
     }
     
-    public override void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid)
+    public override void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid,int range)
     {
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
         if(hex.isVisible)
         {
             if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
-
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
                     foreach (Vector3Int hexPosition in currentPath)
@@ -32,7 +31,7 @@ public class UnitMovementSystem : MovementSystem
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
                     Vector3Int? enemyHex = null;
-                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid);
+                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,range);
                     foreach (Vector3Int hexPosition in currentPath)
                     {
                         hexGrid.GetTileAt(hexPosition).HighlightPath();                    
@@ -73,6 +72,23 @@ public class UnitMovementSystem : MovementSystem
             }
             else if(hex.Building != null && hex.Building.Side == Side.Enemy)
             {
+                if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
+                {
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                    }
+                    Vector3Int? enemyHex = null;
+                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,range);
+                    foreach (Vector3Int hexPosition in currentPath)
+                    {
+                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                    }
+                    
+                }
+            }
+            else if(hex.Settler != null && hex.Settler.Side == Side.Enemy)
+            {
                 
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
@@ -81,7 +97,7 @@ public class UnitMovementSystem : MovementSystem
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
                     Vector3Int? enemyHex = null;
-                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid);
+                    currentPath = movementRange.GetPathEnemyGridSettler(selectedHexPosition,out enemyHex,hexGrid,range);
                     foreach (Vector3Int hexPosition in currentPath)
                     {
                         hexGrid.GetTileAt(hexPosition).HighlightPath();
@@ -89,6 +105,7 @@ public class UnitMovementSystem : MovementSystem
                     
                 }
             }
+            
             else
             {
                 if(movementRange.GetRangePositions().Contains(selectedHexPosition))
@@ -104,6 +121,7 @@ public class UnitMovementSystem : MovementSystem
                     }
                 }
             }
+
         }
         else
         {
@@ -150,6 +168,7 @@ public class UnitMovementSystem : MovementSystem
             {
                 // selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,this,false);
                 selectedUnit.StartCoroutineRotationUnit(selectedUnit,hex.transform.position,hex);
+                
             }
             
             else
@@ -160,10 +179,7 @@ public class UnitMovementSystem : MovementSystem
         }
         else if(hex.IsEnemySettler())
         {
-            
             selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);   
-            selectedUnit.GetComponent<Unit>().CivManager.Capture(hex.Settler.GetComponent<NetworkIdentity>());     
-            hex.Settler.StartCoroutine1(hex.Settler.GetComponent<NetworkIdentity>(),hex.Settler.gameObject);
             // selectedUnit.GetComponent<Unit>().Capture(hex.Settler.GetComponent<NetworkIdentity>(),hex.Settler.gameObject);
         }
         else if(hex.IsMe())

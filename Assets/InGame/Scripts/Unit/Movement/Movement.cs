@@ -14,6 +14,7 @@ public abstract class Movement : NetworkBehaviour
     public int MovementPoints {get => _movementPoints;}
     [SerializeField] protected int _currentMovementPoints = 20;
     protected Queue<Vector3> pathPositions = new Queue<Vector3>();
+    MovementSystem movementSy;
     
     protected void Start() {
         if(playerManager == null)
@@ -29,7 +30,7 @@ public abstract class Movement : NetworkBehaviour
     {
         return _currentMovementPoints;
     }
-    [ClientRpc] protected void RPCSetHex(Hex hex,Hex prevHex) // parametreler hex degıl IMoveable olcak
+    [ClientRpc] protected void RPCSetHex(Hex hex,Hex prevHex) 
     {
         
         if(TryGetComponent(out Unit unit))
@@ -65,7 +66,7 @@ public abstract class Movement : NetworkBehaviour
     {
         pathPositions = new Queue<Vector3>(currentPathTemp);
         pathHexes = new Queue<Hex>(currentPath);
-
+        
         if(currentPathTemp.Count == 0) return;
         Vector3 firstTarget = pathPositions.Dequeue();
         Hex firstHex = pathHexes.Dequeue();
@@ -112,21 +113,36 @@ public abstract class Movement : NetworkBehaviour
                 AttackUnit(hex);
                 MovementFinished?.Invoke(this);
             }
+           
         }
 
     }
-    public void AttackUnit(Hex hex)
+    // protected bool IsAttackable(Hex hex, out IDamagable damagable)
+    // {
+    //     if((hex.Unit != null && hex.Unit.Side == Side.Enemy))
+    //     {
+    //         damagable = hex.Unit;
+    //         return true;
+    //     }
+    //     else if((hex.Building != null && hex.Building.Side == Side.Enemy))
+    //     {
+    //         damagable = hex.Building;
+    //         return true;
+    //     }
+    //     damagable = null;
+    //     return false;
+    // }
+    protected void AttackUnit(Hex hex)
     {
         if(TryGetComponent(out Attack attack))
         {
-            if(hex.Building != null)
+            if(hex.Building != null && hex.Building.Side == Side.Enemy)
             {
-
                 attack.AttackUnit(hex.Building);
             }
-            else
+            else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
-            attack.AttackUnit(hex.Unit);
+                attack.AttackUnit(hex.Unit);
 
             }
 
@@ -155,63 +171,17 @@ public abstract class Movement : NetworkBehaviour
             
         firstUnit.AttackUnit(hex);
         MovementFinished?.Invoke(this);
-        // }
     }
     
 
 
     protected abstract IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem);
-    [Command]
-    protected void CMDShow()
-    {
-        RPCShow();
-    }
-    [ClientRpc]
-    protected void RPCShow()
+    protected virtual void CMDHide(){}
+    protected virtual void CMDShow(){}
+    public void RPCStopAuthorityHide()
     {
         MovementSystem movementSystem = new UnitMovableResult(Moveable);
-        // movementSystem.CalculateRange(Moveable,FindObjectOfType<HexGrid>());
-        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
-        {
-            // Debug.Log("true");
-            // Debug.Log(UnitManager.Instance.selectedUnit + " UnitManager.Instance.selectedUnit");
-            // if(UnitManager.Instance.selectedUnit != null)
-                // Debug.Log(UnitManager.Instance.selectedUnit.Movable + " UnitManager.Instance.selectedUnit.moveable");
-            movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
-        }
-        else{
-            // Debug.Log(UnitManager.Instance.selectedUnit + " UnitManager.Instance.selectedUnit");
-            // if(UnitManager.Instance.selectedUnit != null)
-                // Debug.Log(UnitManager.Instance.selectedUnit.Movable + " UnitManager.Instance.selectedUnit.moveable");
-        }
-    }
-    [ClientRpc]
-    protected void RPCHide()
-    {
-        MovementSystem movementSystem = new UnitMovableResult(Moveable);
-        // movementSystem.CalculateRange(Moveable,FindObjectOfType<HexGrid>());
-        // // Debug.Log(UnitManager.Instance);
-        // // Debug.Log(UnitManager.Instance.selectedUnit);
-        // // Debug.Log(UnitManager.Instance.selectedUnit.Movable +  " UnitManager.Instance.selectedUnit.Movable ");
-        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
-        {
-            // Debug.Log("true");
-            movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
-            // Debug.Log(UnitManager.Instance.selectedUnit + " UnitManager.Instance.selectedUnit");
-            // if(UnitManager.Instance.selectedUnit != null)
-                // Debug.Log(UnitManager.Instance.selectedUnit.Movable + " UnitManager.Instance.selectedUnit.moveable");
-        }
-        else
-        {
-            // Debug.Log(UnitManager.Instance.selectedUnit + " UnitManager.Instance.selectedUnit");
-            // if(UnitManager.Instance.selectedUnit != null)
-                // Debug.Log(UnitManager.Instance.selectedUnit.Movable + " UnitManager.Instance.selectedUnit.moveable");
-        }
-    }
-    [Command]
-    protected void CMDHide(Movement movement)
-    {
-       RPCHide();
+        movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
     }
     [Command]
     protected void CMDChangeHexes(Hex hex1, Hex hex2)
@@ -248,7 +218,6 @@ public abstract class Movement : NetworkBehaviour
     
     public void ChangeHex(Movement firstUnit,Movement targetUnit,MovementSystem movementSystem)
     {
-        // BFSResult result = GraphSearch.GetRange(hexGrid,targetUnit.hex.HexCoordinates,targetUnit.MovementPoints);
 
         if(movementSystem.IsHexInRange(firstUnit.Moveable.Hex.HexCoordinates) && movementSystem.IsHexInRange(targetUnit.Moveable.Hex.HexCoordinates,firstUnit.Moveable.Hex.HexCoordinates,targetUnit.GetCurrentMovementPoints()))
         {
@@ -259,15 +228,12 @@ public abstract class Movement : NetworkBehaviour
             endPos.y = 1;
             StartCoroutine(RotationUnit(firstUnit,targetUnit,endPos,startPos,rotationDuration));
             StartCoroutine(RotationUnit(targetUnit,firstUnit,startPos,endPos,rotationDuration));
-            // StartCoroutine(MoveUnit(firstUnit,endPos,startPos,movementDuration));
-            // StartCoroutine(MoveUnit(targetUnit,startPos,endPos,movementDuration));
 
             CMDChangeHexes(firstUnit.Moveable.Hex,targetUnit.Moveable.Hex);
             playerManager = FindObjectOfType<PlayerManager>();
             playerManager.CMDHideAllUnits();
 
 
-            // CMDChangeHex(firstUnit.hex,targetUnit.hex);
 
             playerManager.CMDShowAllUnits();
 
@@ -281,14 +247,7 @@ public abstract class Movement : NetworkBehaviour
         Vector3 direction = endPos - firstUnit.transform.position;
         Quaternion endRotation = Quaternion.LookRotation(direction,Vector3.up);
 
-        // Quaternion startRotation = firstUnit.transform.rotation;
-        // Vector3 endPos = firstUnit.transform.position;
-        // endPos.y = targetUnit.transform.position.y;
-        // Vector3 direction = endPos - firstUnit.transform.position;
-        // Quaternion endRotation = Quaternion.LookRotation(direction,Vector3.up);
-
-        // if(Mathf.Approximately(Mathf.Abs(Quaternion.Dot(startRotation,endRotation)),1f) == false)
-        // {
+        
             float timeElapsed = 0;
             while(timeElapsed < rotationDuration)
             {
@@ -300,11 +259,10 @@ public abstract class Movement : NetworkBehaviour
 
             StartCoroutine(MoveUnit(firstUnit,endPos,startPos));
 
-        // }
+       
     }
     protected IEnumerator MoveUnit(Movement unit,Vector3 endPos,Vector3 startPos )
     {
-        //  startPos = unit.transform.position;
         float timeElapsed = 0f;
         while(timeElapsed<movementDuration)
         {
@@ -315,4 +273,5 @@ public abstract class Movement : NetworkBehaviour
         }
 
     }
+    public virtual void HideRangeStopAuthority() {}
 }

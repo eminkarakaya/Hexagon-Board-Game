@@ -40,9 +40,9 @@ public class Hex : NetworkBehaviour
     public List<GameObject> GetLinkedObjects()
     {
         List<GameObject> list = new List<GameObject>();
-        if(unit != null)
+        if(Unit != null)
         {
-            foreach (var item in unit.Sights)
+            foreach (var item in Unit.Sights)
             {
                 list.Add(item);
             }

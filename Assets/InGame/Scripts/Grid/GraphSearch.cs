@@ -325,7 +325,7 @@ public class GraphSearch
             {
                 if(hexGrid.GetTileAt(currentNode).isVisible)
                 {
-                    if(hexGrid.GetTileAt(currentNode).IsEnemy() || hexGrid.GetTileAt(currentNode).IsEnemyBuilding()||hexGrid.GetTileAt(currentNode).IsEnemyBuilding())
+                    if(hexGrid.GetTileAt(currentNode).IsEnemy() || hexGrid.GetTileAt(currentNode).IsEnemyBuilding()||hexGrid.GetTileAt(currentNode).IsEnemySettler())
                     {
                         continue;
                     }
@@ -358,7 +358,7 @@ public class GraphSearch
                         }
                         if(!enemiesNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding()||hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
+                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding()||hexGrid.GetTileAt(neighbourPosition).IsEnemySettler())
                             {
                                 enemiesNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -370,7 +370,7 @@ public class GraphSearch
                         {
                             continue;
                         }
-                        if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding() ||hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
+                        if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding() ||hexGrid.GetTileAt(neighbourPosition).IsEnemySettler())
                         {
                             // enemiesNodes[neighbourPosition] = currentNode;
                             continue;
@@ -488,8 +488,10 @@ public class GraphSearch
         allNodes.Remove(startPoint);
         foreach (var item in allNodes)
         {
-            if(hexGrid.GetTileAt (item.Key).IsEnemy())
+            if(hexGrid.GetTileAt (item.Key).IsEnemy() || hexGrid.GetTileAt (item.Key).IsEnemyBuilding())
+            {
                 enemiesNodes.Add(item.Key,item.Value);
+            }
             enemiesNodes.Remove(startPoint);
         }
         return new BFSResult{rangeNodesDict = enemiesNodes};
@@ -561,6 +563,17 @@ public struct BFSResult
         }
         meGrid = GraphSearch.GneratePathBFS(destination,allNodesDict)[0];
         return GraphSearch.GetCloseseteHex(hexGrid, destination, allNodesDict,rangePoint);
+    }
+    
+    public List<Vector3Int> GetPathEnemyGridSettler(Vector3Int destination, out Vector3Int? enemyGrid ,HexGrid hexGrid, int rangePoint = 1)
+    {
+        if (allNodesDict.ContainsKey(destination) == false)
+        {
+            enemyGrid = null;
+            return new List<Vector3Int>();
+        }
+        enemyGrid = GraphSearch.GneratePathBFS(destination,allNodesDict)[0];
+        return GraphSearch.GneratePathBFS(destination,allNodesDict);
     }
     public List<Vector3Int> GetPathEnemyGrid(Vector3Int destination, out Vector3Int? enemyGrid ,HexGrid hexGrid, int rangePoint = 1)
     {

@@ -25,7 +25,13 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     public IMovable Movable { get; set; }
 
     [SerializeField] private Side _side;
-   
+    public override void OnStopAuthority()
+    {
+        // CloseCanvas();
+        // civManager.CMDHideAllUnits();
+        // Movement.HideRangeStopAuthority();
+        UnitManager.Instance.ClearOldSelection();
+    }
 
     private void Awake() {
 
@@ -43,7 +49,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     public void Deselect()
     {
         Result.HideRange(this,Movement);
-
     }
 
 
@@ -63,10 +68,10 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     public void RightClick(Hex selectedHex)
     {
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
-        Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
+        Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
         Result = new UnitMovableResult(this);
         Result.CalculateRange(this,hexGrid);
-        Result.ShowPath(selectedHex.HexCoordinates,hexGrid);
+        Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
     }
 
     public void RightClick2(Hex selectedHex)
@@ -102,13 +107,14 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
                 item.SetSide(Side.Enemy,item.GetComponent<Outline>());
         }
     }
-     [Command] public void CMDSetSide(NetworkIdentity identity, GameObject _gameObject)
+    [Command] public void CMDSetSide(NetworkIdentity identity, GameObject _gameObject,CivManager civManager)
     {
-        RPGSetSide(identity,_gameObject,CivManager);
+        RPGSetSide(identity,_gameObject,civManager);
     }
     [ClientRpc] private void RPGSetSide(NetworkIdentity identity,GameObject _gameObject,CivManager civManager)
     {
         ISideable sideable = _gameObject.GetComponent<ISideable>();
+        Debug.Log(civManager,civManager);
         sideable.CivManager = civManager;
         if(identity.isOwned)
         {
@@ -119,16 +125,19 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
             sideable.SetSide(Side.Enemy,sideable.Outline);
         }
     }
-    public IEnumerator wait(NetworkIdentity identity,GameObject sideable)
+    public IEnumerator wait(NetworkIdentity identity,GameObject sideable,CivManager civManager)
     {
         while(sideable.GetComponent<NetworkIdentity>().isOwned == false)
         {
-            Debug.Log("kekw settler");
             yield return null;
-            
+
         }
+        CMDSetSide(identity,sideable,civManager);
         civManager.SetTeamColor(this.gameObject);
-        CMDSetSide(identity,sideable);
+        Debug.Log(civManager , civManager);
+        civManager.CMDHideAllUnits();
+        civManager.CMDShowAllUnits();
+        
     }
     public void SetSide(Side side, Outline outline)
     {
@@ -143,9 +152,9 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
             outline.OutlineColor = Color.red;
         }
     }
-    public void StartCoroutine1(NetworkIdentity identity,GameObject sideable)
+    public void StartCoroutine1(NetworkIdentity identity,GameObject sideable,CivManager civManager)
     {
         // civManager.Capture(identity);
-        StartCoroutine(wait(identity,sideable));
+        StartCoroutine(wait(identity,sideable,civManager));
     }
 }

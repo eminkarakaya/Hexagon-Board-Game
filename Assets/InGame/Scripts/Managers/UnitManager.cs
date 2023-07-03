@@ -117,7 +117,7 @@ public class UnitManager : SingletonMirror<UnitManager>
         // attackSystem.ShowRange(selectedUnit);
     }
 
-    private void ClearOldSelection()
+    public void ClearOldSelection()
     {
         if(selectedUnit == null) return;
         selectedUnit.CloseCanvas();

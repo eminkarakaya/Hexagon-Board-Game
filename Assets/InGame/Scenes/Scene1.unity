@@ -3043,6 +3043,10 @@ PrefabInstance:
       propertyPath: hexType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8109950461736078625, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
 --- !u!4 &1258931494 stripped
@@ -3916,7 +3920,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718213996}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: 24.42, z: -22.49}
+  m_LocalPosition: {x: 7, y: 29.970001, z: -27.68}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4722,7 +4726,7 @@ MonoBehaviour:
   buildingPrefab: {fileID: 899474852993721947, guid: 2da110e74f8705a488bdb1271ce2eae4, type: 3}
   ownedObjs: []
   hexGrid: {fileID: 1189800794}
-  data: {fileID: 11400000, guid: 9156276579117e645aecf05f543a5be6, type: 2}
+  civData: {fileID: 0}
 --- !u!1 &2113353587
 GameObject:
   m_ObjectHideFlags: 0
@@ -4833,6 +4837,7 @@ MonoBehaviour:
   - {fileID: 6415209383831887824, guid: 56919fa60e0e44240aa635b8ba3acf71, type: 3}
   - {fileID: 1184824918596368635, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
   - {fileID: 270059685851880822, guid: b7b092293cb59c84990473ddd4694eff, type: 3}
+  - {fileID: 651546988363916524, guid: 86f7cb2ccf586d34dbe22a2374aadec9, type: 3}
   snapshotSettings:
     bufferTimeMultiplier: 2
     catchupNegativeThreshold: -1
@@ -4853,6 +4858,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  npcs: []
 --- !u!4 &2135804231 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1962029369421980225, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}

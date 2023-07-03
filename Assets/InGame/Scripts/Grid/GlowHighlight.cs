@@ -14,9 +14,6 @@ public class GlowHighlight : NetworkBehaviour
     private bool isGlowing = false;
     private Color validSpaceColor = Color.green;
     [SerializeField] private Color originalGlowColor,enemyGlowColor,rangeGlowColor;
-    public override void OnStartClient()
-    {
-    }
     private void Awake() {  
         PrepareMaterialDictionaries();
         originalGlowColor = glowMaterial.GetColor("_GlowColor");

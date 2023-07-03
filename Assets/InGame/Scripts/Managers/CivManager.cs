@@ -7,11 +7,10 @@ using System.Linq;
 public class CivManager : NetworkBehaviour
 {
     [SerializeField] protected GameObject buildingPrefab;
-
     [SerializeField] public List<GameObject> ownedObjs = new List<GameObject>();
     [SerializeField] private HexGrid hexGrid;
-    public CivData data;
-    [Command()]
+    public CivData civData;
+    [Command]
     public void Capture(NetworkIdentity identity)
     {
         // NetworkServer.ReplacePlayerForConnection(connectionToClient,)
@@ -27,22 +26,24 @@ public class CivManager : NetworkBehaviour
         TeamColor [] teamColors = obj.GetComponentsInChildren<TeamColor>();
         foreach (var item in teamColors)
         {
-            item.SetColor(data);
+            item.SetColor(civData);
         }
 
     }
+
+    #region  Sight
     [Command]
     public virtual void CMDHideAllUnits()
     {
-        HideAllUnits();
+        RPCHideAllUnits();
     }
    
     [Command]
     public virtual void CMDShowAllUnits()
     {
-        ShowAllUnits();
+        RPCShowAllUnits();
     }
-    [ClientRpc] protected void HideAllUnits()
+    [ClientRpc] protected void RPCHideAllUnits()
     {
         hexGrid = FindObjectOfType<HexGrid>();
         hexGrid.CloseVisible();
@@ -53,7 +54,7 @@ public class CivManager : NetworkBehaviour
             item.HideSight(item.GetComponent<ISightable>().Hex);
         }
     }
-    [ClientRpc] protected void ShowAllUnits()
+    [ClientRpc] protected void RPCShowAllUnits()
     {
         
         hexGrid = FindObjectOfType<HexGrid>();
@@ -64,4 +65,5 @@ public class CivManager : NetworkBehaviour
             item.ShowSight(item.sightable.Hex);
         }
     }
+    #endregion
 }

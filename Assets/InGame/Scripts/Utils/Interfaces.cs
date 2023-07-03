@@ -6,6 +6,7 @@ public interface IDamagable
 {
     public HP hp { get; set; }
     public Hex Hex { get; set; }
+    public CivManager CivManager { get; set; }
 }
 public interface ISightable
 {
@@ -63,7 +64,7 @@ public interface ISelectable
 
 public interface IAttackable
 {
-    public Vector3Int Position { get; set; }
+    public Hex Hex { get; set; }
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
 
@@ -73,6 +74,7 @@ public class MeeleAttack : AttackSystem,IAttackable
     public Vector3Int Position { get; set; }
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
+    public Hex Hex { get; set; }
 }
 public interface ISideable
 {
