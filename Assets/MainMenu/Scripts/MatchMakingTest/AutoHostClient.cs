@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-public class AutoHostClient : MonoBehaviour
-{
-    [SerializeField] NetworkManager networkManager;
-    private void Start() {
-        if(!Application.isBatchMode){
+ public class AutoHostClient : MonoBehaviour {
 
-            Debug.Log(" --- client connected  --");
-            networkManager.StartClient();
+        [SerializeField] NetworkManager networkManager;
+
+        void Start () {
+            
+            if (!Application.isBatchMode) { //Headless build
+                Debug.Log ($"=== Client Build ===");
+                networkManager.StartClient ();
+            } else {
+                Debug.Log ($"=== Server Build ===");
+            }
         }
-        else{
-            Debug.Log(" --- server starting --");
+
+        public void JoinLocal () {
+            networkManager.networkAddress = "localhost";
+            networkManager.StartClient ();
         }
-        
+
     }
-    public void JoinLocal()
-    {
-        networkManager.networkAddress = "localhost";
-        networkManager.StartClient();
-    }
-}

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using Mirror;
 public class UnitManager : SingletonMirror<UnitManager>
@@ -9,7 +10,6 @@ public class UnitManager : SingletonMirror<UnitManager>
     private HexGrid hexGrid;
     public LayerMask layer,defaulLayer;
     [SerializeField] private UnityEvent OnSelectedUnit;
-    // [SerializeField] private MovementSystem movementSystem;
     [SerializeField] private AttackSystem attackSystem;
     [SerializeField] private bool playersTurn = true;
     public bool PlayersTurn { get => playersTurn; private set{} }
@@ -19,6 +19,13 @@ public class UnitManager : SingletonMirror<UnitManager>
     public ISelectable selectedUnit;
     private Hex previouslySelectedHex;
 
+    public void HandleESC()
+    {
+        if(selectedUnit != null)
+        {
+            selectedUnit.CloseCanvas();
+        }
+    }
 
     public void HandleUnitSelected(GameObject unit)
     {
@@ -29,10 +36,7 @@ public class UnitManager : SingletonMirror<UnitManager>
         {
             return;
         }
-        else
-        {
-
-        }
+       
         if (CheckIfTheSameUnitSelected(selectableReference))
             return;
 
@@ -44,11 +48,9 @@ public class UnitManager : SingletonMirror<UnitManager>
     {
         ClearOldSelection();
     }
-    public void HandleEnemyUnitSelected(GameObject unit)
+    public void HandleEnemyUnitSelected(ISelectable selectable)
     {
-        if(selectedUnit != null)
-        {
-        }
+        
     }
     private bool CheckIfTheSameUnitSelected(ISelectable selectableReference)
     {
@@ -67,41 +69,29 @@ public class UnitManager : SingletonMirror<UnitManager>
         {
             return;
         }
-        ClearOldSelection();
+        // ClearOldSelection();
     }
     public void HandleTerrainSelectedRightClick(GameObject hexGO) // move
     {
         if(selectedUnit == null || PlayersTurn == false)
             return;
         Hex selectedHex = hexGO.GetComponent<Hex>();
-        // if(attackSystem.CheckEnemyInRange(selectedHex))
-        // {
-        //     if(selectedHex.Building != null)
-        //     {
-        //         selectedUnit.GetComponent<Attack>().AttackUnit(selectedHex.Building.hp);
-        //     }
-        //     else
-        //         selectedUnit.GetComponent<Attack>().AttackUnit(selectedHex.Unit.hp);
-        //     // selectedUnit.SetCurrentMovementPoints(0);
-        //     ClearOldSelection();
-        //     return;
-        // }
+        if(selectedHex.isReachable == false) return;
         if (/*HandleHexOutOfRange(selectedHex.HexCoordinates) ||*/ HandleSelectedHexIsUnitHex(selectedHex.HexCoordinates))
             return;
 
         HandleTargetHexSelected(selectedHex);
     }
 
-    public void HandleUnitSelectedRightClick(GameObject unit)
+    public void HandleUnitSelectedRightClick(GameObject gameObject)
     {
-        // if(selectedUnit == null) // eger secılı unıt yoksa return
-        // {
-        //     return;
-        // }
-        // Hex selectedHex = selectedUnit.Hex;
-        // if (HandleHexOutOfRange(selectedHex.HexCoordinates) || HandleSelectedHexIsUnitHex(selectedHex.HexCoordinates))
-        //     return;
-        // HandleTargetHexSelected(hexGrid.GetTileAt(GraphSearch.GetCloseseteHex(movementSystem.movementRange.allNodesDict,selectedHex.HexCoordinates)));
+        if(selectedUnit == null || PlayersTurn == false)
+            return;
+        Hex selectedHex = gameObject.GetComponent<ISelectable>().Hex;
+        if (/*HandleHexOutOfRange(selectedHex.HexCoordinates) ||*/ HandleSelectedHexIsUnitHex(selectedHex.HexCoordinates))
+            return;
+        Debug.Log(selectedHex,selectedHex);
+        HandleTargetHexSelected(selectedHex);
     }
     private void PrepareUnitForMovement(ISelectable selectableReference)
     {
@@ -111,10 +101,8 @@ public class UnitManager : SingletonMirror<UnitManager>
         }
 
         this.selectedUnit = selectableReference;
-        // this.selectedUnit.Select();
         selectableReference.OpenCanvas();
         selectedUnit.LeftClick();
-        // attackSystem.ShowRange(selectedUnit);
     }
 
     public void ClearOldSelection()
@@ -123,8 +111,6 @@ public class UnitManager : SingletonMirror<UnitManager>
         selectedUnit.CloseCanvas();
         previouslySelectedHex = null;
         this.selectedUnit.Deselect();
-        // movementSystem.HideRange();
-        // attackSystem.HideRange();
         this.selectedUnit = null;
 
     }
@@ -134,25 +120,15 @@ public class UnitManager : SingletonMirror<UnitManager>
         if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
         {
             previouslySelectedHex = selectedHex;
-            // selectedUnit.Select();
             selectedUnit.RightClick(selectedHex);
-            // movementSystem.ShowPath(selectedHex.HexCoordinates, this.hexGrid,selectedUnit.GetComponent<Attack>().range);
         }
         else
         {
 
             selectedUnit.RightClick2(selectedHex);
-            // if(selectedUnit.Hex.IsEnemy())
-            // {
-            //     movementSystem.MoveUnit(selectedUnit, this.hexGrid,selectedHex);
-            // }
-            // selectedUnit.Hex.Unit = null;
-
-            //     movementSystem.MoveUnit(selectedUnit.GetComponent<Movement>(), this.hexGrid,selectedHex,selectedUnit.GetComponent<Attack>().range);
 
 
-            // PlayersTurn = false;
-            // selectedUnit.GetComponent<Movement>().MovementFinished += ResetTurn;
+
             ClearOldSelection();
         }
     }
@@ -167,15 +143,6 @@ public class UnitManager : SingletonMirror<UnitManager>
         return false;
     }
 
-    // private bool HandleHexOutOfRange(Vector3Int hexPosition)
-    // {
-    //     if(!hexGrid.GetTileAt(hexPosition).isVisible) return false;
-    //     if (movementSystem.IsHexInRange(hexPosition) == false)
-    //     {
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     private void ResetTurn(Movement selectedUnit)
     {

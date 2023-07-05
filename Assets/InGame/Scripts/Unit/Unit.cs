@@ -111,6 +111,10 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
         {
             outline.OutlineColor = Color.red;
         }
+        else if(side == Side.Ally)
+        {
+            outline.OutlineColor = Color.blue;
+        }
     }
     [Command] private void CMDSetSide(NetworkIdentity identity,GameObject sideable)
     {

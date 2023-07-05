@@ -15,7 +15,7 @@ public class HP : NetworkBehaviour
         Hp = _maxHp;
     }
     
-    public virtual void Death(IDamagable damagable)
+    public virtual void Death(IDamagable damagable,IAttackable attackable)
     {   
         if(_hp <= 0 )
         {

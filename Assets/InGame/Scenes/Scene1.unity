@@ -773,7 +773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -816,7 +816,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1653951231}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3054,6 +3055,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1962029369421980225, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
   m_PrefabInstance: {fileID: 530614182}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1258931495 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5688706492345755159, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
+  m_PrefabInstance: {fileID: 530614182}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f763167397556645a67e9d4f1818068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1264831993
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3379,6 +3391,21 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: SelectionManager, Assembly-CSharp
         m_MethodName: HandleRightClick
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  ESCEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 375664486}
+        m_TargetAssemblyTypeName: UnitManager, Assembly-CSharp
+        m_MethodName: HandleESC
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3727,6 +3754,67 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
+--- !u!1 &1653951230
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1653951231}
+  - component: {fileID: 1653951232}
+  m_Layer: 5
+  m_Name: Civs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1653951231
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653951230}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 146595784}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -272.51978, y: 0}
+  m_SizeDelta: {x: 642.9568, y: 152.2418}
+  m_Pivot: {x: 1, y: 1}
+--- !u!114 &1653951232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653951230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 2
+  m_StartCorner: 1
+  m_StartAxis: 0
+  m_CellSize: {x: 100, y: 140.18}
+  m_Spacing: {x: 0, y: 0}
+  m_Constraint: 0
+  m_ConstraintCount: 2
 --- !u!1001 &1685053463
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4838,6 +4926,7 @@ MonoBehaviour:
   - {fileID: 1184824918596368635, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
   - {fileID: 270059685851880822, guid: b7b092293cb59c84990473ddd4694eff, type: 3}
   - {fileID: 651546988363916524, guid: 86f7cb2ccf586d34dbe22a2374aadec9, type: 3}
+  - {fileID: 6222234485230108890, guid: cc28901ae5c7e8d48ad8db91303f1bf8, type: 3}
   snapshotSettings:
     bufferTimeMultiplier: 2
     catchupNegativeThreshold: -1
@@ -4849,11 +4938,14 @@ MonoBehaviour:
     dynamicAdjustmentTolerance: 1
     deliveryTimeEmaDuration: 2
   timeInterpolationGui: 0
+  civUIParent: {fileID: 1653951231}
   npcHexes:
   - {fileID: 1229589330}
   playersHexes:
   - {fileID: 2006750530}
   - {fileID: 458910841}
+  - {fileID: 2135804232}
+  - {fileID: 1258931495}
   buildings:
   - {fileID: 0}
   - {fileID: 0}
@@ -4864,6 +4956,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1962029369421980225, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
   m_PrefabInstance: {fileID: 1174328696}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2135804232 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5688706492345755159, guid: c7fae1d14855bb344b93abe8b7c38cfe, type: 3}
+  m_PrefabInstance: {fileID: 1174328696}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f763167397556645a67e9d4f1818068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6415209384953492617
 PrefabInstance:
   m_ObjectHideFlags: 0

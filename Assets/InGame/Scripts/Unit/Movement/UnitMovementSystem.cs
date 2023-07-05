@@ -158,7 +158,6 @@ public class UnitMovementSystem : MovementSystem
     {
         if(selectedUnit.GetCurrentMovementPoints() == 0) 
             return;
-        // selectedUnit.SetCurrentMovementPoints(selectedUnit.GetCurrentMovementPoints() - movementRange.GetCost(hex.HexCoordinates));
         
         List<Vector3> currentPathTemp = currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList(); 
         List<Hex> currentHexes = currentPath.Select(pos => hexGrid.GetTileAt(pos)).ToList(); 
@@ -166,7 +165,6 @@ public class UnitMovementSystem : MovementSystem
         {
             if(currentPath.Count == 0)
             {
-                // selectedUnit.MoveThroughPath(currentPathTemp,currentHexes , hex,this,false);
                 selectedUnit.StartCoroutineRotationUnit(selectedUnit,hex.transform.position,hex);
                 
             }
@@ -180,7 +178,6 @@ public class UnitMovementSystem : MovementSystem
         else if(hex.IsEnemySettler())
         {
             selectedUnit.MoveThroughPath(currentPathTemp,currentHexes, hex,this);   
-            // selectedUnit.GetComponent<Unit>().Capture(hex.Settler.GetComponent<NetworkIdentity>(),hex.Settler.gameObject);
         }
         else if(hex.IsMe())
         {
@@ -200,5 +197,27 @@ public class UnitMovementSystem : MovementSystem
             selectedUnit.MoveThroughPath(currentPathTemp,currentHexes ,hex,this);
         }
     }
-    
+
+    public override void ShowRange(IMovable selectedUnit, Movement unit)
+    {
+        if(UnitManager.Instance.selectedUnit  == null) return;
+        if(UnitManager.Instance.selectedUnit != unit.GetComponent<ISelectable>()) return;
+        HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
+        CalculateRange(selectedUnit,hexGrid);
+        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.Movement.transform.position);
+        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        {
+            if(unitPos == hexPosition) continue;
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hex.EnableHighligh();
+            hex.isReachable = true;
+        }
+        
+        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
+        {
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hex.EnableHighlighEnemy();
+            hex.isReachable = true;
+        }
+    }
 }

@@ -22,7 +22,7 @@ public abstract class Attack : NetworkBehaviour
         _damageText.text = _damagePower.ToString();
     }
     
-    public abstract void AttackUnit(IDamagable damagable);
+    public abstract void AttackUnit(IDamagable damagable, IAttackable attackable);
     // [Command]
     // protected virtual void CMDInflictDamage(HP hp)
     // {

@@ -24,6 +24,7 @@ public class Sight : NetworkBehaviour
             if(hexGrid.GetTileAt(item) != null)
             {
                 Hex hex1 = hexGrid.GetTileAt(item);
+                hex1.transform.GetChild(2).gameObject.SetActive(false);   
                 hex1.OpenLinkedObjectSight();
                 hex1.isVisible=true;
             }
@@ -37,12 +38,13 @@ public class Sight : NetworkBehaviour
         {
             sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
         }
+        
         // if(Side == Side.Enemy) return;
         foreach (var item in sightRange.sightNodesDict)
         {
             Hex [] hexes = FindObjectsOfType<Hex>();
-           
             Hex hex1 = hexGrid.GetTileAt(item.Key);
+            hex1.transform.GetChild(2).gameObject.SetActive(true);   
             hex1.CloseLinkedObjectSight();
             hex.isVisible = false;
         }

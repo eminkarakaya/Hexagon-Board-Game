@@ -4,9 +4,7 @@ using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Turnbased {
-
-    [RequireComponent(typeof(NetworkMatch))]
+[RequireComponent(typeof(NetworkMatch))]
     public class Player : NetworkBehaviour {
 
         public static Player localPlayer;
@@ -18,7 +16,7 @@ namespace Turnbased {
         [SyncVar] public Match currentMatch;
 
         [SerializeField] GameObject playerLobbyUI;
-        // [SerializeField] GameObject canvas;
+        [SerializeField] GameObject canvas;
 
         public bool myTurn { get; private set; }
 
@@ -185,7 +183,7 @@ namespace Turnbased {
             Debug.Log ($"MatchID: {matchID} | Beginning");
             //Additively load game scene
             SceneManager.LoadScene (2, LoadSceneMode.Additive);
-            // canvas.SetActive (true);
+            canvas.SetActive (true);
         }
 
         /*
@@ -227,4 +225,5 @@ namespace Turnbased {
         }
 
     }
-}
+
+

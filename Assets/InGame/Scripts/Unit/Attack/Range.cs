@@ -5,7 +5,7 @@ using Mirror;
 public class Range : Attack
 {
 
-    public override void AttackUnit(IDamagable damagable)
+    public override void AttackUnit(IDamagable damagable,IAttackable attackable)
     {
         if(GetComponent<Movement>().GetCurrentMovementPoints()==0) return;
         if(isServer)
@@ -17,7 +17,7 @@ public class Range : Attack
             CMDAttack(damagable.hp);
         }
         if(damagable.hp.TryGetComponent(out BuildingHP buildingHP)) return;
-        damagable.hp.Death(damagable);
+        damagable.hp.Death(damagable,attackable);
         
     }
 

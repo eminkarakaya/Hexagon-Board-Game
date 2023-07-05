@@ -5,6 +5,7 @@ using System.Linq;
 using Mirror;
 public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,ISideable
 {
+    #region  Props
         [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
 
@@ -25,6 +26,9 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     public IMovable Movable { get; set; }
 
     [SerializeField] private Side _side;
+    #endregion
+
+    #region Mirror and Unity callbacks
     public override void OnStopAuthority()
     {
         // CloseCanvas();
@@ -32,6 +36,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
         // Movement.HideRangeStopAuthority();
         UnitManager.Instance.ClearOldSelection();
     }
+    
 
     private void Awake() {
 
@@ -41,6 +46,9 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
         Movement = GetComponent<Movement>();
         Result = new SettlerMovableResult(this);
     }
+    #endregion
+    
+    #region  selectable methods
     public void CloseCanvas()
     {
         Canvas.gameObject.SetActive(false);
@@ -69,7 +77,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     {
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
-        Result = new UnitMovableResult(this);
+        Result = new SettlerMovableResult(this);
         Result.CalculateRange(this,hexGrid);
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
     }
@@ -78,14 +86,17 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     {
         Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
     }
+    #endregion
+    
+    #region  createBuilding
     [Command]
     public void CreateBuilding_OnClick()
     {
-
+        if(Hex.Building != null) return;
         Building unit = Instantiate(buildingPrefab).GetComponent<Building>();
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
-
         RPCCreateBuilding(unit);
+        
     }
     [ClientRpc] // server -> client
     private void RPCCreateBuilding(Building building)
@@ -95,6 +106,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
         building.transform.rotation = Quaternion.Euler(-90,0,0);
         building.Hex = Hex;
         building.Hex.Building = building;
+        building.CivManager = civManager;
         var buildings = FindObjectsOfType<Building>().ToList();
         foreach (var item in buildings)
         {
@@ -106,7 +118,12 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
             else
                 item.SetSide(Side.Enemy,item.GetComponent<Outline>());
         }
+        civManager.SetTeamColor(building.gameObject);
+        civManager.DestroyObj(this.gameObject);
     }
+    #endregion
+
+    #region  setside
     [Command] public void CMDSetSide(NetworkIdentity identity, GameObject _gameObject,CivManager civManager)
     {
         RPGSetSide(identity,_gameObject,civManager);
@@ -114,7 +131,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     [ClientRpc] private void RPGSetSide(NetworkIdentity identity,GameObject _gameObject,CivManager civManager)
     {
         ISideable sideable = _gameObject.GetComponent<ISideable>();
-        Debug.Log(civManager,civManager);
         sideable.CivManager = civManager;
         if(identity.isOwned)
         {
@@ -134,8 +150,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
         }
         CMDSetSide(identity,sideable,civManager);
         civManager.SetTeamColor(this.gameObject);
-        Debug.Log(civManager , civManager);
-        civManager.CMDHideAllUnits();
+        
         civManager.CMDShowAllUnits();
         
     }
@@ -157,4 +172,5 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
         // civManager.Capture(identity);
         StartCoroutine(wait(identity,sideable,civManager));
     }
+    #endregion
 }

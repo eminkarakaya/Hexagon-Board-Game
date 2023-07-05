@@ -5,6 +5,7 @@ using Mirror;
 public class UnitMovement : Movement
 {
     MovementSystem movementSystem;
+    
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex nextHex,Hex lastHex,MovementSystem movementSystem)
     {
         Vector3 startPos = transform.position;
@@ -98,7 +99,7 @@ public class UnitMovement : Movement
             }
         }
     }
-     [Command]
+    [Command]
     protected  override void CMDShow()
     {
         RPCShow();
@@ -128,12 +129,5 @@ public class UnitMovement : Movement
     {
        RPCHide();
     }
-    public override void HideRangeStopAuthority()
-    {
-        if(movementSystem == null) return;
-        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit == Moveable)
-        {
-            movementSystem.HideRangeStopAuthority(Moveable);    
-        }
-    }
+   
 }

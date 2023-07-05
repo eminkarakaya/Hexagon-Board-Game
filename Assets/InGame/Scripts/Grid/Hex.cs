@@ -7,7 +7,7 @@ using Mirror;
 public class Hex : NetworkBehaviour
 {
     public bool isVisible;
-    public bool isEnemy;
+    public bool isReachable;
     [SerializeField] private GlowHighlight highlight;
     [SerializeField] private HexType hexType;
     [SerializeField] private HexCoordinates hexCoordinates;
@@ -94,6 +94,18 @@ public class Hex : NetworkBehaviour
     {
         return Building != null && Building.Side == Side.Me;
 
+    }
+    public bool IsAlly()
+    {
+        return Unit != null && Unit.Side == Side.Ally;
+    }
+    public bool IsAllySettler()
+    {
+        return Settler != null && Settler.Side == Side.Ally;
+    }
+    public bool IsAllyBuilding()
+    {
+        return Building != null && Building.Side == Side.Ally;
     }
     public bool IsMe()
     {

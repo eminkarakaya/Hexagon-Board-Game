@@ -69,3 +69,4 @@ MonoBehaviour:
   ownedObjs: []
   hexGrid: {fileID: 6415209383831887827, guid: 56919fa60e0e44240aa635b8ba3acf71, type: 3}
   civData: {fileID: 11400000, guid: ecc1986c615d2354a9b5f63208e13a83, type: 2}
+  civUIPrefab: {fileID: 6222234485230108890, guid: cc28901ae5c7e8d48ad8db91303f1bf8, type: 3}

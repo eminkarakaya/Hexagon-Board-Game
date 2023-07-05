@@ -5,6 +5,7 @@ using Mirror;
 
 public abstract class Movement : NetworkBehaviour
 {
+    #region  props
     protected IMovable Moveable;
     [SerializeField] protected CivManager playerManager;
     [SerializeField] protected float movementDuration = 1, rotationDuration = .3f;
@@ -15,21 +16,26 @@ public abstract class Movement : NetworkBehaviour
     [SerializeField] protected int _currentMovementPoints = 20;
     protected Queue<Vector3> pathPositions = new Queue<Vector3>();
     MovementSystem movementSy;
-    
+    #endregion
+    #region  unity methods
     protected void Start() {
         if(playerManager == null)
             playerManager = PlayerManager.FindPlayerManager();
         Moveable = GetComponent<IMovable>();
     }
-     public void SetCurrentMovementPoints(int value)
+    #endregion
+    
+    
+    public void SetCurrentMovementPoints(int value)
     {
         _currentMovementPoints = value;
     }
 
-     public int GetCurrentMovementPoints()
+    public int GetCurrentMovementPoints()
     {
         return _currentMovementPoints;
     }
+    #region  sethex
     [ClientRpc] protected void RPCSetHex(Hex hex,Hex prevHex) 
     {
         
@@ -61,7 +67,9 @@ public abstract class Movement : NetworkBehaviour
     {
         MovementFinished?.Invoke(movement);
     }
-
+    #endregion
+    
+    #region  move rotate
     internal void MoveThroughPath(List<Vector3> currentPathTemp,List<Hex> currentPath ,Hex lastHex,MovementSystem movementSystem ,bool isMove = true)
     {
         pathPositions = new Queue<Vector3>(currentPathTemp);
@@ -116,38 +124,7 @@ public abstract class Movement : NetworkBehaviour
            
         }
 
-    }
-    // protected bool IsAttackable(Hex hex, out IDamagable damagable)
-    // {
-    //     if((hex.Unit != null && hex.Unit.Side == Side.Enemy))
-    //     {
-    //         damagable = hex.Unit;
-    //         return true;
-    //     }
-    //     else if((hex.Building != null && hex.Building.Side == Side.Enemy))
-    //     {
-    //         damagable = hex.Building;
-    //         return true;
-    //     }
-    //     damagable = null;
-    //     return false;
-    // }
-    protected void AttackUnit(Hex hex)
-    {
-        if(TryGetComponent(out Attack attack))
-        {
-            if(hex.Building != null && hex.Building.Side == Side.Enemy)
-            {
-                attack.AttackUnit(hex.Building);
-            }
-            else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
-            {
-                attack.AttackUnit(hex.Unit);
-
-            }
-
-        }
-    }
+    }    
     public void StartCoroutineRotationUnit(Movement firstUnit,Vector3 endPos,Hex hex)
     {
         StartCoroutine(RotationUnit(firstUnit,endPos,hex));
@@ -176,70 +153,7 @@ public abstract class Movement : NetworkBehaviour
 
 
     protected abstract IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem);
-    protected virtual void CMDHide(){}
-    protected virtual void CMDShow(){}
-    public void RPCStopAuthorityHide()
-    {
-        MovementSystem movementSystem = new UnitMovableResult(Moveable);
-        movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
-    }
-    [Command]
-    protected void CMDChangeHexes(Hex hex1, Hex hex2)
-    {
-        ChangeHexes(hex1,hex2);
-    }
 
-    [ClientRpc]
-    protected void ChangeHexes(Hex hex1, Hex hex2)
-    {
-        if(TryGetComponent(out Unit unit))
-        {
-            Unit tempUnit = hex1.Unit;
-            hex1.Unit = hex2.Unit;
-            hex2.Unit = tempUnit;
-
-
-            hex1.Unit.Hex = hex1;
-            hex2.Unit.Hex = hex2;
-        }
-        else if(TryGetComponent(out Settler settler))
-        {
-            Settler tempUnit = hex1.Settler;
-            hex1.Settler = hex2.Settler;
-            hex2.Settler = tempUnit;
-
-
-            hex1.Settler.Hex = hex1;
-            hex2.Settler.Hex = hex2;
-
-        }
-    }
-
-    
-    public void ChangeHex(Movement firstUnit,Movement targetUnit,MovementSystem movementSystem)
-    {
-
-        if(movementSystem.IsHexInRange(firstUnit.Moveable.Hex.HexCoordinates) && movementSystem.IsHexInRange(targetUnit.Moveable.Hex.HexCoordinates,firstUnit.Moveable.Hex.HexCoordinates,targetUnit.GetCurrentMovementPoints()))
-        {
-
-            Vector3 startPos = firstUnit.Moveable.Hex.transform.position;
-            startPos.y = 1;
-            Vector3 endPos = targetUnit.Moveable.Hex.transform.position;
-            endPos.y = 1;
-            StartCoroutine(RotationUnit(firstUnit,targetUnit,endPos,startPos,rotationDuration));
-            StartCoroutine(RotationUnit(targetUnit,firstUnit,startPos,endPos,rotationDuration));
-
-            CMDChangeHexes(firstUnit.Moveable.Hex,targetUnit.Moveable.Hex);
-            playerManager = FindObjectOfType<PlayerManager>();
-            playerManager.CMDHideAllUnits();
-
-
-
-            playerManager.CMDShowAllUnits();
-
-        }
-
-    }
     protected IEnumerator RotationUnit(Movement firstUnit,Movement targetUnit,Vector3 endPos,Vector3 startPos, float rotationDuration)
     {
         Quaternion startRotation = firstUnit.transform.rotation;
@@ -273,5 +187,86 @@ public abstract class Movement : NetworkBehaviour
         }
 
     }
-    public virtual void HideRangeStopAuthority() {}
+    #endregion
+    protected virtual void CMDHide(){}
+    protected virtual void CMDShow(){}
+   
+    #region  change units
+    [Command]
+    protected void CMDChangeHexes(Hex hex1, Hex hex2)
+    {
+        ChangeHexes(hex1,hex2);
+    }
+
+    [ClientRpc]
+    protected void ChangeHexes(Hex hex1, Hex hex2)
+    {
+        if(TryGetComponent(out Unit unit))
+        {
+            Unit tempUnit = hex1.Unit;
+            hex1.Unit = hex2.Unit;
+            hex2.Unit = tempUnit;
+
+
+            hex1.Unit.Hex = hex1;
+            hex2.Unit.Hex = hex2;
+        }
+        else if(TryGetComponent(out Settler settler))
+        {
+            Settler tempUnit = hex1.Settler;
+            hex1.Settler = hex2.Settler;
+            hex2.Settler = tempUnit;
+
+
+            hex1.Settler.Hex = hex1;
+            hex2.Settler.Hex = hex2;
+
+        }
+    }
+     public void ChangeHex(Movement firstUnit,Movement targetUnit,MovementSystem movementSystem)
+    {
+
+        if(movementSystem.IsHexInRange(firstUnit.Moveable.Hex.HexCoordinates) && movementSystem.IsHexInRange(targetUnit.Moveable.Hex.HexCoordinates,firstUnit.Moveable.Hex.HexCoordinates,targetUnit.GetCurrentMovementPoints()))
+        {
+
+            Vector3 startPos = firstUnit.Moveable.Hex.transform.position;
+            startPos.y = 1;
+            Vector3 endPos = targetUnit.Moveable.Hex.transform.position;
+            endPos.y = 1;
+            StartCoroutine(RotationUnit(firstUnit,targetUnit,endPos,startPos,rotationDuration));
+            StartCoroutine(RotationUnit(targetUnit,firstUnit,startPos,endPos,rotationDuration));
+
+            CMDChangeHexes(firstUnit.Moveable.Hex,targetUnit.Moveable.Hex);
+            playerManager = FindObjectOfType<PlayerManager>();
+            playerManager.CMDHideAllUnits();
+
+
+
+            playerManager.CMDShowAllUnits();
+
+        }
+
+    }
+    #endregion
+    #region  attack
+    protected void AttackUnit(Hex hex)
+    {
+        if(TryGetComponent(out Attack attack))
+        {
+            if(hex.Building != null && hex.Building.Side == Side.Enemy)
+            {
+                attack.AttackUnit(hex.Building,GetComponent<Unit>());
+            }
+            else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
+            {
+                attack.AttackUnit(hex.Unit,GetComponent<Unit>());
+
+            }
+
+        }
+    }
+    #endregion
+    
+   
+    
 }

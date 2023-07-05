@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-namespace Turnbased {
-    public class TurnManager : MonoBehaviour {
+   public class TurnManager : MonoBehaviour {
 
         [SerializeField] List<Player> players;
         [SerializeField] Player currentPlayer;
@@ -41,4 +40,3 @@ namespace Turnbased {
         }
 
     }
-}

@@ -5,14 +5,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-namespace Turnbased {
 
-    public class UILobby : MonoBehaviour {
+     public class UILobby : MonoBehaviour {
 
         public static UILobby instance;
 
         [Header ("Host Join")]
-        [SerializeField] TMP_InputField joinMatchInput;
+        [SerializeField] InputField joinMatchInput;
         [SerializeField] List<Selectable> lobbySelectables = new List<Selectable> ();
         [SerializeField] Canvas lobbyCanvas;
         [SerializeField] Canvas searchCanvas;
@@ -21,7 +20,7 @@ namespace Turnbased {
         [Header ("Lobby")]
         [SerializeField] Transform UIPlayerParent;
         [SerializeField] GameObject UIPlayerPrefab;
-        [SerializeField] TextMeshProUGUI matchIDText;
+        [SerializeField] Text matchIDText;
         [SerializeField] GameObject beginGameButton;
 
         GameObject localPlayerLobbyUI;
@@ -130,4 +129,5 @@ namespace Turnbased {
         }
 
     }
-}
+
+

@@ -9,7 +9,7 @@ public class SettlerMovement : Movement
     {
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
-        if(endHex.IsEnemy())
+        if(endHex.IsEnemy() || endHex.IsEnemySettler() || endHex.IsEnemyBuilding())
         {
             yield break;
         }
@@ -94,12 +94,5 @@ public class SettlerMovement : Movement
     {
        RPCHide();
     }
-    public override void HideRangeStopAuthority()
-    {
-        if(movementSystem == null) return;
-        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit == Moveable)
-        {
-            movementSystem.HideRangeStopAuthority(Moveable);
-        }
-    }
+    
 }

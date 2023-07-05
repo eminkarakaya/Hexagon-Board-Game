@@ -4,21 +4,19 @@ using UnityEngine;
 using Mirror;
 public class BuildingHP : HP
 {
-    public override void Death(IDamagable damagable)
+    public override void Death(IDamagable damagable, IAttackable attackable)
     {
         if(_hp <= 0 )
         {
-            if(civManager == null)
-            {
-                civManager = PlayerManager.FindPlayerManager();
-            }
-            civManager.Capture(GetComponent<NetworkIdentity>());
+            
+            attackable.CivManager.CMDHideAllUnits();
+            attackable.CivManager.Capture(GetComponent<NetworkIdentity>());
             TeamColor [] teamColors = GetComponent<Building>().transform.GetComponentsInChildren<TeamColor>();
             foreach (var item in teamColors)
             {
-                item.SetColor(civManager.civData);
+                item.SetColor(attackable.CivManager.civData);
             }
-            StartCoroutine (GetComponent<Building>().wait(GetComponent<NetworkIdentity>(),GetComponent<Building>().gameObject,damagable.CivManager));
+            StartCoroutine (GetComponent<Building>().wait(GetComponent<NetworkIdentity>(),GetComponent<Building>().gameObject,attackable.CivManager));
         } 
     }
    

@@ -40,6 +40,11 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
         Outline = GetComponent<Outline>();
         hp = GetComponent<HP>();
         Sight = GetComponent<Sight>();
+        if(CivManager == null)
+            CivManager = PlayerManager.FindPlayerManager();
+            
+        CivManager.CMDHideAllUnits();
+        CivManager.CMDShowAllUnits();
     }
 
     public override void OnStopAuthority()
@@ -51,7 +56,7 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
    
     #region  CREATE Unit
     [Command]
-    private void CMDCreateMC1Range()
+    private void CMDCreateMC1()
     {
         if(Hex.Unit != null) return;
         Unit unit = Instantiate(mc1,transform.position,Quaternion.identity).GetComponent<Unit>();
@@ -63,6 +68,7 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
         CivManager.ownedObjs.Add(unit.gameObject);
         RPCCreateMC1(unit);
         FindPlayerManager(unit);
+        civManager.SetTeamColor(unit.gameObject);
         // AddLiveUnits(unit);
     }
     [ClientRpc] private void FindPlayerManager(Unit unit)
@@ -72,55 +78,6 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
         StartCoroutine(FindPlayerManagerIE(unit));
     }
     private IEnumerator FindPlayerManagerIE(Unit unit)
-    {
-        while(unit.CivManager == null)
-        {
-            yield return null;
-        }
-        unit.CivManager.SetTeamColor(this.gameObject);
-
-    }
-    
-    [ClientRpc]
-    private void RPCCreateMC1Range(Unit unit)
-    {
-        unit.Hex = Hex;
-        unit.Hex.Unit = unit;
-        if(unit.isOwned)
-        {
-            unit.SetSide(Side.Me,unit.GetComponent<Outline>());
-        }
-        else
-        {
-            unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
-        }
-        
-       
-        CivManager.CMDHideAllUnits();
-        CivManager.CMDShowAllUnits();
-    }
-    public void CreateMC1OnClickRange()
-    {
-        CMDCreateMC1();
-    }
-    #endregion
-    #region  CREATE RANGEMC1
-    [Command]
-    private void CMDCreateMC1()
-    {
-        if(Hex.Unit != null) return;
-        Unit unit = Instantiate(mc1Range,transform.position,Quaternion.identity).GetComponent<Unit>();
-        unit.Hex = Hex;
-        // RPCSetHex(unit,Hex);
-        NetworkServer.Spawn(unit.gameObject,connectionToClient);
-        if(CivManager == null)
-            CivManager = PlayerManager.FindPlayerManager();
-        CivManager.ownedObjs.Add(unit.gameObject);
-        RPCCreateMC1(unit);
-        FindPlayerManager(unit);
-        // AddLiveUnits(unit);
-    }
-    private IEnumerator FindPlayerManagerIERange(Unit unit)
     {
         while(unit.CivManager == null)
         {
@@ -153,6 +110,56 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
         CMDCreateMC1();
     }
     #endregion
+    #region  CREATE RANGEMC1
+    [Command]
+    private void CMDCreateMC1Range()
+    {
+        if(Hex.Unit != null) return;
+        Unit unit = Instantiate(mc1Range,transform.position,Quaternion.identity).GetComponent<Unit>();
+        unit.Hex = Hex;
+        // RPCSetHex(unit,Hex);
+        NetworkServer.Spawn(unit.gameObject,connectionToClient);
+        if(CivManager == null)
+            CivManager = PlayerManager.FindPlayerManager();
+        CivManager.ownedObjs.Add(unit.gameObject);
+        RPCCreateMC1(unit);
+        FindPlayerManager(unit);
+        // AddLiveUnits(unit);
+    }
+    private IEnumerator FindPlayerManagerIERange(Unit unit)
+    {
+        while(unit.CivManager == null)
+        {
+            yield return null;
+        }
+        unit.CivManager.SetTeamColor(this.gameObject);
+
+    }
+    
+    [ClientRpc]
+    private void RPCCreateMC1Range(Unit unit)
+    {
+        unit.Hex = Hex;
+        unit.Hex.Unit = unit;
+        if(unit.isOwned)
+        {
+            unit.SetSide(Side.Me,unit.GetComponent<Outline>());
+        }
+        else
+        {
+            unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
+        }
+        
+        CivManager.CMDHideAllUnits(); 
+       
+        
+        CivManager.CMDShowAllUnits();
+    }
+    public void CreateMC1OnClickRange()
+    {
+        CMDCreateMC1Range();
+    }
+    #endregion
     #region  SetSide
     [Command] public void CMDSetSide(NetworkIdentity identity, GameObject _gameObject,CivManager civManager)
     {
@@ -175,11 +182,11 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
     {
         while(sideable.GetComponent<NetworkIdentity>().isOwned == false)
         {
-            Debug.Log("kekw building");
             yield return null;
             
         }
         CMDSetSide(identity,sideable,civManager);
+        civManager.CMDShowAllUnits();
     }
     public void SetSide(Side side, Outline outline)
     {
@@ -280,7 +287,7 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
     }
     public void CloseCanvas()
     {
-        // Canvas.gameObject.SetActive(false);
+        Canvas.gameObject.SetActive(false);
     }
     #endregion
     

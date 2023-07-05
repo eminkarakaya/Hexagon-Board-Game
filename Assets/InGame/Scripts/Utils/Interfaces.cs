@@ -6,7 +6,7 @@ public interface IDamagable
 {
     public HP hp { get; set; }
     public Hex Hex { get; set; }
-    public CivManager CivManager { get; set; }
+    
 }
 public interface ISightable
 {
@@ -58,6 +58,7 @@ public interface ISelectable
     public void RightClick2(Hex selectedHex);
     public void Deselect();
     public IMovable Movable { get; set; }
+    public Hex Hex { get; set; }
     
     // public System.Action SelectEvent { get; set; }
 }
@@ -67,6 +68,7 @@ public interface IAttackable
     public Hex Hex { get; set; }
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
+    public CivManager CivManager { get; set; }
 
 }
 public class MeeleAttack : AttackSystem,IAttackable
@@ -75,6 +77,7 @@ public class MeeleAttack : AttackSystem,IAttackable
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
     public Hex Hex { get; set; }
+    public CivManager CivManager { get; set; }
 }
 public interface ISideable
 {

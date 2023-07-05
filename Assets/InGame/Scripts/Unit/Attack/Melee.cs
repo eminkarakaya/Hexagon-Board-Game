@@ -5,7 +5,7 @@ using Mirror;
 public class Melee : Attack
 {
     
-    public override void AttackUnit(IDamagable damagable)
+    public override void AttackUnit(IDamagable damagable,IAttackable attackable)
     {
         if(GetComponent<Movement>().GetCurrentMovementPoints()==0) return;
         if(isServer)
@@ -20,7 +20,7 @@ public class Melee : Attack
         {
             StartCoroutine(movement.MoveKill(damagable.Hex,damagable.hp.Hp<=0));
         }
-        damagable.hp.Death(damagable);
+        damagable.hp.Death(damagable,attackable);
         
     }
 
@@ -36,7 +36,6 @@ public class Melee : Attack
         if(hp != null)
         {
             hp.Hp -= _damagePower;
-        Debug.Log("melee attack to : "  + hp);
 
         }
 

@@ -14,39 +14,25 @@ public abstract class MovementSystem
     {
         
     }
-    public void ShowRange(IMovable selectedUnit,Movement unit)
-    {
-        if(UnitManager.Instance.selectedUnit  == null) return;
-        if(UnitManager.Instance.selectedUnit != unit.GetComponent<ISelectable>()) return;
-        HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
-        CalculateRange(selectedUnit,hexGrid);
-        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.Movement.transform.position);
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
-        {
-            if(unitPos == hexPosition) continue;
-            hexGrid.GetTileAt(hexPosition).EnableHighligh();
-        }
-        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
-        {
-            // hexGrid.GetTileAt(hexPosition).
-            hexGrid.GetTileAt(hexPosition).EnableHighlighEnemy();
-        }
-    }
+    public abstract void ShowRange(IMovable selectedUnit,Movement unit);
+    // {
+    //     if(UnitManager.Instance.selectedUnit  == null) return;
+    //     if(UnitManager.Instance.selectedUnit != unit.GetComponent<ISelectable>()) return;
+    //     HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
+    //     CalculateRange(selectedUnit,hexGrid);
+    //     Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.Movement.transform.position);
+    //     foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+    //     {
+    //         if(unitPos == hexPosition) continue;
+    //         hexGrid.GetTileAt(hexPosition).EnableHighligh();
+    //     }
+    //     foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
+    //     {
+    //         // hexGrid.GetTileAt(hexPosition).
+    //         hexGrid.GetTileAt(hexPosition).EnableHighlighEnemy();
+    //     }
+    // }
     
-    public void HideRangeStopAuthority(IMovable movable)
-    {
-        HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
-        CalculateRange(movable,hexGrid);
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
-        {
-            hexGrid.GetTileAt(hexPosition).DisableHighligh();
-        }
-        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
-        {
-            hexGrid.GetTileAt(hexPosition).DisableHighlighEnemy();
-        }
-        movementRange = new BFSResult();
-    }
     public void HideRange(IMovable movable,Movement movement)
     {
         if(UnitManager.Instance.selectedUnit != movement.GetComponent<ISelectable>()) 
@@ -58,11 +44,15 @@ public abstract class MovementSystem
         CalculateRange(movable,hexGrid);
         foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
         {
-            hexGrid.GetTileAt(hexPosition).DisableHighligh();
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hex.DisableHighligh();
+            hex.isReachable = false;
         }
         foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
         {
-            hexGrid.GetTileAt(hexPosition).DisableHighlighEnemy();
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hex.isReachable = false;
+            hex.DisableHighlighEnemy();
         }
         movementRange = new BFSResult();
     }

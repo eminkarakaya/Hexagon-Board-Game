@@ -11,6 +11,7 @@ using Mirror;
 
 public class NetworkManagerGdd : NetworkManager
 {
+    public Transform civUIParent;
     public  List<Hex > npcHexes;
     public  List<Hex > playersHexes;
     public  List<Building> buildings;
@@ -18,8 +19,9 @@ public class NetworkManagerGdd : NetworkManager
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.
     public static new NetworkManagerGdd singleton { get; private set; }
-    public List<AIManager> npcs;
-    public static Dictionary<NetworkConnection,NetworkIdentity> LocalPlayers = new Dictionary<NetworkConnection, NetworkIdentity>();
+    public List<AIManager> npcs = new List<AIManager>();
+    
+    public static Dictionary<NetworkConnection,PlayerManager> LocalPlayers = new Dictionary<NetworkConnection, PlayerManager>();
     /// <summary>
     /// Runs on both Server and Client
     /// Networking is NOT initialized when this fires
@@ -164,7 +166,7 @@ public class NetworkManagerGdd : NetworkManager
         // instantiating a "Player" prefab gives it the name "Player(clone)"
         // => appending the connectionId is WAY more useful for debugging!
         player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
-        LocalPlayers[conn] = player.GetComponent<NetworkIdentity>();
+        LocalPlayers[conn] = player.GetComponent<PlayerManager>();
 
         NetworkServer.AddPlayerForConnection(conn, player);
         

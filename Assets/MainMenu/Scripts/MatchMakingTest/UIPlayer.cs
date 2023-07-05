@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-namespace Turnbased {
 
-    public class UIPlayer : MonoBehaviour {
+   public class UIPlayer : MonoBehaviour {
 
-        [SerializeField] TextMeshProUGUI text;
+        [SerializeField] Text text;
         Player player;
 
         public void SetPlayer (Player player) {
@@ -16,4 +15,5 @@ namespace Turnbased {
         }
 
     }
-}
+
+

@@ -50,7 +50,6 @@ public class CivManager : NetworkBehaviour
         List<Sight> allUnits = FindObjectsOfType<Sight>().ToList();
         foreach (var item in allUnits)
         {
-            // Debug.Log(item + " a " + item.GetComponent<IMovable>() + " a  " + item.GetComponent<IMovable>().Hex,item.GetComponent<IMovable>().Movement);
             item.HideSight(item.GetComponent<ISightable>().Hex);
         }
     }

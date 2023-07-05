@@ -37,7 +37,6 @@ public class SettlerMovementSystem : MovementSystem
                     if(currentPath.Count == 0)
                     {
                         currentPath.Add((Vector3Int)enemyHex);
-                        // hexGrid.GetTileAt((Vector3Int)enemyHex).HighlightPath();                    
                     }
                 }
             }
@@ -110,7 +109,6 @@ public class SettlerMovementSystem : MovementSystem
     {
          if(selectedUnit.GetCurrentMovementPoints() == 0) 
             return;
-        // selectedUnit.SetCurrentMovementPoints(selectedUnit.GetCurrentMovementPoints() - movementRange.GetCost(hex.HexCoordinates));
         
         List<Vector3> currentPathTemp = currentPath.Select(pos => hexGrid.GetTileAt(pos).transform.position).ToList(); 
         List<Hex> currentHexes = currentPath.Select(pos => hexGrid.GetTileAt(pos)).ToList(); 
@@ -145,5 +143,26 @@ public class SettlerMovementSystem : MovementSystem
         }
     }
 
-   
+    public override void ShowRange(IMovable selectedUnit, Movement unit)
+    {
+        if(UnitManager.Instance.selectedUnit  == null) return;
+        if(UnitManager.Instance.selectedUnit != unit.GetComponent<ISelectable>()) return;
+
+        HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
+        CalculateRange(selectedUnit,hexGrid);
+        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.Movement.transform.position);
+        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        {
+            if(unitPos == hexPosition) continue;
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hex.EnableHighligh();
+            hex.isReachable = true;
+        }
+        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
+        {
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hex.EnableHighlighEnemy();
+            hex.isReachable = true;
+        }
+    }
 }

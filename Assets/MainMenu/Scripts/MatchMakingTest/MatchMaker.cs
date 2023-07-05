@@ -5,9 +5,7 @@ using System.Text;
 using Mirror;
 using UnityEngine;
 
-namespace Turnbased {
-
-    [System.Serializable]
+  [System.Serializable]
     public class Match {
         public string matchID;
         public bool publicMatch;
@@ -169,4 +167,5 @@ namespace Turnbased {
         }
     }
 
-}
+
+
