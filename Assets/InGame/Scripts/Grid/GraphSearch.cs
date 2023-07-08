@@ -44,7 +44,7 @@ public class GraphSearch
        
         return new VisionResult{visionNodesDict = allNodes};
     }
-    public static BFSResult BfsSettlerRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
+    public static BFSResult BfsSettlerRangeLand(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
     {
          int movementPointsTemp = movementPoints;
         Dictionary<Vector3Int, Vector3Int?> visitedNodes = new Dictionary<Vector3Int, Vector3Int?>();
@@ -64,17 +64,375 @@ public class GraphSearch
             Vector3Int currentNode = nodesToVisitQueue.Dequeue();
             foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
             {
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle())
+                    continue;
+                int nodeCost = neighbourHex.GetCost();
+                int currentCost = costSoFar[currentNode];
+                int newCost = currentCost + nodeCost;
+                if (neighbourHex.IsEnemy()  || neighbourHex.IsEnemySettler()|| neighbourHex.IsEnemyBuilding() )
+                {
+                    continue;   
+                }
+                if (neighbourHex.IsMeSettler())
+                {
+                    continue;   
+                }
+                
+                if (newCost <= movementPoints)
+                {
+                    if (!allNodes.ContainsKey(neighbourPosition))
+                    {
+                        allNodes[neighbourPosition] = currentNode;
+                        costSoFar[neighbourPosition] = newCost;
+                        nodesToVisitQueue.Enqueue(neighbourPosition);
+                    }
+                    else if (costSoFar[neighbourPosition] > newCost)
+                    {
+                        costSoFar[neighbourPosition] = newCost;
+                        allNodes[neighbourPosition] = currentNode;
+                    }
+                }
+            }
+        }
+        Queue<Vector3Int> nodesToVisitQueue1 = new Queue<Vector3Int>();
+        Dictionary<Vector3Int, int> costSoFar1 = new Dictionary<Vector3Int, int>();
+        nodesToVisitQueue1.Enqueue(startPoint);
+        movementPoints = movementPointsTemp;
+        costSoFar1.Add(startPoint, 0);
+        while (nodesToVisitQueue1.Count > 0)      // 
+        {
+            Vector3Int currentNode = nodesToVisitQueue1.Dequeue();
+            foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
+            {
+                Hex currentNodeHex = hexGrid.GetTileAt(currentNode);
+                if(hexGrid.GetTileAt(currentNode).isVisible)
+                {
+                    if(currentNodeHex.IsEnemy() || currentNodeHex.IsEnemySettler() || currentNodeHex.IsEnemyBuilding()) 
+                    {
+                        continue;
+                    }
+                    if(currentNodeHex.IsMeSettler() &&currentNode != startPoint )
+                    {
+                        continue;
+                    }
+                   
+                }
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle() || neighbourHex.IsWater())
+                    continue;
+                int nodeCost = neighbourHex.GetCost();
+                int currentCost = costSoFar1[currentNode];
+                int newCost = currentCost + nodeCost;
+                if (newCost <= movementPoints)
+                {
+                    if(neighbourHex.isVisible)
+                    {
+                        if(!meNodes.ContainsKey(neighbourPosition))
+                        {
+                            if (neighbourHex.IsMeSettler())
+                            {
+                                meNodes[neighbourPosition] = currentNode;
+                                continue;
+                            }
+
+                        }
+                        if(!enemiesNodes.ContainsKey(neighbourPosition))
+                        {
+                            if (neighbourHex.IsEnemy() || neighbourHex.IsEnemySettler()|| neighbourHex.IsEnemyBuilding())
+                            {
+                                enemiesNodes[neighbourPosition] = currentNode;
+                                continue;
+                            }
+                            
+                        }
+                            if (neighbourHex.IsMeSettler())
+                            {
+                                continue;
+                            }
+                            if (neighbourHex.IsEnemy() || neighbourHex.IsEnemySettler()|| neighbourHex.IsEnemyBuilding())
+                            {
+                                // enemiesNodes[neighbourPosition] = currentNode;
+                                continue;
+                            }
+                    }                        
+                    if (!visitedNodes.ContainsKey(neighbourPosition))
+                    {
+                        visitedNodes[neighbourPosition] = currentNode;
+                        costSoFar1[neighbourPosition] = newCost;
+                        nodesToVisitQueue1.Enqueue(neighbourPosition);
+                    }
+                    else if (costSoFar1[neighbourPosition] > newCost)
+                    {
+                        costSoFar1[neighbourPosition] = newCost;
+                        visitedNodes[neighbourPosition] = currentNode;
+                    }
+                }
+            }
+        }
+       
+            foreach (var item in enemiesNodes)
+            {
+                allNodes.Add(item.Key, item.Value);
+            }
+            meNodes.Remove(startPoint);
+            foreach (var item in meNodes)
+            {
+                allNodes.Add(item.Key, item.Value);
+            }
+            
+
+
+
+
+            movementPointsTemp = movementPoints;
+        Dictionary<Vector3Int, int> costSoFar2 = new Dictionary<Vector3Int, int>();
+        Queue<Vector3Int> nodesToVisitQueue2 = new Queue<Vector3Int>();
+
+        Dictionary<Vector3Int, Vector3Int?> allNodes2 = new Dictionary<Vector3Int, Vector3Int?>();   
+        allNodes2.Add(startPoint, null);
+        nodesToVisitQueue2.Enqueue(startPoint);  // startpoint ekleniyor 
+        costSoFar2.Add(startPoint, 0);            // suana kadarkı malıyete startpoint eklenıyor
+        
+        while (nodesToVisitQueue2.Count > 0)      // 
+        {
+            Vector3Int currentNode = nodesToVisitQueue2.Dequeue();
+            foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
+            {
+                if (hexGrid.GetTileAt(neighbourPosition).IsObstacle() || hexGrid.GetTileAt(neighbourPosition).IsWater())
+                    continue;
+                int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
+                int currentCost = costSoFar2[currentNode];
+                int newCost = currentCost + nodeCost;
+                if (newCost <= movementPoints)
+                {
+                    if (!allNodes2.ContainsKey(neighbourPosition))
+                    {
+                        allNodes2[neighbourPosition] = currentNode;
+                        costSoFar2[neighbourPosition] = newCost;
+                        nodesToVisitQueue2.Enqueue(neighbourPosition);
+                    }
+                    else if (costSoFar2[neighbourPosition] > newCost)
+                    {
+                        costSoFar2[neighbourPosition] = newCost;
+                        allNodes2[neighbourPosition] = currentNode;
+                    }
+                }
+            }
+        }
+        return new BFSResult { visitedNodesDict = visitedNodes, enemiesNodesDict = enemiesNodes, allNodesDict = allNodes , costDict = costSoFar1,startPoint = startPoint,allNodesDict2 = allNodes2, meNodesDict = meNodes};
+    }
+    public static BFSResult BfsSettlerRangeSeaAndLand(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
+    {
+        int movementPointsTemp = movementPoints;
+        Dictionary<Vector3Int, Vector3Int?> visitedNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        Dictionary<Vector3Int, Vector3Int?> enemiesNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        Dictionary<Vector3Int, Vector3Int?> meNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        Dictionary<Vector3Int, int> costSoFar = new Dictionary<Vector3Int, int>();
+        Queue<Vector3Int> nodesToVisitQueue = new Queue<Vector3Int>();
+
+        Dictionary<Vector3Int, Vector3Int?> allNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        allNodes.Add(startPoint, null);
+        nodesToVisitQueue.Enqueue(startPoint);  // startpoint ekleniyor 
+        costSoFar.Add(startPoint, 0);            // suana kadarkı malıyete startpoint eklenıyor
+        visitedNodes.Add(startPoint, null);      // visited nodes e start point eklenıyor
+
+        while (nodesToVisitQueue.Count > 0)      // 
+        {
+            Vector3Int currentNode = nodesToVisitQueue.Dequeue();
+            foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
+            {
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle())
+                    continue;
+                int nodeCost = neighbourHex.GetCost();
+                int currentCost = costSoFar[currentNode];
+                int newCost = currentCost + nodeCost;
+                if (neighbourHex.IsEnemy()  || neighbourHex.IsEnemySettler()|| neighbourHex.IsEnemyBuilding() )
+                {
+                    continue;   
+                }
+                if (neighbourHex.IsMeSettler())
+                {
+                    continue;   
+                }
+                
+                if (newCost <= movementPoints)
+                {
+                    if (!allNodes.ContainsKey(neighbourPosition))
+                    {
+                        allNodes[neighbourPosition] = currentNode;
+                        costSoFar[neighbourPosition] = newCost;
+                        nodesToVisitQueue.Enqueue(neighbourPosition);
+                    }
+                    else if (costSoFar[neighbourPosition] > newCost)
+                    {
+                        costSoFar[neighbourPosition] = newCost;
+                        allNodes[neighbourPosition] = currentNode;
+                    }
+                }
+            }
+        }
+        Queue<Vector3Int> nodesToVisitQueue1 = new Queue<Vector3Int>();
+        Dictionary<Vector3Int, int> costSoFar1 = new Dictionary<Vector3Int, int>();
+        nodesToVisitQueue1.Enqueue(startPoint);
+        movementPoints = movementPointsTemp;
+        costSoFar1.Add(startPoint, 0);
+        while (nodesToVisitQueue1.Count > 0)      // 
+        {
+            Vector3Int currentNode = nodesToVisitQueue1.Dequeue();
+            foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
+            {
+                Hex currentNodeHex = hexGrid.GetTileAt(currentNode);
+                if(hexGrid.GetTileAt(currentNode).isVisible)
+                {
+                    if(currentNodeHex.IsEnemy() || currentNodeHex.IsEnemySettler() || currentNodeHex.IsEnemyBuilding()) 
+                    {
+                        continue;
+                    }
+                    if(currentNodeHex.IsMeSettler() &&currentNode != startPoint )
+                    {
+                        continue;
+                    }
+                   
+                }
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle() )
+                    continue;
+                int nodeCost = neighbourHex.GetCost();
+                int currentCost = costSoFar1[currentNode];
+                int newCost = currentCost + nodeCost;
+                if (newCost <= movementPoints)
+                {
+                    if(neighbourHex.isVisible)
+                    {
+                        if(!meNodes.ContainsKey(neighbourPosition))
+                        {
+                            if (neighbourHex.IsMeSettler())
+                            {
+                                meNodes[neighbourPosition] = currentNode;
+                                continue;
+                            }
+
+                        }
+                        if(!enemiesNodes.ContainsKey(neighbourPosition))
+                        {
+                            if (neighbourHex.IsEnemy() || neighbourHex.IsEnemySettler()|| neighbourHex.IsEnemyBuilding())
+                            {
+                                enemiesNodes[neighbourPosition] = currentNode;
+                                continue;
+                            }
+                            
+                        }
+                            if (neighbourHex.IsMeSettler())
+                            {
+                                continue;
+                            }
+                            if (neighbourHex.IsEnemy() || neighbourHex.IsEnemySettler()|| neighbourHex.IsEnemyBuilding())
+                            {
+                                // enemiesNodes[neighbourPosition] = currentNode;
+                                continue;
+                            }
+                    }                        
+                    if (!visitedNodes.ContainsKey(neighbourPosition))
+                    {
+                        visitedNodes[neighbourPosition] = currentNode;
+                        costSoFar1[neighbourPosition] = newCost;
+                        nodesToVisitQueue1.Enqueue(neighbourPosition);
+                    }
+                    else if (costSoFar1[neighbourPosition] > newCost)
+                    {
+                        costSoFar1[neighbourPosition] = newCost;
+                        visitedNodes[neighbourPosition] = currentNode;
+                    }
+                }
+            }
+        }
+       
+            foreach (var item in enemiesNodes)
+            {
+                allNodes.Add(item.Key, item.Value);
+            }
+            meNodes.Remove(startPoint);
+            foreach (var item in meNodes)
+            {
+                allNodes.Add(item.Key, item.Value);
+            }
+            
+
+
+
+
+        movementPointsTemp = movementPoints;
+        Dictionary<Vector3Int, int> costSoFar2 = new Dictionary<Vector3Int, int>();
+        Queue<Vector3Int> nodesToVisitQueue2 = new Queue<Vector3Int>();
+
+        Dictionary<Vector3Int, Vector3Int?> allNodes2 = new Dictionary<Vector3Int, Vector3Int?>();   
+        allNodes2.Add(startPoint, null);
+        nodesToVisitQueue2.Enqueue(startPoint);  // startpoint ekleniyor 
+        costSoFar2.Add(startPoint, 0);            // suana kadarkı malıyete startpoint eklenıyor
+        
+        while (nodesToVisitQueue2.Count > 0)      // 
+        {
+            Vector3Int currentNode = nodesToVisitQueue2.Dequeue();
+            foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
+            {
                 if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
                     continue;
                 int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
+                int currentCost = costSoFar2[currentNode];
+                int newCost = currentCost + nodeCost;
+                if (newCost <= movementPoints)
+                {
+                    if (!allNodes2.ContainsKey(neighbourPosition))
+                    {
+                        allNodes2[neighbourPosition] = currentNode;
+                        costSoFar2[neighbourPosition] = newCost;
+                        nodesToVisitQueue2.Enqueue(neighbourPosition);
+                    }
+                    else if (costSoFar2[neighbourPosition] > newCost)
+                    {
+                        costSoFar2[neighbourPosition] = newCost;
+                        allNodes2[neighbourPosition] = currentNode;
+                    }
+                }
+            }
+        }
+        return new BFSResult { visitedNodesDict = visitedNodes, enemiesNodesDict = enemiesNodes, allNodesDict = allNodes , costDict = costSoFar1,startPoint = startPoint,allNodesDict2 = allNodes2, meNodesDict = meNodes};
+    }
+   
+    public static BFSResult BsfGetRangeSea(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
+    {
+        int movementPointsTemp = movementPoints;
+        Dictionary<Vector3Int, Vector3Int?> visitedNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        Dictionary<Vector3Int, Vector3Int?> enemiesNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        Dictionary<Vector3Int, Vector3Int?> meNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        Dictionary<Vector3Int, int> costSoFar = new Dictionary<Vector3Int, int>();
+        Queue<Vector3Int> nodesToVisitQueue = new Queue<Vector3Int>();
+
+        Dictionary<Vector3Int, Vector3Int?> allNodes = new Dictionary<Vector3Int, Vector3Int?>();
+        allNodes.Add(startPoint, null);
+        nodesToVisitQueue.Enqueue(startPoint);  // startpoint ekleniyor 
+        costSoFar.Add(startPoint, 0);            // suana kadarkı malıyete startpoint eklenıyor
+        visitedNodes.Add(startPoint, null);      // visited nodes e start point eklenıyor
+
+        while (nodesToVisitQueue.Count > 0)      // 
+        {
+            Vector3Int currentNode = nodesToVisitQueue.Dequeue();
+            foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
+            {
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle() || !neighbourHex.IsWaterOrIsCoastCity())
+                    continue;
+                int nodeCost = neighbourHex.GetCost();
                 int currentCost = costSoFar[currentNode];
                 int newCost = currentCost + nodeCost;
         
-                    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy()  || hexGrid.GetTileAt(neighbourPosition).IsEnemySettler()|| hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding() )
+                    if (neighbourHex.IsEnemyShip() || neighbourHex.IsEnemyBuilding()|| neighbourHex.IsEnemySettler())
                     {
-                        continue;   
+                        continue;
                     }
-                    if (hexGrid.GetTileAt(neighbourPosition).IsMeSettler())
+                    if (neighbourHex.IsMeShip())
                     {
                         continue;   
                     }
@@ -105,30 +463,34 @@ public class GraphSearch
             Vector3Int currentNode = nodesToVisitQueue1.Dequeue();
             foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
             {
-                if(hexGrid.GetTileAt(currentNode).isVisible)
+                Hex currentHex = hexGrid.GetTileAt(currentNode);
+                if(currentHex.isVisible)
                 {
-                    if(hexGrid.GetTileAt(currentNode).IsEnemy() || hexGrid.GetTileAt(currentNode).IsEnemySettler() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding()) 
+                    if(currentHex.IsEnemyShip() || currentHex.IsEnemyBuilding()||currentHex.IsEnemySettler())
                     {
                         continue;
                     }
-                    if(hexGrid.GetTileAt(currentNode).IsMeSettler() &&currentNode != startPoint )
+                    if(currentHex.IsMeShip() &&currentNode != startPoint )
                     {
                         continue;
                     }
                    
                 }
-                if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle() || !neighbourHex.IsWaterOrIsCoastCity())
                     continue;
-                int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
+                int nodeCost = neighbourHex.GetCost();
                 int currentCost = costSoFar1[currentNode];
                 int newCost = currentCost + nodeCost;
+ 
+
                 if (newCost <= movementPoints)
                 {
-                    if(hexGrid.GetTileAt(neighbourPosition).isVisible)
+                    if(neighbourHex.isVisible)
                     {
                         if(!meNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsMeSettler())
+                            if (neighbourHex.IsMeShip())
                             {
                                 meNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -137,22 +499,23 @@ public class GraphSearch
                         }
                         if(!enemiesNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemySettler()|| hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
+                            if (neighbourHex.IsEnemyShip() || neighbourHex.IsEnemyBuilding()||neighbourHex.IsEnemySettler())
                             {
                                 enemiesNodes[neighbourPosition] = currentNode;
                                 continue;
                             }
                             
                         }
-                            if (hexGrid.GetTileAt(neighbourPosition).IsMeSettler())
-                            {
-                                continue;
-                            }
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemySettler()|| hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding())
-                            {
-                                // enemiesNodes[neighbourPosition] = currentNode;
-                                continue;
-                            }
+                        
+                        if (neighbourHex.IsMeShip())
+                        {
+                            continue;
+                        }
+                        if (neighbourHex.IsEnemyShip() || neighbourHex.IsEnemyBuilding() ||neighbourHex.IsEnemySettler())
+                        {
+                            // enemiesNodes[neighbourPosition] = currentNode;
+                            continue;
+                        }
                     }                        
                     if (!visitedNodes.ContainsKey(neighbourPosition))
                     {
@@ -220,48 +583,6 @@ public class GraphSearch
         }
         return new BFSResult { visitedNodesDict = visitedNodes, enemiesNodesDict = enemiesNodes, allNodesDict = allNodes , costDict = costSoFar1,startPoint = startPoint,allNodesDict2 = allNodes2, meNodesDict = meNodes};
     }
-    public static BFSResult BfsGetAllRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
-    {
-        int movementPointsTemp = movementPoints;
-        Dictionary<Vector3Int, Vector3Int?> visitedNodes = new Dictionary<Vector3Int, Vector3Int?>();
-        Dictionary<Vector3Int, Vector3Int?> enemiesNodes = new Dictionary<Vector3Int, Vector3Int?>();
-        Dictionary<Vector3Int, int> costSoFar = new Dictionary<Vector3Int, int>();
-        Queue<Vector3Int> nodesToVisitQueue = new Queue<Vector3Int>();
-
-        Dictionary<Vector3Int, Vector3Int?> allNodes = new Dictionary<Vector3Int, Vector3Int?>();
-        allNodes.Add(startPoint, null);
-        nodesToVisitQueue.Enqueue(startPoint);  // startpoint ekleniyor 
-        costSoFar.Add(startPoint, 0);            // suana kadarkı malıyete startpoint eklenıyor
-        visitedNodes.Add(startPoint, null);      // visited nodes e start point eklenıyor
-
-        while (nodesToVisitQueue.Count > 0)      // 
-        {
-            Vector3Int currentNode = nodesToVisitQueue.Dequeue();
-            foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
-            {
-                if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
-                    continue;
-                int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
-                int currentCost = costSoFar[currentNode];
-                int newCost = currentCost + nodeCost;
-                if (newCost <= movementPoints)
-                {
-                    if (!allNodes.ContainsKey(neighbourPosition))
-                    {
-                        allNodes[neighbourPosition] = currentNode;
-                        costSoFar[neighbourPosition] = newCost;
-                        nodesToVisitQueue.Enqueue(neighbourPosition);
-                    }
-                    else if (costSoFar[neighbourPosition] > newCost)
-                    {
-                        costSoFar[neighbourPosition] = newCost;
-                        allNodes[neighbourPosition] = currentNode;
-                    }
-                }
-            }
-        }
-        return new BFSResult{allNodesDict2 = allNodes};
-    }
     public static BFSResult BsfGetRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
     {
         int movementPointsTemp = movementPoints;
@@ -282,17 +603,18 @@ public class GraphSearch
             Vector3Int currentNode = nodesToVisitQueue.Dequeue();
             foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
             {
-                if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle() || neighbourHex.IsWater())
                     continue;
-                int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
+                int nodeCost = neighbourHex.GetCost();
                 int currentCost = costSoFar[currentNode];
                 int newCost = currentCost + nodeCost;
         
-                    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding()|| hexGrid.GetTileAt(neighbourPosition).IsEnemySettler() )
+                    if (neighbourHex.IsEnemy() || neighbourHex.IsEnemyBuilding()|| neighbourHex.IsEnemySettler() )
                     {
                         continue;
                     }
-                    if (hexGrid.GetTileAt(neighbourPosition).IsMe())
+                    if (neighbourHex.IsMe())
                     {
                         continue;   
                     }
@@ -323,33 +645,34 @@ public class GraphSearch
             Vector3Int currentNode = nodesToVisitQueue1.Dequeue();
             foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
             {
-                if(hexGrid.GetTileAt(currentNode).isVisible)
+                Hex currentHex = hexGrid.GetTileAt(currentNode);
+                if(currentHex.isVisible)
                 {
-                    if(hexGrid.GetTileAt(currentNode).IsEnemy() || hexGrid.GetTileAt(currentNode).IsEnemyBuilding()||hexGrid.GetTileAt(currentNode).IsEnemySettler())
+                    if(currentHex.IsEnemy() || currentHex.IsEnemyBuilding()||currentHex.IsEnemySettler())
                     {
                         continue;
                     }
-                    if(hexGrid.GetTileAt(currentNode).IsMe() &&currentNode != startPoint )
+                    if(currentHex.IsMe() &&currentNode != startPoint )
                     {
                         continue;
                     }
                    
                 }
-
-                if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle() || neighbourHex.IsWater())
                     continue;
-                int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
+                int nodeCost = neighbourHex.GetCost();
                 int currentCost = costSoFar1[currentNode];
                 int newCost = currentCost + nodeCost;
 
 
                 if (newCost <= movementPoints)
                 {
-                    if(hexGrid.GetTileAt(neighbourPosition).isVisible)
+                    if(neighbourHex.isVisible)
                     {
                         if(!meNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsMe())
+                            if (neighbourHex.IsMe())
                             {
                                 meNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -358,7 +681,7 @@ public class GraphSearch
                         }
                         if(!enemiesNodes.ContainsKey(neighbourPosition))
                         {
-                            if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding()||hexGrid.GetTileAt(neighbourPosition).IsEnemySettler())
+                            if (neighbourHex.IsEnemy() || neighbourHex.IsEnemyBuilding()||neighbourHex.IsEnemySettler())
                             {
                                 enemiesNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -366,11 +689,11 @@ public class GraphSearch
                             
                         }
                         
-                        if (hexGrid.GetTileAt(neighbourPosition).IsMe())
+                        if (neighbourHex.IsMe())
                         {
                             continue;
                         }
-                        if (hexGrid.GetTileAt(neighbourPosition).IsEnemy() || hexGrid.GetTileAt(neighbourPosition).IsEnemyBuilding() ||hexGrid.GetTileAt(neighbourPosition).IsEnemySettler())
+                        if (neighbourHex.IsEnemy() || neighbourHex.IsEnemyBuilding() ||neighbourHex.IsEnemySettler())
                         {
                             // enemiesNodes[neighbourPosition] = currentNode;
                             continue;
@@ -459,9 +782,10 @@ public class GraphSearch
             Vector3Int currentNode = nodesToVisitQueue.Dequeue();
             foreach (Vector3Int neighbourPosition in hexGrid.GetNeighboursFor(currentNode))
             {
-                if (hexGrid.GetTileAt(neighbourPosition).IsObstacle())
+                Hex neighbourHex = hexGrid.GetTileAt(neighbourPosition);
+                if (neighbourHex.IsObstacle())
                     continue;
-                int nodeCost = hexGrid.GetTileAt(neighbourPosition).GetCost();
+                int nodeCost = neighbourHex.GetCost();
                 int currentCost = costSoFar[currentNode];
                 int newCost = currentCost + nodeCost;
                 //    if (hexGrid.GetTileAt(neighbourPosition).IsEnemy())
@@ -522,6 +846,8 @@ public class GraphSearch
         path.Reverse();
         return path.Skip(1).ToList();
     }
+    
+
    
 }
 public struct BFSResult

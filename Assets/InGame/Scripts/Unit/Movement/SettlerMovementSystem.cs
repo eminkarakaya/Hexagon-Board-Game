@@ -12,8 +12,9 @@ public class SettlerMovementSystem : MovementSystem
 
     public override void CalculateRange(IMovable selectedUnit, HexGrid hexGrid)
     {
+        Debug.Log("settlermovementcalculate");
         hexGrid = GameObject.FindObjectOfType<HexGrid>();
-        movementRange = GraphSearch.BfsSettlerRange(hexGrid,hexGrid.GetClosestHex(selectedUnit.Movement.transform.position),selectedUnit.Movement.GetCurrentMovementPoints());
+        movementRange = GraphSearch.BfsSettlerRangeLand(hexGrid,hexGrid.GetClosestHex(selectedUnit.Hex.transform.position),selectedUnit.Movement.GetCurrentMovementPoints());
     }
     public override void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid,int range)
     {

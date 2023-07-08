@@ -61,7 +61,7 @@ public class PlayerManager : CivManager
     }
     
     private void Start() {
-        StartGame();
+        StartCoroutine (StartGame());
     }
     private IEnumerator Wait()
     {

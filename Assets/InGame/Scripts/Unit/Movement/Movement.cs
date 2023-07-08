@@ -15,7 +15,7 @@ public abstract class Movement : NetworkBehaviour
     public int MovementPoints {get => _movementPoints;}
     [SerializeField] protected int _currentMovementPoints = 20;
     protected Queue<Vector3> pathPositions = new Queue<Vector3>();
-    MovementSystem movementSy;
+    protected MovementSystem movementSystem;
     #endregion
     #region  unity methods
     protected void Start() {
@@ -24,7 +24,7 @@ public abstract class Movement : NetworkBehaviour
         Moveable = GetComponent<IMovable>();
     }
     #endregion
-    
+    protected abstract MovementSystem InitMovementSystem();
     
     public void SetCurrentMovementPoints(int value)
     {
@@ -36,7 +36,7 @@ public abstract class Movement : NetworkBehaviour
         return _currentMovementPoints;
     }
     #region  sethex
-    [ClientRpc] protected void RPCSetHex(Hex hex,Hex prevHex) 
+    [ClientRpc] protected virtual void RPCSetHex(Hex hex,Hex prevHex) 
     {
         
         if(TryGetComponent(out Unit unit))
@@ -51,14 +51,16 @@ public abstract class Movement : NetworkBehaviour
             this.Moveable.Hex = hex;
             hex.Settler = settler;            
         }
+        else if(TryGetComponent(out Ship ship))
+        {
+
+            prevHex.Ship = null;
+            this.Moveable.Hex = hex;
+            hex.Ship = ship;            
+        }
 
     }
-     [ClientRpc] protected void RPCChangeHex(Hex hex,Hex prevHex)
-    {
-        Hex tempHex = hex;
-        hex = prevHex;
-        prevHex = tempHex;
-    }
+   
     [Command] protected void CMDSetHex(Hex hex,Hex prevHex)
     {
         RPCSetHex(hex,prevHex);

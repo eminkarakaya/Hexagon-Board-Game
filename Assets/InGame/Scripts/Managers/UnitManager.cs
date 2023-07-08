@@ -90,7 +90,6 @@ public class UnitManager : SingletonMirror<UnitManager>
         Hex selectedHex = gameObject.GetComponent<ISelectable>().Hex;
         if (/*HandleHexOutOfRange(selectedHex.HexCoordinates) ||*/ HandleSelectedHexIsUnitHex(selectedHex.HexCoordinates))
             return;
-        Debug.Log(selectedHex,selectedHex);
         HandleTargetHexSelected(selectedHex);
     }
     private void PrepareUnitForMovement(ISelectable selectableReference)
@@ -135,7 +134,7 @@ public class UnitManager : SingletonMirror<UnitManager>
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)
     {
-        if (hexPosition == hexGrid.GetClosestHex(selectedUnit.Position))
+        if (hexPosition == hexGrid.GetClosestHex(selectedUnit.Hex.transform.position))
         {
             ClearOldSelection();
             return true;

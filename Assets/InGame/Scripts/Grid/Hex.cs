@@ -6,8 +6,17 @@ using Mirror;
 [SelectionBase]
 public class Hex : NetworkBehaviour
 {
+    public bool isCoast;
     public bool isVisible;
     public bool isReachable;
+    public bool IsCoastCity()
+    {
+        if(Building != null && isCoast == true)
+        {
+            return true;
+        }
+        return false;
+    }
     [SerializeField] private GlowHighlight highlight;
     [SerializeField] private HexType hexType;
     [SerializeField] private HexCoordinates hexCoordinates;
@@ -18,16 +27,21 @@ public class Hex : NetworkBehaviour
     [SyncVar] [SerializeField] private Unit unit;
     [SyncVar] [SerializeField] private Settler settler;
     [SyncVar] [SerializeField] private Building building;
-    public Unit Unit { get => unit; set{unit = value;} }
+    [SyncVar] [SerializeField] private Ship ship;
+    public Unit Unit { get => unit;
+    
+     set{unit = value;}}
     public Settler Settler { get => settler; set{settler = value;} }
     public Building Building { get => building; set{building = value;} }
+    public Ship Ship { get=> ship; set{ship = value;} }
+    
 
     private void Awake() {
         
         hexCoordinates = GetComponent<HexCoordinates>();
         highlight = GetComponent<GlowHighlight>();
     }
- 
+    
     public int GetCost()
         =>hexType switch
         {
@@ -35,6 +49,7 @@ public class Hex : NetworkBehaviour
             HexType.Default => 1,
             HexType.None => 1,
             HexType.Road => 1,
+            HexType.Water => 1,
             
             _ => throw new System.Exception("Hex type not supported")
         };
@@ -79,6 +94,10 @@ public class Hex : NetworkBehaviour
             item.layer = LayerMask.NameToLayer("Default");
         }
     }
+    public bool IsWaterOrIsCoastCity()
+    {
+        return IsWater() || IsCoastCity();
+    }
     public bool IsWater()
     {
         return this.hexType == HexType.Water;
@@ -99,6 +118,14 @@ public class Hex : NetworkBehaviour
     {
         return Building != null && Building.Side == Side.Me;
 
+    }
+    public bool IsEnemyShip()
+    {
+        return Ship != null && Ship.Side == Side.Enemy;
+    }
+    public bool IsMeShip()
+    {
+        return Ship != null && Ship.Side == Side.Me;
     }
     public bool IsAlly()
     {

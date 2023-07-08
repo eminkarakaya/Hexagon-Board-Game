@@ -12,12 +12,20 @@ public class HexGrid : NetworkBehaviour
         {
             hexTileDict[hex.HexCoordinates] = hex;
         }
+        SetCoastAllUnits();
     }
     public void CloseVisible()
     {
         foreach (var item in hexTileDict.Values)
         {
             item.isVisible = false;
+            if(item.Ship != null)
+            {
+
+                if(item.Ship.Side == Side.Me)
+                    continue;
+                    item.Ship.GetComponent<Vision>().HideVision(item);
+            }
             if(item.Unit != null)
             {
                 if(item.Unit.Side == Side.Me)
@@ -59,6 +67,24 @@ public class HexGrid : NetworkBehaviour
             }
         }
         return hexTileNeighboursDict[hexCoordinates];
+    }
+
+    private void SetCoastAllUnits()
+    {
+        foreach (var item in hexTileDict)
+        {
+            if(GetTileAt(item.Key).IsWater()) 
+                continue;
+            List<Vector3Int> hexTileNeighboursDict = new List<Vector3Int>();
+            hexTileNeighboursDict = GetNeighboursFor(item.Key);
+            foreach (var item1  in hexTileNeighboursDict)
+            {
+                if(GetTileAt(item1).IsWater())
+                {
+                    GetTileAt(item.Key).isCoast = true;
+                }
+            }
+        }
     }
 }
 public static class Direction

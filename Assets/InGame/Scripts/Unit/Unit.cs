@@ -7,7 +7,7 @@ using TMPro;
 public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IVisionable,IDamagable, ISideable
 {
     #region PROPERTiES
-        [SyncVar] [SerializeField] private  CivManager civManager;
+    [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
 
     public Attack Attack { get; set; }
@@ -40,7 +40,12 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         Movement = GetComponent<Movement>();
         Attack = GetComponent<Attack>();
         AttackSystem = new MeeleAttack();
-        Result = new UnitMovableResult(this);
+        if(TryGetComponent(out ShipMovement shipMovement))
+        {
+            Result = new ShipMovementSystem(this);
+        }
+        else
+            Result = new UnitMovementSystem(this);
         Outline = GetComponent<Outline>();
         Movable = GetComponent<IMovable>();
     }
@@ -73,16 +78,21 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
         Result.CalculateRange(this,hexGrid);
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
+        Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
     } 
     public void RightClick2(Hex selectedHex)
     {
-        Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
     } 
     
     public void LeftClick()
     {
         Outline.enabled = true;
-        Result = new UnitMovableResult(this);
+        if(TryGetComponent(out ShipMovement shipMovement))
+        {
+            Result = new ShipMovementSystem(this);
+        }
+        else
+            Result = new UnitMovementSystem(this);
         Result.ShowRange(this,Movement);
         // AttackSystem.GetRange(this);
         AttackSystem.ShowRange(this);

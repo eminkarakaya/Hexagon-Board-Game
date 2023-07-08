@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror;
 public class SettlerMovement : Movement
 { 
-    MovementSystem movementSystem;
+    
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem)
     {
         Vector3 startPos = transform.position;
@@ -69,17 +69,16 @@ public class SettlerMovement : Movement
     [ClientRpc]
     protected void RPCShow()
     {
-        movementSystem = new SettlerMovementSystem(Moveable);
+        movementSystem = InitMovementSystem();
         if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
         {
             movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
         }
-        
     }
     [ClientRpc]
     protected void RPCHide()
     {
-        movementSystem = new SettlerMovementSystem(Moveable);
+        movementSystem = InitMovementSystem();
         if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
         {
             movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
@@ -91,5 +90,9 @@ public class SettlerMovement : Movement
     {
        RPCHide();
     }
-    
+
+    protected override MovementSystem InitMovementSystem()
+    {
+        return new SettlerMovementSystem(Moveable);
+    }
 }

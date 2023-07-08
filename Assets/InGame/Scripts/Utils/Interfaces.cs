@@ -22,34 +22,10 @@ public interface IMovable
     public Hex Hex { get; set; }
     
 }
-public class UnitMovableResult : UnitMovementSystem,IMovable
-{
-    public UnitMovableResult(IMovable movable) : base(movable)
-    {
-        
-    }
-    public Movement Movement { get; set; }
-    public MovementSystem Result { get ; set ; }
-    public Outline Outline { get; set; }
-    public Hex Hex { get; set; }
-}
-
-public class SettlerMovableResult :SettlerMovementSystem, IMovable
-{
-    public SettlerMovableResult(IMovable movable) : base(movable)
-    {        
-        
-    }
-    public Hex Hex { get; set; }
-    public Movement Movement { get; set; }
-    public MovementSystem Result { get;  set; }
-    public Outline Outline { get; set; }
-}
 
 public interface ISelectable
 {
     public Side Side { get; set; }
-    public Vector3Int Position { get; set; }
     public Canvas Canvas { get; set; }
     public void OpenCanvas();
     public void CloseCanvas();

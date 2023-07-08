@@ -9,7 +9,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
 
-    [SerializeField] private GameObject buildingPrefab;
+    [SerializeField] protected GameObject buildingPrefab;
     public Hex Hex { get => _hex; set{_hex = value;} }
     [SerializeField] private Hex _hex;
     public Movement Movement { get; set; }
@@ -44,7 +44,12 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     private void Start() {
         Outline = GetComponent<Outline>();
         Movement = GetComponent<Movement>();
-        Result = new SettlerMovableResult(this);
+        if(TryGetComponent(out SettlerMovementSeaAndLand settlerMovementSeaAndLand))
+        {
+            Result = new SettlerMovementSystemSeaAndLand(this);
+        }
+        else
+            Result = new SettlerMovementSystem(this);
     }
     #endregion
     
@@ -77,7 +82,12 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     {
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
-        Result = new SettlerMovableResult(this);
+        if(TryGetComponent(out SettlerMovementSeaAndLand settlerMovementSeaAndLand))
+        {
+            Result = new SettlerMovementSystemSeaAndLand(this);
+        }
+        else
+            Result = new SettlerMovementSystem(this);
         Result.CalculateRange(this,hexGrid);
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
     }
@@ -89,17 +99,21 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     #endregion
     
     #region  createBuilding
+
+    public void CreateBuildingOnClick()
+    {
+        CMDCreateBuilding();
+    }
     [Command]
-    public void CreateBuilding_OnClick()
+    public virtual void CMDCreateBuilding()
     {
         if(Hex.Building != null) return;
         Building unit = Instantiate(buildingPrefab).GetComponent<Building>();
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
         RPCCreateBuilding(unit);
-        
     }
     [ClientRpc] // server -> client
-    private void RPCCreateBuilding(Building building)
+    protected void RPCCreateBuilding(Building building)
     {
 
         building.transform.position = new Vector3 (Hex.transform.position.x , 1 , Hex.transform.position.z );

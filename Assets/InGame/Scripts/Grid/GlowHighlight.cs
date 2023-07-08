@@ -108,56 +108,18 @@ public class GlowHighlight : NetworkBehaviour
     
     }
    
-    // public void ToggleBuilding()
-    // {
-    //     if(!isGlowing)
-    //     {
-    //         ResetGlowHighlightBuilding();
-    //         foreach (Renderer renderer in originalMaterialDict.Keys)
-    //         {
-    //             renderer.materials = glowMaterialDict[renderer];
-    //         }
-    //     }
-    //     else
-    //     {
-    //         foreach (Renderer renderer in originalMaterialDict.Keys)
-    //         {
-    //             renderer.materials = originalMaterialDict[renderer];
-    //         }
-    //     }
-    //     isGlowing = !isGlowing;
-    // }
+  
     public void ToggleRangeGlow(bool state)
     {
-        // if(isGlowing == state)
-        //     return;
-        // isGlowing = !state;
-        // if(!isGlowing)
-        //     {
+       
                 transform.GetChild(1).gameObject.SetActive(state);
-            //     ResetGlowHighlight();
-            //     foreach (Renderer renderer in originalMaterialDict.Keys)
-            //     {
-            //         renderer.materials = rangeGlowMaterialDict[renderer];
-            //     }
-            // }
-            // else
-            // {
-            //     foreach (Renderer renderer in originalMaterialDict.Keys)
-            //     {
-            //         renderer.materials = originalMaterialDict[renderer];
-            //     }
-            // }
-            // isGlowing = !isGlowing;
+          
     }
     public void ToggleGlow(bool state)
     {
         if(isGlowing == state)
             return;
         isGlowing = !state;
-        
-        
-        // ToggleEnemyGlow();
         ToggleGlow();
     }
     

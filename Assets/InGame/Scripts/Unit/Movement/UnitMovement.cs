@@ -4,7 +4,6 @@ using UnityEngine;
 using Mirror;
 public class UnitMovement : Movement
 {
-    MovementSystem movementSystem;
     
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex nextHex,Hex lastHex,MovementSystem movementSystem)
     {
@@ -109,7 +108,7 @@ public class UnitMovement : Movement
     [ClientRpc]
     protected void RPCShow()
     {
-        movementSystem = new UnitMovableResult(Moveable);
+        movementSystem = InitMovementSystem();
         if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
         {
             movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
@@ -119,7 +118,7 @@ public class UnitMovement : Movement
     [ClientRpc]
     protected void RPCHide()
     {
-        movementSystem = new UnitMovableResult(Moveable);
+        movementSystem = InitMovementSystem();
         if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
         {
             movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
@@ -131,5 +130,9 @@ public class UnitMovement : Movement
     {
        RPCHide();
     }
-   
+
+    protected override MovementSystem InitMovementSystem()
+    {
+        return new UnitMovementSystem(Moveable);
+    }
 }

@@ -8,7 +8,7 @@ public class SelectionManager : MonoBehaviour
     [SerializeField] private Camera _mainCamera;
     public LayerMask selectionMask;
     
-    public UnityEvent<GameObject> OnUnitSelected,TerrainSelected,OnUnitSelectedRightClick,OnTerrainSelectedRightClick,OnBuildingSelected;
+    // public UnityEvent<GameObject> OnUnitSelected,TerrainSelected,OnUnitSelectedRightClick,OnTerrainSelectedRightClick,OnBuildingSelected;
     private void Awake() {
         if(_mainCamera == null) _mainCamera = Camera.main;
     }
@@ -20,14 +20,14 @@ public class SelectionManager : MonoBehaviour
         {
             if(UnitSelected(result))
             {
-                OnUnitSelected?.Invoke(result);
+                UnitManager.Instance.HandleUnitSelected(result);
             }
             else if(BuildingSelected(result))
             {
-                OnBuildingSelected?.Invoke(result);
+                UnitManager.Instance.HandleUnitSelected(result);
             }
             else
-                TerrainSelected?.Invoke(result);
+                UnitManager.Instance.HandleTerrainSelected(result);
 
         }
     }
@@ -38,10 +38,12 @@ public class SelectionManager : MonoBehaviour
         {
             if(UnitSelected(result))
             {
-                OnUnitSelectedRightClick?.Invoke(result);
+                UnitManager.Instance.HandleUnitSelectedRightClick(result);
+                // OnUnitSelectedRightClick?.Invoke(result);
             }
             else
-                OnTerrainSelectedRightClick?.Invoke(result);
+                UnitManager.Instance.HandleTerrainSelectedRightClick(result);
+                // OnTerrainSelectedRightClick?.Invoke(result);
         }
     }
     private bool UnitSelected(GameObject result)
