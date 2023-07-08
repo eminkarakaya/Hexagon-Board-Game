@@ -13,7 +13,7 @@ public class AIManager : CivManager
     }
     private void Start() {
         // GetComponent<NetworkIdentity>().RemoveClientAuthority();
-        // GetComponent<NetworkIdentity>().AssignClientAuthority(NetworkManagerGdd.singleton.connection);
+        // GetComponent<NetworkIdentity>().AssignClientAuthority(GameManager.singleton.connection);
     }
     // client -> server
     [Server]
@@ -25,25 +25,25 @@ public class AIManager : CivManager
         Building unit = Instantiate(buildingPrefab).GetComponent<Building>();
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
         ownedObjs.Add(unit.gameObject);
-        RPCCreateBuilding(unit,NetworkManagerGdd.singleton.npcHexes.Count-1);
-        NetworkManagerGdd.singleton.npcHexes.RemoveAt(NetworkManagerGdd.singleton.npcHexes.Count-1);
+        RPCCreateBuilding(unit,GameManager.singleton.npcHexes.Count-1);
+        GameManager.singleton.npcHexes.RemoveAt(GameManager.singleton.npcHexes.Count-1);
     }
     [Server]
     private void AssignBuildings()
     {
         
-        NetworkManagerGdd.singleton.buildings = FindObjectsOfType<Building>().ToList();
+        GameManager.singleton.buildings = FindObjectsOfType<Building>().ToList();
     }
     // server -> client
     
     private void RPCCreateBuilding(Building unit,int i)
     {
         unit.CivManager = this;
-        unit.transform.position = new Vector3 (NetworkManagerGdd.singleton.npcHexes[i]. transform.position.x , 1 , NetworkManagerGdd.singleton.npcHexes[i]. transform.position.z );
+        unit.transform.position = new Vector3 (GameManager.singleton.npcHexes[i]. transform.position.x , 1 , GameManager.singleton.npcHexes[i]. transform.position.z );
         unit.transform.rotation = Quaternion.Euler(-90,0,0); 
-        unit.Hex = NetworkManagerGdd.singleton.npcHexes[i];
+        unit.Hex = GameManager.singleton.npcHexes[i];
         unit.Hex.Building = unit;
-        foreach (var item in NetworkManagerGdd.singleton.buildings)
+        foreach (var item in GameManager.singleton.buildings)
         {
             if(item == null) continue;
             if(item.isOwned)

@@ -105,7 +105,7 @@ MonoBehaviour:
   syncInterval: 0
   civManager: {fileID: 0}
   hex: {fileID: 0}
-  side: 2
+  side: 0
   canvas: {fileID: 5917179755658358129}
   sights:
   - {fileID: 6185995075040117193}

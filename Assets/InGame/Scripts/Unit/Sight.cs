@@ -10,8 +10,12 @@ public class Sight : NetworkBehaviour
     SightResult sightRange;
     [SerializeField] private int sightDistance = 2;
     public int SightDistance {get => sightDistance;}
-    private void Awake() {
+    public override void OnStartClient()
+    {
         sightable = GetComponent<ISightable>();
+    }
+    private void Awake() {
+        
     }
     public void ShowSight(Hex hex)
     {
@@ -36,6 +40,10 @@ public class Sight : NetworkBehaviour
         hexGrid = FindObjectOfType<HexGrid>();
         if(sightRange.sightNodesDict == null) 
         {
+            if(sightable == null)
+            {
+                sightable = GetComponent<ISightable>();
+            }
             sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
         }
         

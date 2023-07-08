@@ -21,9 +21,10 @@ using UnityEngine.SceneManagement;
         public bool myTurn { get; private set; }
 
         void Awake () {
+            Debug.Log("awakes");
             networkMatch = GetComponent<NetworkMatch> ();
         }
-
+        
         public override void OnStartClient () {
             if (isLocalPlayer) {
                 localPlayer = this;

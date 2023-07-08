@@ -124,7 +124,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
     {
         ISideable sideable1 = sideable.GetComponent<ISideable>();
         sideable1.CivManager = civManager;
-        if(identity.isOwned)
+        if(civManager.isOwned)
         {
             sideable1.SetSide(Side.Me,sideable1.Outline);
         }

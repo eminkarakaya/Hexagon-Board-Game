@@ -8,7 +8,8 @@ public class CanvasCamera : MonoBehaviour
     [SerializeField] Transform target;
     void OnEnable()
     {
-        target = Camera.main.transform;
+        if(target == null)
+            target = Camera.main.transform;
     }
     void LateUpdate()
     {

@@ -119,6 +119,8 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
                 item.SetSide(Side.Enemy,item.GetComponent<Outline>());
         }
         civManager.SetTeamColor(building.gameObject);
+        Result.HideRange(this,Movement);  
+        UnitManager.Instance.selectedUnit = null;
         civManager.DestroyObj(this.gameObject);
     }
     #endregion
@@ -132,7 +134,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     {
         ISideable sideable = _gameObject.GetComponent<ISideable>();
         sideable.CivManager = civManager;
-        if(identity.isOwned)
+        if(civManager.isOwned)
         {
             sideable.SetSide(Side.Me,sideable.Outline);
         }
@@ -141,6 +143,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
             sideable.SetSide(Side.Enemy,sideable.Outline);
         }
     }
+    
     public IEnumerator wait(NetworkIdentity identity,GameObject sideable,CivManager civManager)
     {
         while(sideable.GetComponent<NetworkIdentity>().isOwned == false)
@@ -166,6 +169,8 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
         {
             outline.OutlineColor = Color.red;
         }
+        else
+            outline.OutlineColor = Color.blue;
     }
     public void StartCoroutine1(NetworkIdentity identity,GameObject sideable,CivManager civManager)
     {

@@ -631,7 +631,7 @@ MonoBehaviour:
   settler: {fileID: 8302346154622672150, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
   mc1Range: {fileID: 651546988363916524, guid: 86f7cb2ccf586d34dbe22a2374aadec9, type: 3}
   hex: {fileID: 0}
-  side: 2
+  side: 0
   sights: []
   _canvas: {fileID: 4979740499031143046}
 --- !u!65 &4219315102292651099

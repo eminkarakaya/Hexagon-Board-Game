@@ -6,7 +6,7 @@ using TMPro;
 
    public class UIPlayer : MonoBehaviour {
 
-        [SerializeField] Text text;
+        [SerializeField] TextMeshProUGUI text;
         Player player;
 
         public void SetPlayer (Player player) {

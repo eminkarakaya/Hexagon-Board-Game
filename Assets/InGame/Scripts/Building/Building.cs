@@ -35,14 +35,20 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
     #endregion
 
     #region Mirror and Unity Callback
-   
-    private void Start() {
+    public override void OnStartClient()
+    {
         Outline = GetComponent<Outline>();
         hp = GetComponent<HP>();
         Sight = GetComponent<Sight>();
+
+    }
+    private IEnumerator Start() {
+        while(Hex == null)
+        {
+            yield return null;
+        }
         if(CivManager == null)
             CivManager = PlayerManager.FindPlayerManager();
-            
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();
     }
@@ -73,7 +79,6 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
     }
     [ClientRpc] private void FindPlayerManager(Unit unit)
     {
-       
         unit.CivManager = this.civManager;
         StartCoroutine(FindPlayerManagerIE(unit));
     }
@@ -169,7 +174,7 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
     {
         ISideable sideable = _gameObject.GetComponent<ISideable>();
         sideable.CivManager = civManager;
-        if(identity.isOwned)
+        if(civManager.isOwned)
         {
             sideable.SetSide(Side.Me,sideable.Outline);
         }
@@ -200,6 +205,9 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
         {
             outline.OutlineColor = Color.red;
         }
+        else
+            outline.OutlineColor = Color.blue;
+
     }
 
     #endregion

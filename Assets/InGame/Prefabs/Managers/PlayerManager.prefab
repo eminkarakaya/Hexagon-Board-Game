@@ -69,4 +69,8 @@ MonoBehaviour:
   ownedObjs: []
   hexGrid: {fileID: 6415209383831887827, guid: 56919fa60e0e44240aa635b8ba3acf71, type: 3}
   civData: {fileID: 11400000, guid: ecc1986c615d2354a9b5f63208e13a83, type: 2}
+  lobbyPrefab: {fileID: 7454415712136694504, guid: ad1e145920cbc554e8c6d6392b14a01a, type: 3}
+  team: 0
+  Side: 0
   civUIPrefab: {fileID: 6222234485230108890, guid: cc28901ae5c7e8d48ad8db91303f1bf8, type: 3}
+  lobbyItemPrefab: {fileID: 9175746406503016956, guid: f7c71254da4bf264b9c0d8134a927bde, type: 3}

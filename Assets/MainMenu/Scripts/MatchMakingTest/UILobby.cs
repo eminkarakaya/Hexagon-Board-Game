@@ -37,7 +37,7 @@ using TMPro;
 
         public void HostPrivate () {
             lobbySelectables.ForEach (x => x.interactable = false);
-
+            Debug.Log(Player.localPlayer + " Player.localPlayer ");
             Player.localPlayer.HostGame (false);
         }
 

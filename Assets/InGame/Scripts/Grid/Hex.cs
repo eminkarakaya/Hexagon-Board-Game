@@ -35,6 +35,7 @@ public class Hex : NetworkBehaviour
             HexType.Default => 1,
             HexType.None => 1,
             HexType.Road => 1,
+            
             _ => throw new System.Exception("Hex type not supported")
         };
     public List<GameObject> GetLinkedObjects()
@@ -77,6 +78,10 @@ public class Hex : NetworkBehaviour
         {
             item.layer = LayerMask.NameToLayer("Default");
         }
+    }
+    public bool IsWater()
+    {
+        return this.hexType == HexType.Water;
     }
     public bool IsObstacle()
     {
