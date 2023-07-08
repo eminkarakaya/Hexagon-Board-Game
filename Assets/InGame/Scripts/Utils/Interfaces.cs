@@ -8,10 +8,10 @@ public interface IDamagable
     public Hex Hex { get; set; }
     
 }
-public interface ISightable
+public interface IVisionable
 {
-    public List<GameObject> Sights{get;}
-    public Sight Sight { get; set; }
+    public List<GameObject> Visions{get;}
+    public Vision Vision { get; set; }
     public Hex Hex { get; set; }
 }
 public interface IMovable

@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 [SelectionBase]
-public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , ISightable,IDamagable, ISideable
+public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IVisionable,IDamagable, ISideable
 {
     #region PROPERTiES
         [SyncVar] [SerializeField] private  CivManager civManager;
@@ -26,10 +26,10 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IS
     public int Range { get; set; }
     public Outline Outline { get; set; }
     public Side Side { get => side; set {side = value;} }
-    [SerializeField] private List<GameObject> sights;
-    public List<GameObject> Sights=>sights;
+    [SerializeField] private List<GameObject> visions;
+    public List<GameObject> Visions=>visions;
 
-    public Sight Sight { get; set; }
+    public Vision Vision { get; set; }
     public HP hp { get; set; }
     [SerializeField] private IMovable movable;
     public IMovable Movable { get => movable; set{movable = value;} }

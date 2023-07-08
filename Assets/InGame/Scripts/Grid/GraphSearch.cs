@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GraphSearch
 {
-    public static SightResult GetRangeSightDistance(Vector3Int startPoint, int movementPoints,HexGrid hexGrid)
+    public static VisionResult GetRangeVisionDistance(Vector3Int startPoint, int movementPoints,HexGrid hexGrid)
     {
         int movementPointsTemp = movementPoints;
         Dictionary<Vector3Int, int> costSoFar = new Dictionary<Vector3Int, int>();
@@ -42,7 +42,7 @@ public class GraphSearch
             }
         }
        
-        return new SightResult{sightNodesDict = allNodes};
+        return new VisionResult{visionNodesDict = allNodes};
     }
     public static BFSResult BfsSettlerRange(HexGrid hexGrid, Vector3Int startPoint, int movementPoints)
     {
@@ -612,11 +612,11 @@ public struct BFSResult
         => allNodesDict.Keys;
 
 }
-public struct SightResult
+public struct VisionResult
 {
-    public Dictionary<Vector3Int, Vector3Int?> sightNodesDict;
-    public IEnumerable<Vector3Int> GetRangeSight()
-        => sightNodesDict.Keys;
+    public Dictionary<Vector3Int, Vector3Int?> visionNodesDict;
+    public IEnumerable<Vector3Int> GetRangeVision()
+        => visionNodesDict.Keys;
 }
 public static class DrawArrow
 {

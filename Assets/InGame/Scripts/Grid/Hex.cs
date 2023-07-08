@@ -43,21 +43,21 @@ public class Hex : NetworkBehaviour
         List<GameObject> list = new List<GameObject>();
         if(Unit != null)
         {
-            foreach (var item in Unit.Sights)
+            foreach (var item in Unit.Visions)
             {
                 list.Add(item);
             }
         }
         if(settler != null)
         {
-            foreach (var item in settler.Sights)
+            foreach (var item in settler.Visions)
             {
                 list.Add(item);
             }
         }
         if(building != null)
         {
-            foreach (var item in building.Sights)
+            foreach (var item in building.Visions)
             {
                 list.Add(item);
             }
@@ -65,14 +65,14 @@ public class Hex : NetworkBehaviour
         return list;
     }
     
-    public void OpenLinkedObjectSight()
+    public void OpenLinkedObjectVision()
     {
         foreach (var item in GetLinkedObjects())
         {
             item.layer = LayerMask.NameToLayer("SightLayer");
         }
     }
-    public void CloseLinkedObjectSight()
+    public void CloseLinkedObjectVision()
     {
         foreach (var item in GetLinkedObjects())
         {

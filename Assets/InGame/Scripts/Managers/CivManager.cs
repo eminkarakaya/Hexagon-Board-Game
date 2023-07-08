@@ -35,7 +35,8 @@ public class CivManager : NetworkBehaviour
 
     }
 
-    #region  Sight
+    #region  Vision
+    
     [Command]
     public virtual void CMDHideAllUnits()
     {
@@ -51,10 +52,10 @@ public class CivManager : NetworkBehaviour
     {
         hexGrid = FindObjectOfType<HexGrid>();
         hexGrid.CloseVisible();
-        List<Sight> allUnits = FindObjectsOfType<Sight>().ToList();
+        List<Vision> allUnits = FindObjectsOfType<Vision>().ToList();
         foreach (var item in allUnits)
         {
-            item.HideSight(item.GetComponent<ISightable>().Hex);
+            item.HideVision(item.GetComponent<IVisionable>().Hex);
         }
     }
     [ClientRpc] protected void RPCShowAllUnits()
@@ -62,10 +63,10 @@ public class CivManager : NetworkBehaviour
         
         hexGrid = FindObjectOfType<HexGrid>();
         hexGrid.CloseVisible();
-        List<Sight> allUnits = FindObjectsOfType<Sight>().Where(x=>x.isOwned == true).ToList();
+        List<Vision> allUnits = FindObjectsOfType<Vision>().Where(x=>x.isOwned == true).ToList();
         foreach (var item in allUnits)
         {
-            item.ShowSight(item.sightable.Hex);
+            item.ShowVision(item.visionable.Hex);
         }
     }
     #endregion

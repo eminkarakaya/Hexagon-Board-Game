@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 
-public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,ISideable
+public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,ISideable
 {
     
     #region Properties
@@ -23,10 +23,10 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
 
     public Vector3Int Position { get; set; }
     public Canvas Canvas { get => _canvas; set{_canvas = value;} }
-    [SerializeField] private List<GameObject> sights;
-    public List<GameObject> Sights => sights;
+    [SerializeField] private List<GameObject> visions;
+    public List<GameObject> Visions => visions;
 
-    public Sight Sight { get; set; }
+    public Vision Vision { get; set; }
     public HP hp { get; set; }
     public Outline Outline { get; set; }
     public IMovable Movable { get; set; }
@@ -39,7 +39,7 @@ public class Building : NetworkBehaviour , ISelectable ,ISightable,IDamagable,IS
     {
         Outline = GetComponent<Outline>();
         hp = GetComponent<HP>();
-        Sight = GetComponent<Sight>();
+        Vision = GetComponent<Vision>();
 
     }
     private IEnumerator Start() {

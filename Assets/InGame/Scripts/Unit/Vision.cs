@@ -2,58 +2,57 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-public class Sight : NetworkBehaviour
+public class Vision : NetworkBehaviour
 {
-    public ISightable sightable;
+    public IVisionable visionable;
     private HexGrid hexGrid;
 
-    SightResult sightRange;
-    [SerializeField] private int sightDistance = 2;
-    public int SightDistance {get => sightDistance;}
+    VisionResult visionRange;
+    [SerializeField] private int visionDistance = 2;
+    public int VisionDistance {get => visionDistance;}
     public override void OnStartClient()
     {
-        sightable = GetComponent<ISightable>();
+        visionable = GetComponent<IVisionable>();
     }
     private void Awake() {
         
     }
-    public void ShowSight(Hex hex)
+    public void ShowVision(Hex hex)
     {
         if(hex.IsEnemy() ||hex.IsEnemyBuilding()|| hex.IsEnemySettler()) return;
         hexGrid = FindObjectOfType<HexGrid>();
-        // HideSight(hex);
-        sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
-        foreach (var item in sightRange.GetRangeSight())
+        visionRange = GraphSearch.GetRangeVisionDistance(hex.HexCoordinates,visionDistance,hexGrid);
+        foreach (var item in visionRange.GetRangeVision())
         {
             if(hexGrid.GetTileAt(item) != null)
             {
                 Hex hex1 = hexGrid.GetTileAt(item);
                 hex1.transform.GetChild(2).gameObject.SetActive(false);   
-                hex1.OpenLinkedObjectSight();
+                hex1.OpenLinkedObjectVision();
                 hex1.isVisible=true;
             }
         }
     }
 
-    public void HideSight(Hex hex)
+    public void HideVision(Hex hex)
     {
         hexGrid = FindObjectOfType<HexGrid>();
-        if(sightRange.sightNodesDict == null) 
+        if(visionRange.visionNodesDict == null) 
         {
-            if(sightable == null)
+            if(visionable == null)
             {
-                sightable = GetComponent<ISightable>();
+                visionable = GetComponent<IVisionable>();
             }
-            sightRange = GraphSearch.GetRangeSightDistance(hex.HexCoordinates,sightDistance,hexGrid);
+            visionRange = GraphSearch.GetRangeVisionDistance(hex.HexCoordinates,visionDistance,hexGrid);
         }
         
         // if(Side == Side.Enemy) return;
-        foreach (var item in sightRange.sightNodesDict)
+        foreach (var item in visionRange.visionNodesDict)
         {
             Hex [] hexes = FindObjectsOfType<Hex>();
             Hex hex1 = hexGrid.GetTileAt(item.Key);
             hex1.transform.GetChild(2).gameObject.SetActive(true);   
-            hex1.CloseLinkedObjectSight();
+            hex1.CloseLinkedObjectVision();
             hex.isVisible = false;
         }
     }

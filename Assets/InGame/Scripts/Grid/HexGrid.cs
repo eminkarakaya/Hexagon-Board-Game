@@ -22,13 +22,13 @@ public class HexGrid : NetworkBehaviour
             {
                 if(item.Unit.Side == Side.Me)
                     continue;
-                    item.Unit.GetComponent<Sight>().HideSight(item);
+                    item.Unit.GetComponent<Vision>().HideVision(item);
             }
             else if(item.Settler != null)
             {
                 if(item.Settler.Side == Side.Me)
                     continue;
-                    item.Settler.GetComponent<Sight>().HideSight(item);
+                    item.Settler.GetComponent<Vision>().HideVision(item);
 
             }
         }

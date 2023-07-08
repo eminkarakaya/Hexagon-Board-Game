@@ -74,8 +74,7 @@ public class SettlerMovement : Movement
         {
             movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
         }
-        else{
-        }
+        
     }
     [ClientRpc]
     protected void RPCHide()
@@ -85,9 +84,7 @@ public class SettlerMovement : Movement
         {
             movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
         }
-        else
-        {
-        }
+        
     }
     [Command]
     protected override void CMDHide()

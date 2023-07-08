@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Mirror;
-public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,ISideable
+public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,ISideable
 {
     #region  Props
         [SyncVar] [SerializeField] private  CivManager civManager;
@@ -19,10 +19,10 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,ISightable ,IS
     public Canvas Canvas { get => canvas; set{canvas = value;} }
     public Outline Outline { get; set; }
     public Side Side { get =>_side; set{_side = value;} }
-    [SerializeField] private List<GameObject> sights;
-    public List<GameObject> Sights=>sights;
+    [SerializeField] private List<GameObject> visions;
+    public List<GameObject> Visions=>visions;
 
-    public Sight Sight { get; set; }
+    public Vision Vision { get; set; }
     public IMovable Movable { get; set; }
 
     [SerializeField] private Side _side;
