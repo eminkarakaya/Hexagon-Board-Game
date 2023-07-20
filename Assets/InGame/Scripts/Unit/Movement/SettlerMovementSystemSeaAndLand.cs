@@ -12,7 +12,6 @@ public class SettlerMovementSystemSeaAndLand : SettlerMovementSystem
 
     public override void CalculateRange(IMovable selectedUnit, HexGrid hexGrid)
     {
-        Debug.Log("settlermovementSEAandLandcalculate");
         hexGrid = GameObject.FindObjectOfType<HexGrid>();
         movementRange = GraphSearch.BfsSettlerRangeSeaAndLand(hexGrid,hexGrid.GetClosestHex(selectedUnit.Hex.transform.position),selectedUnit.Movement.GetCurrentMovementPoints());
     }
@@ -28,7 +27,7 @@ public class SettlerMovementSystemSeaAndLand : SettlerMovementSystem
         {
             if(unitPos == hexPosition) continue;
             Hex hex = hexGrid.GetTileAt(hexPosition);
-            hex.EnableHighligh();
+            // hex.EnableHighligh();
             hex.isReachable = true;
         }
         foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
@@ -37,5 +36,17 @@ public class SettlerMovementSystemSeaAndLand : SettlerMovementSystem
             hex.EnableHighlighEnemy();
             hex.isReachable = true;
         }
+        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        {
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hexGrid.DrawBorders(hex,unitPos);
+        }
+        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
+        {
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hexGrid.DrawBorders(hex,unitPos);
+        }
+        
+        
     }
 }

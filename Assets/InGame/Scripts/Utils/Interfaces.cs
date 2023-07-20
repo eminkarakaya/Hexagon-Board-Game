@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using Mirror;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,14 @@ public interface IDamagable
     public Hex Hex { get; set; }
     
 }
+public interface ITaskable
+{
+    public Sprite OrderSprite { get; set; }
+    public Transform Transform{ get; }
+    public void LeftClick();
+    public void TaskComplate();
+    public void TaskReset();
+}
 public interface IVisionable
 {
     public List<GameObject> Visions{get;}
@@ -16,11 +25,11 @@ public interface IVisionable
 }
 public interface IMovable
 {
+    public void ToggleButtons(bool state);
     public Movement Movement { get; set; }
     public MovementSystem Result { get; set; }
     public Outline Outline { get; set; } 
     public Hex Hex { get; set; }
-    
 }
 
 public interface ISelectable

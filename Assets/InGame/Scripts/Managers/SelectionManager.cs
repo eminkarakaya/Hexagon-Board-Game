@@ -20,11 +20,11 @@ public class SelectionManager : MonoBehaviour
         {
             if(UnitSelected(result))
             {
-                UnitManager.Instance.HandleUnitSelected(result);
+                UnitManager.Instance.HandleUnitSelected(result.transform);
             }
             else if(BuildingSelected(result))
             {
-                UnitManager.Instance.HandleUnitSelected(result);
+                UnitManager.Instance.HandleUnitSelected(result.transform);
             }
             else
                 UnitManager.Instance.HandleTerrainSelected(result);

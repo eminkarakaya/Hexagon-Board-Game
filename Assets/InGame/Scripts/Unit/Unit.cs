@@ -1,15 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Mirror;
 using TMPro;
 [SelectionBase]
-public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IVisionable,IDamagable, ISideable
+public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IVisionable,IDamagable, ISideable,ITaskable
 {
     #region PROPERTiES
     [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
-
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }
     public Movement Movement { get; set; }
@@ -33,6 +33,10 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     public HP hp { get; set; }
     [SerializeField] private IMovable movable;
     public IMovable Movable { get => movable; set{movable = value;} }
+
+    public Transform Transform { get => transform;}
+    [SerializeField] private Sprite orderImage;
+    public Sprite OrderSprite { get =>orderImage; set {orderImage = value;} }
     #endregion
     #region Mirror and Unity Callback
     private void Start() {
@@ -60,7 +64,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
 
     #region  SELECTABLE METHODS
     
-    
+    int attackRange,moveRange;
     public void OpenCanvas()
     {
         Canvas.gameObject.SetActive(true);
@@ -70,18 +74,59 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         Canvas.gameObject.SetActive(false);
     }
    
-   
-   
+    
+    protected void AttackUnit(Hex hex)
+    {
+        // Movement.StartCoroutineRotationUnit(Movement,hex.transform.position,hex);
+        if(TryGetComponent(out Attack attack))
+        {
+            if(hex.Building != null && hex.Building.Side == Side.Enemy)
+            {
+                attack.AttackUnit(hex.Building,GetComponent<Unit>());
+            }
+            else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
+            {
+                attack.AttackUnit(hex.Unit,GetComponent<Unit>());
+            }
+            else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)
+            {
+
+                attack.AttackUnit(hex.Ship,GetComponent<Ship>());
+            }
+
+        }
+    }
+    public bool CheckAttackOrMove(Hex selectedHex)
+    {
+        if(Movement.CurrentMovementPoints == 0)
+            return false;
+        if(moveRange == 0 && (selectedHex.IsEnemy()  || selectedHex.IsEnemyBuilding() || selectedHex.IsEnemyShip()))
+        {
+            Movement.StartCoroutineRotationUnit(Movement,selectedHex.transform.position,selectedHex);
+            return true;
+        }
+        return false;
+    }
     public void RightClick(Hex selectedHex)
     {
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
-        Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
-        Result.CalculateRange(this,hexGrid);
-        Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
-        Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
+        moveRange = Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range).Count;
+        
+        if(CheckAttackOrMove(selectedHex))
+        {
+            AttackUnit(selectedHex);
+        }   
+        else
+        {
+            // Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
+            Result.CalculateRange(this,hexGrid);
+            Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
+        }
+        
     } 
     public void RightClick2(Hex selectedHex)
     {
+        
     } 
     
     public void LeftClick()
@@ -95,7 +140,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             Result = new UnitMovementSystem(this);
         Result.ShowRange(this,Movement);
         // AttackSystem.GetRange(this);
-        AttackSystem.ShowRange(this);
+        attackRange = AttackSystem.ShowRange(this);
+        // FindObjectOfType<HexGrid>().DrawBorders(Hex);
     }
     public void Deselect()
     {
@@ -143,32 +189,51 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             sideable1.SetSide(Side.Enemy,sideable1.Outline);
         }
     }
-    public void Capture(NetworkIdentity identity,GameObject _gameObject)
-    {
-        CivManager.Capture(identity);
+    // public void Capture(NetworkIdentity identity,GameObject _gameObject)
+    // {
+    //     CivManager.Capture(identity);
         
-        TeamColor [] teamColors = _gameObject.transform.GetComponentsInChildren<TeamColor>();
-        foreach (var item in teamColors)
-        {
-            item.SetColor(CivManager.civData);
-        }
-        StartCoroutine(wait(identity,_gameObject));
-    }
-    public IEnumerator wait(NetworkIdentity identity,GameObject sideable)
-    {
-        while(GetComponent<NetworkIdentity>().isOwned == false)
-        {
-            Debug.Log("kekw1");
-            yield return null;
+    //     TeamColor [] teamColors = _gameObject.transform.GetComponentsInChildren<TeamColor>();
+    //     foreach (var item in teamColors)
+    //     {
+    //         item.SetColor(CivManager.civData);
+    //     }
+    //     StartCoroutine(wait(identity,_gameObject));
+    // }
+    // public IEnumerator wait(NetworkIdentity identity,GameObject sideable)
+    // {
+    //     while(GetComponent<NetworkIdentity>().isOwned == false)
+    //     {
+    //         yield return null;
             
-        }
+    //     }
 
-        civManager.CMDHideAllUnits();
-        CMDSetSide(identity,sideable);
-    }
-    public void StartCoroutine1(NetworkIdentity identity,GameObject sideable)
+    //     civManager.CMDHideAllUnits();
+    //     CMDSetSide(identity,sideable);
+    // }
+    // public void StartCoroutine1(NetworkIdentity identity,GameObject sideable)
+    // {
+    //     StartCoroutine(wait(identity,sideable));
+    // }
+    protected virtual void ToggleButtonsVirtual(bool state)
     {
-        StartCoroutine(wait(identity,sideable));
+
+    }
+
+    public void ToggleButtons(bool state)
+    {
+        ToggleButtonsVirtual(state);
+    }
+
+    public void TaskComplate()
+    {
+        CivManager.RemoveOrderList(this);
+    }
+
+    public void TaskReset()
+    {
+        civManager.AddOrderList(this);
+        Movement.ResetMovementPoint();
     }
     #endregion
 }

@@ -83,9 +83,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 266743516753432431}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 1, y: 0.75208884, z: 1.9438773}
   m_Center: {x: 0, y: 0.5584998, z: -0.07148355}
 --- !u!114 &1113163169887892027
@@ -107,12 +115,12 @@ MonoBehaviour:
   hex: {fileID: 0}
   side: 0
   canvas: {fileID: 5917179755658358129}
-  sights:
+  visions:
   - {fileID: 6185995075040117193}
   - {fileID: 6192000830055002033}
   - {fileID: 671811955279829656}
-  - {fileID: 1299313750934944699}
   - {fileID: 1113163170176909489}
+  orderImage: {fileID: 21300000, guid: 72e7643c92ef003419089e9d11d03696, type: 3}
 --- !u!114 &1113163169887892024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,6 +138,21 @@ MonoBehaviour:
   syncInterval: 0
   _damageText: {fileID: 1113163169317611573}
   _damagePower: 10
+  AttackEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1113163169887892027}
+        m_TargetAssemblyTypeName: Unit, Assembly-CSharp
+        m_MethodName: TaskComplate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   range: 1
 --- !u!114 &2534661644325525724
 MonoBehaviour:
@@ -234,7 +257,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  sightDistance: 2
+  visionDistance: 2
 --- !u!114 &2084575117948564161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,11 +273,30 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  h: 1.2
   playerManager: {fileID: 0}
   movementDuration: 0.1
   rotationDuration: 0.1
-  _movementPoints: 10
-  _currentMovementPoints: 10
+  MovementFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  MovementPointFinished:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1113163169887892027}
+        m_TargetAssemblyTypeName: Unit, Assembly-CSharp
+        m_MethodName: TaskComplate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _movementPoints: 2
+  _currentMovementPoints: 2
 --- !u!1 &671811955279829656
 GameObject:
   m_ObjectHideFlags: 0
@@ -1142,7 +1184,9 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -1381,7 +1425,9 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -2371,6 +2417,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 4872545445854455629}
     m_Modifications:
     - target: {fileID: 71067212650806420, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
@@ -2482,6 +2529,9 @@ PrefabInstance:
       value: -1.9993896
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
 --- !u!224 &6058868069705393510 stripped
 RectTransform:

@@ -7,13 +7,13 @@ public class SettlerMovement : Movement
     
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem)
     {
+        Moveable.ToggleButtons(false);
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
         if(endHex.IsEnemy() || endHex.IsEnemySettler() || endHex.IsEnemyBuilding())
         {
             yield break;
         }
-
         // Movementstart
         float timeElapsed = 0f;
         while(timeElapsed<movementDuration)
@@ -24,7 +24,7 @@ public class SettlerMovement : Movement
             yield return null;
         }
         // MovementFinish
-
+        
         // MovementFinishEvents
         playerManager.CMDHideAllUnits();
         
@@ -35,6 +35,7 @@ public class SettlerMovement : Movement
         transform.position = endPos;
         playerManager.CMDShowAllUnits();
         CMDShow();
+        CurrentMovementPoints -= 1;
         
         if(pathPositions.Count > 0)
         {
@@ -42,7 +43,7 @@ public class SettlerMovement : Movement
         }
         else
         {
-
+            
             MovementFinsihEvent(this);
             if(hex.Settler != null && hex.Settler.Side == Side.Enemy)
             {
@@ -60,6 +61,7 @@ public class SettlerMovement : Movement
                 transform.rotation = endRotation;
             }
         }
+        Moveable.ToggleButtons(true);
     }
      [Command]
     protected override void CMDShow()

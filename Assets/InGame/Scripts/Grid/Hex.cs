@@ -6,6 +6,8 @@ using Mirror;
 [SelectionBase]
 public class Hex : NetworkBehaviour
 {
+    public Resource resource;
+    public List<MeshRenderer> Edges = new List<MeshRenderer>(); // 1 nw 2 ne 3 e 4 se 5 sw 6 w
     public bool isCoast;
     public bool isVisible;
     public bool isReachable;
@@ -28,20 +30,25 @@ public class Hex : NetworkBehaviour
     [SyncVar] [SerializeField] private Settler settler;
     [SyncVar] [SerializeField] private Building building;
     [SyncVar] [SerializeField] private Ship ship;
+    [SyncVar] [SerializeField] private PlaneUnit plane;
     public Unit Unit { get => unit;
     
      set{unit = value;}}
     public Settler Settler { get => settler; set{settler = value;} }
     public Building Building { get => building; set{building = value;} }
     public Ship Ship { get=> ship; set{ship = value;} }
+    public PlaneUnit Plane { get=> plane; set{plane = value;} }
     
-
+    
     private void Awake() {
-        
+        resource = GetComponent<Resource>();
         hexCoordinates = GetComponent<HexCoordinates>();
         highlight = GetComponent<GlowHighlight>();
     }
-    
+    public void OpenEdge(int index, bool state)
+    {
+        Edges[index].enabled = state;
+    }
     public int GetCost()
         =>hexType switch
         {
@@ -123,6 +130,14 @@ public class Hex : NetworkBehaviour
     {
         return Ship != null && Ship.Side == Side.Enemy;
     }
+    public bool IsMePlane()
+    {
+        return Plane != null && Plane.Side == Side.Me;
+    }
+    public bool IsEnemyPlane()
+    {
+        return Plane != null && Plane.Side == Side.Enemy;
+    }
     public bool IsMeShip()
     {
         return Ship != null && Ship.Side == Side.Me;
@@ -161,12 +176,12 @@ public class Hex : NetworkBehaviour
     }
     public void ResetHighlight()
     {
-        highlight.ResetGlowHighlight();
+        // highlight.ResetGlowHighlight();
     }
     internal void HighlightPath()
     {
 
-        highlight.HighlightValidPath();
+        // highlight.HighlightValidPath();
     }
     public void DisableHighlighRange()
     {
@@ -193,6 +208,14 @@ public class Hex : NetworkBehaviour
     public void DisableHighligh()
     {
         highlight.ToggleGlow(false);
+    }
+
+    [ContextMenu("RoundPos")]
+    public void RoundPos()
+    {
+        Vector3 newPos = transform.position;
+        newPos.x =Mathf.Round(transform.position.x);
+        transform.position = newPos;
     }
     
 }

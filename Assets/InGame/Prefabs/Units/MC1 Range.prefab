@@ -856,7 +856,9 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -996,9 +998,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 651546988363916524}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 1, y: 0.75208884, z: 1.9438773}
   m_Center: {x: 0, y: 0.5584998, z: -0.07148355}
 --- !u!114 &417615790542756280
@@ -1020,12 +1030,11 @@ MonoBehaviour:
   hex: {fileID: 0}
   side: 2
   canvas: {fileID: 6388181228573689586}
-  sights:
+  visions:
   - {fileID: 6872628163651250762}
   - {fileID: 6869973684577633330}
   - {fileID: 282506533089227035}
-  - {fileID: 1779341457855074360}
-  - {fileID: 417615791326980914}
+  orderImage: {fileID: 21300000, guid: 72e7643c92ef003419089e9d11d03696, type: 3}
 --- !u!114 &2996448522007917407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1129,7 +1138,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  sightDistance: 2
+  visionDistance: 2
 --- !u!114 &1609066403575568706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1145,9 +1154,28 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  h: 1.2
   playerManager: {fileID: 0}
   movementDuration: 0.1
   rotationDuration: 0.1
+  MovementFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  MovementPointFinished:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 417615790542756280}
+        m_TargetAssemblyTypeName: Unit, Assembly-CSharp
+        m_MethodName: TaskComplate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   _movementPoints: 10
   _currentMovementPoints: 10
 --- !u!114 &-6245334228086340341
@@ -1167,6 +1195,21 @@ MonoBehaviour:
   syncInterval: 0
   _damageText: {fileID: 417615789972734902}
   _damagePower: 10
+  AttackEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 417615790542756280}
+        m_TargetAssemblyTypeName: Unit, Assembly-CSharp
+        m_MethodName: TaskComplate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   range: 2
 --- !u!1 &662157830488377078
 GameObject:
@@ -1256,7 +1299,9 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -2371,6 +2416,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 5271367828694895822}
     m_Modifications:
     - target: {fileID: 71067212650806420, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
@@ -2470,6 +2516,9 @@ PrefabInstance:
       value: SelectUITemplate
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
 --- !u!224 &8593891346197703908 stripped
 RectTransform:

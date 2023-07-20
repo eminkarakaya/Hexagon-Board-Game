@@ -6,7 +6,7 @@ public class BuildingHP : HP
 {
     public override void Death(IDamagable damagable, IAttackable attackable)
     {
-        if(_hp <= 0 )
+        if(Hp <= 0 )
         {
             
             attackable.CivManager.CMDHideAllUnits();
@@ -16,8 +16,8 @@ public class BuildingHP : HP
             {
                 item.SetColor(attackable.CivManager.civData);
             }
-            StartCoroutine (GetComponent<Building>().wait(GetComponent<NetworkIdentity>(),GetComponent<Building>().gameObject,attackable.CivManager));
+            StartCoroutine (GetComponent<Building>().wait(attackable.CivManager));
         } 
+        // StartCoroutine(Wait(damagable,attackable));
     }
-   
 }

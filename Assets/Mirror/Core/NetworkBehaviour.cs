@@ -317,8 +317,8 @@ namespace Mirror
                     Debug.LogWarning($"Command Function {functionFullName} called on {name} while NetworkClient is not ready.\nThis may be ignored if client intentionally set NotReady.", gameObject);
                 return;
             }
-
-            // local players can always send commands, regardless of authority, other objects must have authority.
+           
+            // local players can always send commands, regardless of authority, ot  her objects must have authority.
             if (!(!requiresAuthority || isLocalPlayer || isOwned))
             {
                 Debug.LogWarning($"Command Function {functionFullName} called on {name} without authority.", gameObject);

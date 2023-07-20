@@ -2,18 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.Events;
 
 public abstract class Movement : NetworkBehaviour
 {
     #region  props
     protected IMovable Moveable;
+    public float h = 1.2f;
+
     [SerializeField] protected CivManager playerManager;
     [SerializeField] protected float movementDuration = 1, rotationDuration = .3f;
-    public event System.Action<Movement> MovementFinished;
+    public UnityEvent<Movement> MovementFinished;
+    public UnityEvent MovementPointFinished;
     protected Queue<Hex> pathHexes = new Queue<Hex>();
     [SerializeField] protected int _movementPoints = 20;
     public int MovementPoints {get => _movementPoints;}
     [SerializeField] protected int _currentMovementPoints = 20;
+    public int CurrentMovementPoints {get => _currentMovementPoints; set{_currentMovementPoints = value; if(_currentMovementPoints == 0) MovementPointFinished?.Invoke();}}
     protected Queue<Vector3> pathPositions = new Queue<Vector3>();
     protected MovementSystem movementSystem;
     #endregion
@@ -30,10 +35,10 @@ public abstract class Movement : NetworkBehaviour
     {
         _currentMovementPoints = value;
     }
-
+   
     public int GetCurrentMovementPoints()
     {
-        return _currentMovementPoints;
+        return CurrentMovementPoints;
     }
     #region  sethex
     [ClientRpc] protected virtual void RPCSetHex(Hex hex,Hex prevHex) 
@@ -133,6 +138,7 @@ public abstract class Movement : NetworkBehaviour
     }
     public IEnumerator RotationUnit(Movement firstUnit,Vector3 endPos,Hex hex)
     {
+        Debug.Log("attack2");
         Quaternion startRotation = firstUnit.transform.rotation;
         endPos.y = firstUnit.transform.position.y;
         Vector3 direction = endPos - firstUnit.transform.position;
@@ -147,13 +153,11 @@ public abstract class Movement : NetworkBehaviour
                 firstUnit.transform.rotation = Quaternion.Lerp(startRotation,endRotation,lerpStep);
                 yield return null;
             }
-            
+        // onComplate?.Invoke();
+        CurrentMovementPoints = 0;
         firstUnit.AttackUnit(hex);
         MovementFinished?.Invoke(this);
     }
-    
-
-
     protected abstract IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem);
 
     protected IEnumerator RotationUnit(Movement firstUnit,Movement targetUnit,Vector3 endPos,Vector3 startPos, float rotationDuration)
@@ -225,7 +229,7 @@ public abstract class Movement : NetworkBehaviour
 
         }
     }
-     public void ChangeHex(Movement firstUnit,Movement targetUnit,MovementSystem movementSystem)
+    public void ChangeHex(Movement firstUnit,Movement targetUnit,MovementSystem movementSystem)
     {
 
         if(movementSystem.IsHexInRange(firstUnit.Moveable.Hex.HexCoordinates) && movementSystem.IsHexInRange(targetUnit.Moveable.Hex.HexCoordinates,firstUnit.Moveable.Hex.HexCoordinates,targetUnit.GetCurrentMovementPoints()))
@@ -239,12 +243,11 @@ public abstract class Movement : NetworkBehaviour
             StartCoroutine(RotationUnit(targetUnit,firstUnit,startPos,endPos,rotationDuration));
 
             CMDChangeHexes(firstUnit.Moveable.Hex,targetUnit.Moveable.Hex);
-            playerManager = FindObjectOfType<PlayerManager>();
+            // playerManager = FindObjectOfType<PlayerManager>();
             playerManager.CMDHideAllUnits();
-
-
-
             playerManager.CMDShowAllUnits();
+            firstUnit.CurrentMovementPoints -= 1;
+            targetUnit.CurrentMovementPoints -= 1;
 
         }
 
@@ -262,13 +265,21 @@ public abstract class Movement : NetworkBehaviour
             else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
                 attack.AttackUnit(hex.Unit,GetComponent<Unit>());
+            }
+            else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)
+            {
+                attack.AttackUnit(hex.Ship,GetComponent<Unit>());
 
             }
+
 
         }
     }
     #endregion
     
-   
+    public void ResetMovementPoint()
+    {
+        CurrentMovementPoints = MovementPoints;
+    }
     
 }

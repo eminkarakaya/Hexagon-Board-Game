@@ -7,7 +7,6 @@ public abstract class MovementSystem
 {
     public int Range;
     [SerializeField] public HexGrid hexGrid;
-    public float h;
     public BFSResult movementRange = new BFSResult();
     [SerializeField] protected List<Vector3Int> currentPath = new List<Vector3Int>();
     public MovementSystem(IMovable movement)
@@ -25,24 +24,37 @@ public abstract class MovementSystem
         if(UnitManager.Instance.selectedUnit == null) return;
         HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
         CalculateRange(movable,hexGrid);
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        IEnumerable<Vector3Int> poses = movementRange.GetRangePositions();
+        IEnumerable<Vector3Int> enemyPoses = movementRange.GetRangeEnemiesPositions();
+        foreach (Vector3Int hexPosition in poses)
         {
             Hex hex = hexGrid.GetTileAt(hexPosition);
             hex.DisableHighligh();
             hex.isReachable = false;
         }
-        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
+        foreach (Vector3Int hexPosition in enemyPoses)
         {
             Hex hex = hexGrid.GetTileAt(hexPosition);
             hex.isReachable = false;
             hex.DisableHighlighEnemy();
+        }
+        foreach (Vector3Int hexPosition in poses)
+        {
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hexGrid.DeleteBorders(hex,movable.Hex);
+
+        }
+        foreach (Vector3Int hexPosition in enemyPoses)
+        {
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hexGrid.DeleteBorders(hex,movable.Hex);
         }
         movementRange = new BFSResult();
     }
     
     public abstract void CalculateRange(IMovable selectedUnit,HexGrid hexGrid);
         
-    public abstract void ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid,int range);
+    public abstract List<Vector3Int> ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid,int range);
     
     public abstract void MoveUnit(Movement selectedUnit,HexGrid hexGrid, Hex hex);
   

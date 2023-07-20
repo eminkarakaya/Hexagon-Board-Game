@@ -15,6 +15,13 @@ public class HP : NetworkBehaviour
         Hp = _maxHp;
     }
     
+    public virtual void Death()
+    {   
+        if(_hp <= 0 )
+        {
+            civManager.DestroyObj(gameObject);
+        } 
+    }
     public virtual void Death(IDamagable damagable,IAttackable attackable)
     {   
         if(_hp <= 0 )
@@ -22,5 +29,4 @@ public class HP : NetworkBehaviour
             civManager.DestroyObj(gameObject);
         } 
     }
-    
 }

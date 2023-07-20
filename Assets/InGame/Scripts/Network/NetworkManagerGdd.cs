@@ -11,20 +11,20 @@ using Mirror;
 
 public class NetworkManagerGdd : NetworkManager
 {
-   
+    public Dictionary<NetworkConnection,PlayerManager> LocalPlayers = new Dictionary<NetworkConnection, PlayerManager>();
     /// <summary>
     public static new NetworkManagerGdd singleton { get; private set; }
     /// Runs on both Server and Client
     /// Networking is NOT initialized when this fires
     /// </summary>
+
+    #region Unity Callbacks
+
     public override void Awake()
     {
         base.Awake();
         singleton = this;
     }
-
-    #region Unity Callbacks
-
     public override void OnValidate()
     {
         base.OnValidate();
@@ -159,8 +159,9 @@ public class NetworkManagerGdd : NetworkManager
         player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
 
         NetworkServer.AddPlayerForConnection(conn, player);
-        
+        LocalPlayers.Add(conn,player.GetComponent<PlayerManager>());
     }
+
 
     /// <summary>
     /// Called on the server when a client disconnects.

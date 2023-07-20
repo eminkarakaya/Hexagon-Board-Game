@@ -4,9 +4,26 @@ using UnityEngine;
 using Mirror;
 public class UnitMovement : Movement
 {
-    
+     private void OnDrawGizmos() {
+        movementSystem = InitMovementSystem();
+        if(movementSystem.movementRange.allNodesDict2== null)
+        {
+            return;
+        }
+        HexGrid hexGrid = FindObjectOfType<HexGrid>();
+        foreach (var item in movementSystem.movementRange.allNodesDict2 )
+        {
+            Vector3 startPos =hexGrid.GetTileAt (item.Key).transform.position;
+            if( item.Value != null)
+            {
+                Vector3 valuePos = hexGrid.GetTileAt ((Vector3Int)item.Value).transform.position;
+                DrawArrow.ForGizmo(valuePos + Vector3.up * h,(startPos-valuePos),Color.red,.5f,25);
+            }
+        }
+    }
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex nextHex,Hex lastHex,MovementSystem movementSystem)
     {
+        Moveable.ToggleButtons(false);
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
         if(lastHex != nextHex && nextHex.IsEnemySettler())
@@ -14,7 +31,7 @@ public class UnitMovement : Movement
         // if(lastHex != nextHex && nextHex.IsEnemyBuilding())
         //     yield break;
         
-        if(nextHex.IsEnemy() || nextHex.IsEnemyBuilding())
+        if(nextHex.IsEnemy() || nextHex.IsEnemyBuilding() ||nextHex.IsEnemyShip())
         {
             yield break;
         }
@@ -41,7 +58,7 @@ public class UnitMovement : Movement
         transform.position = endPos;
         playerManager.CMDShowAllUnits();
         CMDShow();
-        
+        CurrentMovementPoints -= 1;
         if(pathPositions.Count > 0)
         {
             StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),lastHex,rotationDuration,movementSystem));
@@ -49,7 +66,7 @@ public class UnitMovement : Movement
         else
         {  
             MovementFinsihEvent(this);
-            if(lastHex.IsEnemy() ||lastHex.IsEnemyBuilding())
+            if(lastHex.IsEnemy() ||lastHex.IsEnemyBuilding() ||lastHex.IsEnemyShip())
             {
                 Quaternion startRotation = transform.rotation;
                 Vector3 direction = new Vector3(lastHex.transform.position.x,transform.position.y,lastHex.transform.position.z) - transform.position;
@@ -64,14 +81,15 @@ public class UnitMovement : Movement
                 }
                 transform.rotation = endRotation;
                 AttackUnit(lastHex);
+                CurrentMovementPoints = 0;
             }
             else if(lastHex.IsEnemySettler())
             {
                 GetComponent<Unit>().CivManager.Capture(lastHex.Settler.GetComponent<NetworkIdentity>());     
                 lastHex.Settler.StartCoroutine1(lastHex.Settler.GetComponent<NetworkIdentity>(),lastHex.Settler.gameObject,GetComponent<Unit>().CivManager);
-
             }
         }
+        Moveable.ToggleButtons(true);
     }
     
     public IEnumerator MoveKill(Hex hex,bool state)

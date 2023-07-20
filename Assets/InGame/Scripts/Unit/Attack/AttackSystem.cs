@@ -13,11 +13,11 @@ public class AttackSystem
         hexGrid = GameObject.FindObjectOfType<HexGrid>();
         rangeInfo = GraphSearch.GetRange(hexGrid,selectedUnit.Hex.HexCoordinates,selectedUnit.Attack.range);
     }
-    public void ShowRange(IAttackable selectedUnit)
+    public int ShowRange(IAttackable selectedUnit)
     {
         if(!selectedUnit.Attack.TryGetComponent(out Range range))
         {
-            return;
+            return 0;
         }
         // if(selectedUnit.GetComponent<Movement>().GetCurrentMovementPoints() == 0) return;
         GetRange(selectedUnit);
@@ -25,6 +25,7 @@ public class AttackSystem
         {
             hexGrid.GetTileAt(item.Key).EnableHighlighRange();
         }
+        return selectedUnit.Attack.range;
     }
     public void HideRange(IAttackable attackable)
     {

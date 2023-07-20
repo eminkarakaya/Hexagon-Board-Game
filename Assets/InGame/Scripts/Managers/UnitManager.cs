@@ -27,7 +27,7 @@ public class UnitManager : SingletonMirror<UnitManager>
         }
     }
 
-    public void HandleUnitSelected(GameObject unit)
+    public void HandleUnitSelected(Transform unit)
     {
         if (PlayersTurn == false)
             return;
@@ -116,20 +116,10 @@ public class UnitManager : SingletonMirror<UnitManager>
 
     private void HandleTargetHexSelected(Hex selectedHex)
     {
-        if (previouslySelectedHex == null || previouslySelectedHex != selectedHex)
-        {
-            previouslySelectedHex = selectedHex;
-            selectedUnit.RightClick(selectedHex);
-        }
-        else
-        {
-
-            selectedUnit.RightClick2(selectedHex);
-
-
-
-            ClearOldSelection();
-        }
+        previouslySelectedHex = selectedHex;
+        selectedUnit.RightClick(selectedHex);
+        selectedUnit.RightClick2(selectedHex);
+        ClearOldSelection();
     }
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)
@@ -145,7 +135,7 @@ public class UnitManager : SingletonMirror<UnitManager>
 
     private void ResetTurn(Movement selectedUnit)
     {
-        selectedUnit.MovementFinished -= ResetTurn;
+        // selectedUnit.MovementFinished -= ResetTurn;
         PlayersTurn = true;
     }
 }

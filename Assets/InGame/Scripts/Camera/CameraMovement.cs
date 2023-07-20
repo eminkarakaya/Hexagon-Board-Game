@@ -4,14 +4,20 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-
+    Vector3 startPosition;
     private LayerMask mask;
     public LayerMask Mask{get => mask; set {
         mask = value;
         Camera.main.cullingMask = mask;
         }
     }
-    
+    public static System.Action<Transform> OnTargetObject;
+    private void OnEnable() {
+        OnTargetObject += TargetObj;
+    }
+    private void OnDisable() {
+        OnTargetObject -= TargetObj;
+    }
     [SerializeField] private Vector2 clampX,clampY;
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] private float _movementSpeed,_movementTime,_normalSpeed,_fastSpeed;
@@ -21,6 +27,7 @@ public class CameraMovement : MonoBehaviour
     private void Start() {
         // Debug.Log(transform.forward);
         // Debug.Log(Screen.height + " " + Screen.width);
+        startPosition = transform.position;
         _newPosition = transform.position;
         _newZoom = _cameraTransform.localPosition;
     }
@@ -28,7 +35,11 @@ public class CameraMovement : MonoBehaviour
         HandleMovementInput();
         HandleMouseInput();
     }
-
+    public void TargetObj(Transform transform)
+    {
+        _newPosition.x = transform.position.x;
+        _newPosition.z = transform.position.z + startPosition.z;
+    }   
     private void HandleMouseInput()
     {
         if(Input.mouseScrollDelta.y != 0)

@@ -118,7 +118,7 @@ using UnityEngine;
                         players.Add(player);
                     }
                     
-                    turnManager.ManagePlayers(players);
+                    // turnManager.ManagePlayers(players);
                     break;
                 }
             }

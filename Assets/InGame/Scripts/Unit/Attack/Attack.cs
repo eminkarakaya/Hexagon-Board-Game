@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Mirror;
+using UnityEngine.Events;
+
 public abstract class Attack : NetworkBehaviour
 {
     protected IAttackable attackable;
     [SerializeField] private TextMeshProUGUI _damageText;
     [SerializeField] protected int _damagePower;
-    public System.Action AttackEvent;
+    public UnityEvent AttackEvent;
     public System.Action<Hex> KillEvent;
     protected int DamagePower { get; set; }
     public int range = 1;

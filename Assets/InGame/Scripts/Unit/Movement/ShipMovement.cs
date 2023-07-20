@@ -7,7 +7,6 @@ public class ShipMovement : UnitMovement
 {
     protected override MovementSystem InitMovementSystem()
     {
-        Debug.Log("calculate SEA AND LAND");
         return new ShipMovementSystem(Moveable);
     }
     

@@ -9,13 +9,15 @@ using Steamworks;
 using UnityEngine.SceneManagement;
 public class PlayerManager : CivManager
 {
+    #region  properties
+    List<PlayerManager> waitedPlayers;
     public GameManager gameManager;
     [SerializeField] PlayerInfoDisplay lobbyPrefab;
     public PlayerInfoDisplay lobby;
     [SyncVar] public int team;
 
     public Side Side;
-    public List<IMovable> liveUnits;
+    // public List<ITaskable> liveUnits = new List<ITaskable>();
     [SerializeField] private GameObject civUIPrefab;
     /* PlayerInfoDisplay */ 
     public LobbyItem lobbyItemPrefab;
@@ -23,29 +25,50 @@ public class PlayerManager : CivManager
     LobbyItem lobbyItem;
     [SyncVar(hook =nameof(HandleSteamIDUpdated))] private ulong steamID;
     protected Callback<AvatarImageLoaded_t> avatarImageLoaded;
-    /* PlayerInfoDisplay */ 
+    #endregion
 
+    
+   
+
+    #region  unityMirrorCallbacks
     private void Awake() {
         team = Random.Range(0,2);
+
         // DontDestroyOnLoad(this.gameObject);
     }
+    bool kekw = false;
+   
     public IEnumerator StartGame()
     {
-        if(isOwned)
-        {
+
             while(gameManager == null)
             {
-                Debug.Log("waiting gm");
-                gameManager = gameManager = FindObjectOfType<GameManager>();
+                gameManager = FindObjectOfType<GameManager>();
                 yield return null;
             }
-            waitGameManager();
+        while(gameManager.playerCount != FindObjectsOfType<PlayerManager>().Length)
+        {
+            Debug.Log("waiting other players..");
+            yield return null;
+        }
+        if(isOwned)
+        {
+            orderButton = gameManager.OrderButton;
+            orderButton.onClick.AddListener(GetOrder);
+            orderButton.image.sprite = nextTurnSprite;
+            kekw = true;
+            CMDCreateCivUI();
             CMDCreateBuilding();
             // StartCoroutine(wait());
             StartCoroutine(Wait());
             
         }    
     }
+
+    #endregion
+
+    #region lobby team falan
+
     [ClientRpc] private void RPCSetParentLobby()
     {
         lobby.gameObject.SetActive(true);
@@ -60,9 +83,6 @@ public class PlayerManager : CivManager
         RPCSetParentLobby();
     }
     
-    private void Start() {
-        StartCoroutine (StartGame());
-    }
     private IEnumerator Wait()
     {
         while(team == -1)
@@ -103,42 +123,11 @@ public class PlayerManager : CivManager
             }
         }
     }
-    public void SetSide(Side side, Outline outline)
-    {
-        this.Side = side;
-        if(outline == null) return;
-        if(side == Side.Me)
-        {
-            outline.OutlineColor = Color.white;
-        }
-        else if(side == Side.Enemy)
-        {
-            outline.OutlineColor = Color.red;
-        }
-        else
-            outline.OutlineColor = Color.blue;
-    }
+    #endregion
+   
+   
+    
 
-    public static PlayerManager FindPlayerManager()
-    {
-        var managers = FindObjectsOfType<PlayerManager>();
-        foreach (var item in managers)
-        {
-            if(item.isOwned)
-                return item;
-        }
-        return null;
-    }
-    IEnumerator waitGameManager()
-    {
-        while(gameManager == null)
-        {
-            Debug.Log("waiting gm");
-            gameManager = gameManager = FindObjectOfType<GameManager>();
-            yield return null;
-        }
-        CMDCreateCivUI();
-    }
     [Command] private void CMDCreateCivUI()
     {
         CivDataUI civDataUI = Instantiate(civUIPrefab,gameManager.civUIParent).GetComponent<CivDataUI>();
@@ -156,13 +145,14 @@ public class PlayerManager : CivManager
         }
     }
     
+    #region  createBuilding
     [Command] // client -> server
     private void CMDCreateBuilding()
     {
         Building building = Instantiate(buildingPrefab).GetComponent<Building>();
         NetworkServer.Spawn(building.gameObject,connectionToClient);
         
-        ownedObjs.Add(building.gameObject);
+       
         RPCCreateBuilding(building,gameManager.playersHexes.Count-1);
         
         FindPlayerManager(building);
@@ -177,7 +167,7 @@ public class PlayerManager : CivManager
         building.transform.rotation = Quaternion.Euler(-90,0,0); 
         building.Hex = gameManager.playersHexes[i];
         building.Hex.Building = building;
-        
+        ownedObjs.Add(building.gameObject);
         foreach (var item in gameManager.buildings)
         {
             if(item == null) continue;
@@ -193,7 +183,9 @@ public class PlayerManager : CivManager
         gameManager.playersHexes.RemoveAt(gameManager.playersHexes.Count-1);
         SetTeamColor(building.gameObject);
     }
-
+    #endregion
+    
+    #region  findPlayerMnaager
     [ClientRpc] private void FindPlayerManager(Building building)
     {
        
@@ -209,7 +201,19 @@ public class PlayerManager : CivManager
         building.CivManager.SetTeamColor(this.gameObject);
 
     }
-        
+    public static PlayerManager FindPlayerManager()
+    {
+        var managers = FindObjectsOfType<PlayerManager>();
+        foreach (var item in managers)
+        {
+            if(item.isOwned)
+                return item;
+        }
+        return null;
+    }
+    #endregion
+
+    #region  hideshow
     [Command]
     public override void CMDHideAllUnits()
     {
@@ -221,17 +225,19 @@ public class PlayerManager : CivManager
     {
         RPCShowAllUnits();
     }
-    
+    #endregion
+   
+   
     /* playerınfodisplay */
     public override void OnStartClient()
     {  
-        
+        StartCoroutine (StartGame());
 
         // if(lobbyItem == null)
         //     lobbyItem = Instantiate(lobbyItemPrefab,SteamNetworkManager.instance.playerPrefabParent); 
         // avatarImageLoaded = Callback<AvatarImageLoaded_t>.Create(OnAvatarImageLoaded);
     }
-
+    #region  steam falan
     private void OnAvatarImageLoaded(AvatarImageLoaded_t callback)
     {
         if(callback.m_steamID.m_SteamID != steamID) return;
@@ -280,21 +286,27 @@ public class PlayerManager : CivManager
     [TargetRpc]
     public void TargetBeginGame () {
         //Additively load game scene
-        SceneManager.LoadScene (1,LoadSceneMode.Additive);
+        // SceneManager.LoadScene (1,LoadSceneMode.Additive);
 
-        lobby.gameObject.SetActive(false);
-        StartCoroutine (StartGame());
-        StartCoroutine(wait());
+        // lobby.gameObject.SetActive(false);
+        // StartCoroutine (StartGame());
+        // StartCoroutine(wait());
     } 
-    IEnumerator wait()
-    {
-        while(!SceneManager.GetSceneByBuildIndex(1).isLoaded)
-        {
-            Debug.Log("waitin Scene load");
-            yield return null;
-        }
-        SceneManager.UnloadSceneAsync(0);
+    // IEnumerator wait()
+    // {
+    //     while(!SceneManager.GetSceneByBuildIndex(1).isLoaded)
+    //     {
+    //         yield return null;
+    //     }
+    //     SceneManager.UnloadSceneAsync(0);
 
-    }
+    // }
+    #endregion
         /* playerınfodisplay */
+
+
+    #region  turn order
+    
+
+    #endregion
 }

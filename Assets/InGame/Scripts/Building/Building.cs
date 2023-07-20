@@ -8,14 +8,15 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
 {
     
     #region Properties
-
-    [SyncVar] [SerializeField] private  CivManager civManager;
+    [SerializeField] private GameObject shipRange;
+    [SyncVar] [SerializeField] protected  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
 
     
     [Header("Prefabs")]
 
-    [SerializeField] private GameObject mc1,settler,mc1Range,harborSettler,ship;
+    [SerializeField] private GameObject mc1,settler,mc1Range,harborSettler;
+    [SerializeField] protected GameObject ship;
     public Hex Hex { get => hex; set{hex = value;} }
     [SyncVar] [SerializeField] private Hex hex = null;
     [SerializeField] private Side side;
@@ -35,6 +36,19 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     #endregion
 
     #region Mirror and Unity Callback
+    // public override void OnStartAuthority()
+    // {
+    //     if(civManager == null)
+    //     {
+    //         CivManager = PlayerManager.FindPlayerManager();
+    //     }
+    //     if(civManager.TryGetComponent(out PlayerManager playerManager))
+    //     {
+    //         playerManager.liveUnits.Add(this);
+    //         Debug.Log(playerManager,playerManager);
+    //     }
+    // }
+    
     public override void OnStartClient()
     {
         Outline = GetComponent<Outline>();
@@ -61,19 +75,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     #endregion
    
     #region  CREATE Unit
-    private void CreateShip(Ship ship)
-    {
-        ship.Hex = Hex;
-        // RPCSetHex(ship,Hex);
-        NetworkServer.Spawn(ship.gameObject,connectionToClient);
-        if(CivManager == null)
-            CivManager = PlayerManager.FindPlayerManager();
-        CivManager.ownedObjs.Add(ship.gameObject);
-        RPCCreateShip(ship);
-        FindPlayerManager(ship);
-        civManager.SetTeamColor(ship.gameObject);
-    }
-
+    
     private void CreateUnit(Unit unit)
     {
         unit.Hex = Hex;
@@ -81,7 +83,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
         if(CivManager == null)
             CivManager = PlayerManager.FindPlayerManager();
-        CivManager.ownedObjs.Add(unit.gameObject);
+        // CivManager.ownedObjs.Add(unit.gameObject);
         RPCCreateMC1(unit);
         FindPlayerManager(unit);
         civManager.SetTeamColor(unit.gameObject);
@@ -99,16 +101,11 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         Unit unit = Instantiate(mc1Range,transform.position,Quaternion.identity).GetComponent<Unit>();
         CreateUnit(unit);
     }
-    [Command] private void CMDCreateShip()
-    {
-        if(Hex.Ship != null) return;
-        Ship unit = Instantiate(ship,transform.position,Quaternion.identity).GetComponent<Ship>();
-        CreateShip(unit);
-    }
+    
 
 
     #endregion
-    [ClientRpc] private void FindPlayerManager(Unit unit)
+    [ClientRpc] protected void FindPlayerManager(Unit unit)
     {
         unit.CivManager = this.civManager;
         StartCoroutine(FindPlayerManagerIE(unit));
@@ -123,25 +120,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
 
     }
     
-    [ClientRpc]
-    private void RPCCreateShip(Ship ship)
-    {
-        ship.CivManager = civManager;
-        ship.Hex = Hex;
-        ship.Hex.Ship = ship;
-        if(ship.isOwned)
-        {
-            ship.SetSide(Side.Me,ship.GetComponent<Outline>());
-        }
-        else
-        {
-            ship.SetSide(Side.Enemy,ship.GetComponent<Outline>());
-        }
-        
-       
-        CivManager.CMDHideAllUnits();
-        CivManager.CMDShowAllUnits();
-    }
+   
     [ClientRpc]
     private void RPCCreateMC1(Unit unit)
     {
@@ -157,7 +136,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
             unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
         }
         
-       
+        CivManager.CMDAddOwnedObject(unit.gameObject);
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();
     }
@@ -169,15 +148,9 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     {
         CMDCreateMC1Range();
     }
-    public void CreateShipOnClickRange()
-    {
-        CMDCreateShip();
-    }
+   
     #endregion
    
-    
-     #region  CREATE SETTLER
-
     [ClientRpc] private void FindPlayerManager(Settler unit)
     {
        
@@ -191,13 +164,17 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
             yield return null;
         }
         unit.CivManager.SetTeamColor(this.gameObject);
-
+    
     }
+    #region  CREATE SETTLER
+
+
     [ClientRpc]
     private void RPCCreateSettler(Settler unit)
     {
         unit.Hex = Hex;
         unit.Hex.Settler = unit;
+        civManager.CMDAddOwnedObject(unit.gameObject);
         if(unit.isOwned)
         {
             unit.SetSide(Side.Me,unit.GetComponent<Outline>());
@@ -213,12 +190,13 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     }
     private void CreateSettler(Settler settler)
     {
+        settler.Hex = Hex;
+        NetworkServer.Spawn(settler.gameObject,connectionToClient);
         if(CivManager == null)
             CivManager = PlayerManager.FindPlayerManager();
         settler.CivManager = civManager;
-        settler.Hex = Hex;
-        NetworkServer.Spawn(settler.gameObject,connectionToClient);
         RPCCreateSettler(settler);
+        civManager.SetTeamColor(settler.gameObject);
     }
     [Command]
     private void CMDCreateSettler()
@@ -252,32 +230,36 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
 
 
     #region  SetSide
-    [Command] public void CMDSetSide(NetworkIdentity identity, GameObject _gameObject,CivManager civManager)
+    [Command] public void CMDSetSide(CivManager civManager)
     {
-        RPGSetSide(identity,_gameObject,civManager);
+        RPGSetSide(civManager);
+        
     }
-    [ClientRpc] private void RPGSetSide(NetworkIdentity identity,GameObject _gameObject,CivManager civManager)
+    [ClientRpc] private void RPGSetSide(CivManager civManager)
     {
-        ISideable sideable = _gameObject.GetComponent<ISideable>();
-        sideable.CivManager = civManager;
         if(civManager.isOwned)
         {
-            sideable.SetSide(Side.Me,sideable.Outline);
+            SetSide(Side.Me,Outline);
         }
         else
         {
-            sideable.SetSide(Side.Enemy,sideable.Outline);
+            SetSide(Side.Enemy,Outline);
         }
     }
-    public IEnumerator wait(NetworkIdentity identity,GameObject sideable,CivManager civManager)
+    
+    public IEnumerator wait(CivManager attackableCivManager)
     {
-        while(sideable.GetComponent<NetworkIdentity>().isOwned == false)
+        this.civManager.CMDRemoveOwnedObject(this.gameObject); //requestauthority = false
+        this.CivManager = attackableCivManager;
+        while(GetComponent<NetworkIdentity>().isOwned == false)
         {
             yield return null;
-            
         }
-        CMDSetSide(identity,sideable,civManager);
-        civManager.CMDShowAllUnits();
+        
+        // ele gecırıldıkten sonra
+        CMDSetSide(attackableCivManager);
+        attackableCivManager.CMDShowAllUnits();
+        attackableCivManager.CMDAddOwnedObject(this.gameObject); //requestauthority = false
     }
     public void SetSide(Side side, Outline outline)
     {
@@ -294,6 +276,63 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         else
             outline.OutlineColor = Color.blue;
 
+    }
+    #endregion
+
+    #region CREATEShip
+    [Command] public void CMDCreateShip()
+    {
+        if(!hex.isCoast && hex.IsBuilding()) return;
+        if(Hex.Ship != null) return;
+        Ship unit = Instantiate(ship,transform.position,Quaternion.identity).GetComponent<Ship>();
+        CreateShip(unit);
+    }
+    [Command] public void CMDCreateShipRange()
+    {
+        if(!hex.isCoast && hex.IsBuilding()) return;
+        if(Hex.Ship != null) return;
+        Ship unit = Instantiate(shipRange,transform.position,Quaternion.identity).GetComponent<Ship>();
+        CreateShip(unit);
+    }
+    private void CreateShip(Ship ship)
+    {
+        ship.Hex = Hex;
+        // RPCSetHex(ship,Hex);
+        NetworkServer.Spawn(ship.gameObject,connectionToClient);
+        if(CivManager == null)
+            CivManager = PlayerManager.FindPlayerManager();
+        CivManager.CMDAddOwnedObject(ship.gameObject);
+        RPCCreateShip(ship);
+        FindPlayerManager(ship);
+        civManager.SetTeamColor(ship.gameObject);
+    }
+    [ClientRpc]
+    private void RPCCreateShip(Ship ship)
+    {
+        ship.CivManager = civManager;
+        ship.Hex = Hex;
+        ship.Hex.Ship = ship;
+        civManager.CMDAddOwnedObject(ship.gameObject);
+        if(ship.isOwned)
+        {
+            ship.SetSide(Side.Me,ship.GetComponent<Outline>());
+        }
+        else
+        {
+            ship.SetSide(Side.Enemy,ship.GetComponent<Outline>());
+        }
+        
+       
+        CivManager.CMDHideAllUnits();
+        CivManager.CMDShowAllUnits();
+    }
+    public void CreateShipOnClick()
+    {
+        CMDCreateShip();
+    }
+    public void CreateShipOnClickRange()
+    {
+        CMDCreateShipRange();
     }
 
     #endregion
