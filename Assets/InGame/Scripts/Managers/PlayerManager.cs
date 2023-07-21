@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class PlayerManager : CivManager
 {
     #region  properties
-    List<PlayerManager> waitedPlayers;
+    public List<PlayerManager> waitedPlayers = new List<PlayerManager>();
     public GameManager gameManager;
     [SerializeField] PlayerInfoDisplay lobbyPrefab;
     public PlayerInfoDisplay lobby;
@@ -36,16 +36,15 @@ public class PlayerManager : CivManager
 
         // DontDestroyOnLoad(this.gameObject);
     }
-    bool kekw = false;
    
     public IEnumerator StartGame()
     {
 
-            while(gameManager == null)
-            {
-                gameManager = FindObjectOfType<GameManager>();
-                yield return null;
-            }
+        while(gameManager == null)
+        {
+            gameManager = FindObjectOfType<GameManager>();
+            yield return null;
+        }
         while(gameManager.playerCount != FindObjectsOfType<PlayerManager>().Length)
         {
             Debug.Log("waiting other players..");
@@ -53,10 +52,10 @@ public class PlayerManager : CivManager
         }
         if(isOwned)
         {
+            waitedPlayers = FindObjectsOfType<PlayerManager>().ToList();
             orderButton = gameManager.OrderButton;
             orderButton.onClick.AddListener(GetOrder);
             orderButton.image.sprite = nextTurnSprite;
-            kekw = true;
             CMDCreateCivUI();
             CMDCreateBuilding();
             // StartCoroutine(wait());
@@ -227,7 +226,9 @@ public class PlayerManager : CivManager
     }
     #endregion
    
-   
+    
+
+
     /* playerınfodisplay */
     public override void OnStartClient()
     {  
@@ -291,7 +292,8 @@ public class PlayerManager : CivManager
         // lobby.gameObject.SetActive(false);
         // StartCoroutine (StartGame());
         // StartCoroutine(wait());
-    } 
+    }
+
     // IEnumerator wait()
     // {
     //     while(!SceneManager.GetSceneByBuildIndex(1).isLoaded)
@@ -302,11 +304,135 @@ public class PlayerManager : CivManager
 
     // }
     #endregion
-        /* playerınfodisplay */
+    /* playerınfodisplay */
 
 
+
+
+    #region 
+    public override void GetOrderIcon()
+    {
+        if(orderList.Count == 0)
+        {
+            orderButton.image.sprite = nextTurnSprite;
+        }
+        else
+        {
+            orderButton.image.sprite = orderList[orderList.Count-1].OrderSprite;
+        }
+    }
+
+    public override void ResetOrderIndex()
+    {
+        orderList = ownedObjs.Where(x=>x.TryGetComponent(out ITaskable selectable)).Select(x=>x.GetComponent<ITaskable>()).ToList();
+        foreach (var item in orderList)
+        {
+            item.TaskReset();
+        }
+        
+    }
+    public override void GetOrder()
+    {
+        if(orderList.Count == 0)
+        {   
+            // orderlist bıttıyse 
+
+            // next turn butonuna basıldı mı basılmadı mı 
+            if(orderButton.image.sprite == nextTurnSprite)
+            {
+                CMDNextTurnBTN();
+                return;
+            }   
+            orderButton.image.sprite = nextTurnSprite;
+            return;
+        }
+
+        // sıradakı objeyı seciyo
+        orderList[orderList.Count-1].LeftClick();
+        UnitManager.Instance.HandleUnitSelected(orderList[orderList.Count-1].Transform);
+        Transform targetCameraTransform = orderList[orderList.Count-1].Transform;
+        CameraMovement.OnTargetObject?.Invoke(targetCameraTransform);
+    }
+    [ClientRpc] private void RPCNextTurnBTN()
+    {
+        RPCRemoveWaitingList();
+        if(isOwned)
+            orderButton.image.sprite = waitingSprite;
+        foreach (var item in FindObjectsOfType<PlayerManager>())
+        {
+            if(item.waitedPlayers.Count == 0 && item.isOwned)
+            {
+                item.NextTurn();
+            }
+        }
+    }
+    [Command] public void CMDNextTurnBTN()
+    {
+        RPCNextTurnBTN();
+    }
+   
+    public override void NextTurnBtn()
+    {
+        
+    }
+
+    public void RPCRemoveWaitingList()
+    {
+        foreach (var item in FindObjectsOfType<PlayerManager>())
+        {
+            if(item.isOwned)
+            {
+                if(item.waitedPlayers.Contains(this))
+                {
+                    item.waitedPlayers.Remove(this);
+                }
+            }
+        }
+    }
+    [Command]
+    public void CMDAddWaitingList()
+    {
+        RPCAddWaitingList();
+    }
+    [ClientRpc]
+    public void RPCAddWaitingList()
+    {
+        if(!waitedPlayers.Contains(this))
+        {
+            waitedPlayers.Add(this);
+        }
+    }
+    public override void NextTurn()
+    {
+            Debug.Log("NEXT TURN");
+        
+        waitedPlayers = FindObjectsOfType<PlayerManager>().ToList();
+        ResetOrderIndex();
+        GetOrderIcon();
+        
+        // 
+    }
+
+    public override void AddOrderList(ITaskable taskable)
+    {
+        if(!orderList.Contains(taskable))
+        {
+            orderList.Add(taskable);
+        }
+    }
+
+    public override void RemoveOrderList(ITaskable taskable)
+    {
+        if(orderList.Contains(taskable))
+        {
+            orderList.Remove(taskable);
+        }
+
+        GetOrderIcon();
+    }
+    #endregion
     #region  turn order
-    
+
 
     #endregion
 }

@@ -54,5 +54,39 @@ public class AIManager : CivManager
                 item.SetSide(Side.Enemy,item.GetComponent<Outline>());  
         }
     }
-    
+
+    public override void AddOrderList(ITaskable taskable)
+    {
+
+    }
+
+    public override void RemoveOrderList(ITaskable taskable)
+    {
+
+    }
+
+    public override void NextTurnBtn()
+    {
+
+    }
+
+    public override void GetOrder()
+    {
+
+    }
+
+    public override void GetOrderIcon()
+    {
+
+    }
+
+    public override void ResetOrderIndex()
+    {
+
+    }
+
+    public override void NextTurn()
+    {
+
+    }
 }

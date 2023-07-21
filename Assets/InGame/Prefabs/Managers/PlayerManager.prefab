@@ -66,10 +66,12 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   nextTurnSprite: {fileID: 21300000, guid: f21d7ae67f2b869408ed8afe5441f53e, type: 3}
+  waitingSprite: {fileID: 21300000, guid: c4521e1f07a9a1b498d8da261edcf504, type: 3}
   buildingPrefab: {fileID: 3831290402078815314, guid: 355a18b5a4d05d54cabeea49595848e6, type: 3}
   ownedObjs: []
   hexGrid: {fileID: 6415209383831887827, guid: 56919fa60e0e44240aa635b8ba3acf71, type: 3}
   civData: {fileID: 11400000, guid: ecc1986c615d2354a9b5f63208e13a83, type: 2}
+  waitedPlayers: []
   gameManager: {fileID: 0}
   lobbyPrefab: {fileID: 7454415712136694504, guid: ad1e145920cbc554e8c6d6392b14a01a, type: 3}
   lobby: {fileID: 0}

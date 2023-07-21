@@ -7,10 +7,10 @@ using System.Linq;
 using Steamworks;
 
 
-public class CivManager : NetworkBehaviour
+public abstract class CivManager : NetworkBehaviour
 {
     protected Button orderButton;
-    [SerializeField] protected Sprite nextTurnSprite;    
+    [SerializeField] protected Sprite nextTurnSprite,waitingSprite;    
     [SerializeField] protected List<ITaskable> orderList = new List<ITaskable>();
     [SerializeField] protected GameObject buildingPrefab;
     [SyncVar] [SerializeField] public List<GameObject> ownedObjs = new List<GameObject>();
@@ -105,67 +105,19 @@ public class CivManager : NetworkBehaviour
     }
     #endregion
 
-    public void AddOrderList(ITaskable taskable)
-    {
-        if(!orderList.Contains(taskable))
-        {
-            orderList.Add(taskable);
-        }
-    }
-    public void RemoveOrderList(ITaskable taskable)
-    {
-        if(orderList.Contains(taskable))
-        {
-            orderList.Remove(taskable);
-        }
+    public abstract void AddOrderList(ITaskable taskable);
+    
+    public abstract void RemoveOrderList(ITaskable taskable);
 
-        GetOrderIcon();
-    }
-
-    public void NextTurn()
-    {
-        ResetOrderIndex();
-        GetOrderIcon();
-    }
-    public void GetOrder()
-    {
-        // orderList = ownedObjs.Where(x=>x.TryGetComponent(out ITaskable selectable)).Select(x=>x.GetComponent<ITaskable>()).ToList();  
-        if(orderList.Count == 0)
-        {   
-            if(orderButton.image.sprite == nextTurnSprite)
-            {
-                NextTurn();
-                return;
-            }   
-            orderButton.image.sprite = nextTurnSprite;
-            return;
-        }
-        // orderButton.image.sprite = orderList[orderList.Count-1].OrderSprite;
-        orderList[orderList.Count-1].LeftClick();
-        UnitManager.Instance.HandleUnitSelected(orderList[orderList.Count-1].Transform);
-        Transform targetCameraTransform = orderList[orderList.Count-1].Transform;
-        CameraMovement.OnTargetObject?.Invoke(targetCameraTransform);
-    }
-    public  void GetOrderIcon()
-    {
-        if(orderList.Count == 0)
-        {
-            orderButton.image.sprite = nextTurnSprite;
-        }
-        else
-        {
-            orderButton.image.sprite = orderList[orderList.Count-1].OrderSprite;
-        }
-    }
+    public abstract void NextTurnBtn();
+    public abstract void NextTurn();
+    
+    public abstract void GetOrder();
+    
+    public abstract void GetOrderIcon();
+    
     
 
-    public void ResetOrderIndex()
-    {
-        orderList = ownedObjs.Where(x=>x.TryGetComponent(out ITaskable selectable)).Select(x=>x.GetComponent<ITaskable>()).ToList();
-        foreach (var item in orderList)
-        {
-            item.TaskReset();
-        }
-        
-    }
+    public abstract void ResetOrderIndex();
+    
 }
