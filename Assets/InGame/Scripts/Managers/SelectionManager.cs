@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class SelectionManager : MonoBehaviour
 {
@@ -61,6 +62,11 @@ public class SelectionManager : MonoBehaviour
         Ray ray = _mainCamera.ScreenPointToRay(mousePosition);
         if(Physics.Raycast(ray,out hit,10000f,selectionMask ))
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                result = null;
+                return false;
+            }
             result = hit.collider.gameObject;
             return true;
         }

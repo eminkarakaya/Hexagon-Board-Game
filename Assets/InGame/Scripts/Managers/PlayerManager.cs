@@ -7,9 +7,17 @@ using Mirror;
 using TMPro;
 using Steamworks;
 using UnityEngine.SceneManagement;
+using System;
 public class PlayerManager : CivManager
 {
+    
     #region  properties
+    public Action NextTurnEvent;
+    
+
+    public HoverTip hoverTip;
+    public TMP_Text tipText;
+    public const string NETX_TURN_STRING = "Next Turn",UNIT_NEEDS_ORDER = "Unit Needs Orders", WAITING_OTHER_PLAYERS = "Waiting Other Players";
     public List<PlayerManager> waitedPlayers = new List<PlayerManager>();
     public GameManager gameManager;
     [SerializeField] PlayerInfoDisplay lobbyPrefab;
@@ -32,11 +40,11 @@ public class PlayerManager : CivManager
 
     #region  unityMirrorCallbacks
     private void Awake() {
-        team = Random.Range(0,2);
-
+        team = UnityEngine.Random.Range(0,2);
+        FindObjectOfType<SelectCiv>().button.onClick.AddListener(()=> StartCoroutine(StartGame()));
         // DontDestroyOnLoad(this.gameObject);
     }
-   
+
     public IEnumerator StartGame()
     {
 
@@ -50,24 +58,48 @@ public class PlayerManager : CivManager
             Debug.Log("waiting other players..");
             yield return null;
         }
+        // if(isOwned)
+        //     CMDSetCivData();
+        while(civData == null)
+        {
+            Debug.Log("waitingCivData");
+            yield return null;
+        }
         if(isOwned)
         {
             waitedPlayers = FindObjectsOfType<PlayerManager>().ToList();
             orderButton = gameManager.OrderButton;
             orderButton.onClick.AddListener(GetOrder);
             orderButton.image.sprite = nextTurnSprite;
+            tipText = gameManager.nextTurnTipText;
+            hoverTip = gameManager.hoverTip;
+            totalGoldText = gameManager.goldText;
+            goldTextPerTurn = gameManager.goldPerTurnText;
+            gameManager.ownedPlayerManager = this;
             CMDCreateCivUI();
             CMDCreateBuilding();
-            // StartCoroutine(wait());
             StartCoroutine(Wait());
+            GetOrderIcon();
             
         }    
+        
+    }
+    [Command] public void CMDSetCivData(int civDataIndex)
+    {
+        RPCSetCivData(civDataIndex);
+    }
+    [ClientRpc] private void RPCSetCivData(int civDataIndex)
+    {
+        gameManager = FindObjectOfType<GameManager>();
+        this.civData = gameManager.GetCivData(civDataIndex);
+        // this.civType = index;
     }
 
     #endregion
 
     #region lobby team falan
 
+  
     [ClientRpc] private void RPCSetParentLobby()
     {
         lobby.gameObject.SetActive(true);
@@ -126,7 +158,15 @@ public class PlayerManager : CivManager
    
    
     
-
+    [Command] public void CMDSetName(string str)
+    {
+        RPCSetName(str);
+    }
+    [ClientRpc] private void RPCSetName(string str)
+    {
+        nickname = str;
+        
+    }
     [Command] private void CMDCreateCivUI()
     {
         CivDataUI civDataUI = Instantiate(civUIPrefab,gameManager.civUIParent).GetComponent<CivDataUI>();
@@ -136,8 +176,12 @@ public class PlayerManager : CivManager
     }
     [ClientRpc] private void RPGCreateCivUI(CivDataUI civDataUI)
     {
+       
         civDataUI.civManager = this;
         civDataUI.civData = civData;
+        civDataUI.civImage.sprite = civData.civImage;
+        civDataUI.SetNicknameText();
+        gameManager = FindObjectOfType<GameManager>();
         foreach (var item in FindObjectsOfType<CivDataUI>().ToList())
         {
             item.transform.SetParent(gameManager.civUIParent);
@@ -226,18 +270,6 @@ public class PlayerManager : CivManager
     }
     #endregion
    
-    
-
-
-    /* playerınfodisplay */
-    public override void OnStartClient()
-    {  
-        StartCoroutine (StartGame());
-
-        // if(lobbyItem == null)
-        //     lobbyItem = Instantiate(lobbyItemPrefab,SteamNetworkManager.instance.playerPrefabParent); 
-        // avatarImageLoaded = Callback<AvatarImageLoaded_t>.Create(OnAvatarImageLoaded);
-    }
     #region  steam falan
     private void OnAvatarImageLoaded(AvatarImageLoaded_t callback)
     {
@@ -309,22 +341,24 @@ public class PlayerManager : CivManager
 
 
 
-    #region 
+    #region  turn order
     public override void GetOrderIcon()
     {
         if(orderList.Count == 0)
         {
             orderButton.image.sprite = nextTurnSprite;
+            tipText.text = NETX_TURN_STRING;
         }
         else
         {
             orderButton.image.sprite = orderList[orderList.Count-1].OrderSprite;
+            tipText.text = UNIT_NEEDS_ORDER;
         }
     }
 
     public override void ResetOrderIndex()
     {
-        orderList = ownedObjs.Where(x=>x.TryGetComponent(out ITaskable selectable)).Select(x=>x.GetComponent<ITaskable>()).ToList();
+        orderList = ownedObjs.Where(x=> x.TryGetComponent(out ITaskable selectable) ).Select(x=>x.GetComponent<ITaskable>()).ToList();
         foreach (var item in orderList)
         {
             item.TaskReset();
@@ -340,9 +374,16 @@ public class PlayerManager : CivManager
             // next turn butonuna basıldı mı basılmadı mı 
             if(orderButton.image.sprite == nextTurnSprite)
             {
-                CMDNextTurnBTN();
+                NextTurnBtn();
+                UnitManager.Instance.ClearOldSelection();
                 return;
             }   
+            if(orderButton.image.sprite == waitingSprite)
+            {
+                CMDAddWaitingList();
+                orderButton.image.sprite = nextTurnSprite;
+                return;
+            }
             orderButton.image.sprite = nextTurnSprite;
             return;
         }
@@ -357,23 +398,41 @@ public class PlayerManager : CivManager
     {
         RPCRemoveWaitingList();
         if(isOwned)
+        {
             orderButton.image.sprite = waitingSprite;
+            tipText.text = WAITING_OTHER_PLAYERS;
+        }
+        SetWaitedListTip();
         foreach (var item in FindObjectsOfType<PlayerManager>())
         {
-            if(item.waitedPlayers.Count == 0 && item.isOwned)
+            if(item.waitedPlayers.Count == 0)
             {
-                item.NextTurn();
+                SetWaitedListTip();
+                if(item.isOwned)
+                {
+                    item.NextTurn();
+                }
             }
         }
+        
+    }
+    
+    public void SetWaitedListTip()
+    {
+        if(!isOwned) return;
+        string str = string.Empty;
+        foreach (var item in waitedPlayers)
+        {
+            str += item.nickname + ", ";
+        }
+        if(str == string.Empty) return;
+        str.Remove(str.Count()-3,3);
+        hoverTip.tipToShow = string.Empty;
+        hoverTip.tipToShow += str;
     }
     [Command] public void CMDNextTurnBTN()
     {
         RPCNextTurnBTN();
-    }
-   
-    public override void NextTurnBtn()
-    {
-        
     }
 
     public void RPCRemoveWaitingList()
@@ -397,20 +456,30 @@ public class PlayerManager : CivManager
     [ClientRpc]
     public void RPCAddWaitingList()
     {
-        if(!waitedPlayers.Contains(this))
+        foreach (var item in FindObjectsOfType<PlayerManager>())
         {
-            waitedPlayers.Add(this);
+            if(item.isOwned)
+            {
+                if(!item.waitedPlayers.Contains(this))
+                {
+                    item.waitedPlayers.Add(this);
+                }
+            }
         }
+        // if(!waitedPlayers.Contains(this))
+        // {
+        //     waitedPlayers.Add(this);
+        // }
     }
+    // TUR BITIMI
     public override void NextTurn()
     {
-            Debug.Log("NEXT TURN");
-        
+        NextTurnEvent?.Invoke();
         waitedPlayers = FindObjectsOfType<PlayerManager>().ToList();
         ResetOrderIndex();
         GetOrderIcon();
-        
-        // 
+        TotalGold += GoldPerTurn;
+
     }
 
     public override void AddOrderList(ITaskable taskable)
@@ -430,9 +499,12 @@ public class PlayerManager : CivManager
 
         GetOrderIcon();
     }
-    #endregion
-    #region  turn order
 
-
+    public override void NextTurnBtn()
+    {
+        CMDNextTurnBTN();
+        
+    }
     #endregion
+
 }

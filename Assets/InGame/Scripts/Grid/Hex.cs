@@ -31,9 +31,7 @@ public class Hex : NetworkBehaviour
     [SyncVar] [SerializeField] private Building building;
     [SyncVar] [SerializeField] private Ship ship;
     [SyncVar] [SerializeField] private PlaneUnit plane;
-    public Unit Unit { get => unit;
-    
-     set{unit = value;}}
+    public Unit Unit { get => unit;set{unit = value;}}
     public Settler Settler { get => settler; set{settler = value;} }
     public Building Building { get => building; set{building = value;} }
     public Ship Ship { get=> ship; set{ship = value;} }
@@ -174,6 +172,23 @@ public class Hex : NetworkBehaviour
     {
         return (building != null);
     }
+    public bool IsEnemyMine()
+    {
+        return resource.mine != null && resource.mine.Side == Side.Enemy;
+    }
+    public bool IsMeMine()
+    {
+        return resource.mine != null && resource.mine.Side == Side.Me;
+    }
+    public bool IsEnemyResource()
+    {
+        return resource.Side == Side.Enemy;
+    }
+    public bool IsMeResource()
+    {
+        return resource.Side == Side.Me;
+    }
+    
     public void ResetHighlight()
     {
         // highlight.ResetGlowHighlight();

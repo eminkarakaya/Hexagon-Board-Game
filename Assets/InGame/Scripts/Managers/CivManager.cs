@@ -5,10 +5,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using Steamworks;
-
+using TMPro;
 
 public abstract class CivManager : NetworkBehaviour
 {
+    public TMP_Text totalGoldText,goldTextPerTurn;
+    public int _totalGold,_goldPerTurn;
+    public int GoldPerTurn ;
+    // public int GoldPerTurn { get => _goldPerTurn; set{_goldPerTurn = value; goldTextPerTurn.text = _goldPerTurn.ToString();} }
+    public int TotalGold { get=> _totalGold; set {_totalGold = value; totalGoldText.text = _totalGold.ToString();} }
+    public string nickname;
     protected Button orderButton;
     [SerializeField] protected Sprite nextTurnSprite,waitingSprite;    
     [SerializeField] protected List<ITaskable> orderList = new List<ITaskable>();
@@ -16,11 +22,19 @@ public abstract class CivManager : NetworkBehaviour
     [SyncVar] [SerializeField] public List<GameObject> ownedObjs = new List<GameObject>();
     [SerializeField] private HexGrid hexGrid;
     public CivData civData;
-
+    [SyncVar] public int civType;
 
 
     private void Start() {
         
+    }
+    public void SetTotalGoldText()
+    {
+        totalGoldText.text = TotalGold.ToString();
+    }
+    public void SetGoldPerTurnText()
+    {
+        goldTextPerTurn.text = GoldPerTurn.ToString();
     }
     [Command]
     public void Capture(NetworkIdentity identity)

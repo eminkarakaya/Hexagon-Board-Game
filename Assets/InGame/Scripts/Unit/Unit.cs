@@ -8,6 +8,8 @@ using TMPro;
 public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IVisionable,IDamagable, ISideable,ITaskable
 {
     #region PROPERTiES
+
+    public Button pillageButton;
     [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
     public Attack Attack { get; set; }
@@ -52,6 +54,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             Result = new UnitMovementSystem(this);
         Outline = GetComponent<Outline>();
         Movable = GetComponent<IMovable>();
+        pillageButton.onClick.AddListener(()=> PillageButton(Hex.gameObject));
     }
     public override void OnStopAuthority()
     {
@@ -236,6 +239,23 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         Movement.ResetMovementPoint();
     }
     #endregion
+
+    public void TogglePillageButtonInteractableOpen()
+    {
+        pillageButton.interactable = true;
+    }
+    public void TogglePillageButtonInteractableClose()
+    {
+        pillageButton.interactable = false;
+    }
+    public void PillageButton(GameObject target)
+    {
+        if(target.TryGetComponent(out Hex hex))
+        {   
+            hex.resource.ChangeOwned(this);
+        }
+        Debug.Log("kekw");
+    }
 }
 
 public enum Side

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bda2e7de81030148822c5788153331a, type: 3}
+  m_Name: Indian
+  m_EditorClassIdentifier: 
+  civType: 3
+  civImage: {fileID: 21300000, guid: d289d8c183ba86a40849b82349a2e873, type: 3}
+  primaryColor: {r: 0.19430864, g: 1, b: 0, a: 0.9019608}
+  secondaryColor: {r: 1, g: 0.75357664, b: 0, a: 0.77254903}

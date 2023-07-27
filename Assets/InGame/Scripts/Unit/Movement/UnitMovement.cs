@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.Events;
+
 public class UnitMovement : Movement
 {
+    public UnityEvent EnemyResourceEventOpen,EnemyResourceEventClose;
      private void OnDrawGizmos() {
         movementSystem = InitMovementSystem();
         if(movementSystem.movementRange.allNodesDict2== null)
@@ -88,6 +91,14 @@ public class UnitMovement : Movement
                 GetComponent<Unit>().CivManager.Capture(lastHex.Settler.GetComponent<NetworkIdentity>());     
                 lastHex.Settler.StartCoroutine1(lastHex.Settler.GetComponent<NetworkIdentity>(),lastHex.Settler.gameObject,GetComponent<Unit>().CivManager);
             }
+            if(lastHex.IsEnemyMine())
+            {
+                EnemyResourceEventOpen?.Invoke();
+            }
+            else
+            {
+                EnemyResourceEventClose?.Invoke();
+            }
         }
         Moveable.ToggleButtons(true);
     }
@@ -127,9 +138,9 @@ public class UnitMovement : Movement
     protected void RPCShow()
     {
         movementSystem = InitMovementSystem();
-        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.SelectedMoveable != null)
         {
-            movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+            movementSystem.ShowRange(UnitManager.Instance.SelectedMoveable,UnitManager.Instance.SelectedMoveable.Movement);
         }
        
     }
@@ -137,9 +148,9 @@ public class UnitMovement : Movement
     protected void RPCHide()
     {
         movementSystem = InitMovementSystem();
-        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.SelectedMoveable != null)
         {
-            movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+            movementSystem.HideRange(UnitManager.Instance.SelectedMoveable,UnitManager.Instance.SelectedMoveable.Movement);
         }
         
     }

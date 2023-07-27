@@ -117,6 +117,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     {
         CMDCreateBuilding();
         TaskComplate();
+        civManager.CMDRemoveOwnedObject(this.gameObject);
     }
     [Command]
     public virtual void CMDCreateBuilding()
@@ -129,7 +130,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     [ClientRpc] // server -> client
     protected void RPCCreateBuilding(Building building)
     {
-        civManager.CMDRemoveOwnedObject(this.gameObject);
         building.transform.position = new Vector3 (Hex.transform.position.x , 1 , Hex.transform.position.z );
         building.transform.rotation = Quaternion.Euler(-90,0,0);
         building.Hex = Hex;
@@ -226,7 +226,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
 
     public void TaskReset()
     {
-        throw new System.NotImplementedException();
+        
     }
     #endregion
 }

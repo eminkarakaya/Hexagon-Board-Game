@@ -261,7 +261,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8878252520059848393}
         m_TargetAssemblyTypeName: HarborSettler, Assembly-CSharp
-        m_MethodName: CMDCreateBuilding
+        m_MethodName: CreateMineOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -395,7 +395,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8878252520059848393}
         m_TargetAssemblyTypeName: HarborSettler, Assembly-CSharp
-        m_MethodName: CMDCreateBuilding
+        m_MethodName: CreateMineOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -529,7 +529,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8878252520059848393}
         m_TargetAssemblyTypeName: HarborSettler, Assembly-CSharp
-        m_MethodName: CMDCreateBuilding
+        m_MethodName: CreateMineOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -925,7 +925,7 @@ PrefabInstance:
       objectReference: {fileID: 8878252520059848393}
     - target: {fileID: 4552239074876049348, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: CMDCreateBuilding
+      value: CreateMineOnClick
       objectReference: {fileID: 0}
     - target: {fileID: 4552239074876049348, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName

@@ -25,25 +25,25 @@ public class AIManager : CivManager
         Building unit = Instantiate(buildingPrefab).GetComponent<Building>();
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
         ownedObjs.Add(unit.gameObject);
-        RPCCreateBuilding(unit,GameManager.singleton.npcHexes.Count-1);
-        GameManager.singleton.npcHexes.RemoveAt(GameManager.singleton.npcHexes.Count-1);
+        RPCCreateBuilding(unit,GameManager.instance.npcHexes.Count-1);
+        GameManager.instance.npcHexes.RemoveAt(GameManager.instance.npcHexes.Count-1);
     }
     [Server]
     private void AssignBuildings()
     {
         
-        GameManager.singleton.buildings = FindObjectsOfType<Building>().ToList();
+        GameManager.instance.buildings = FindObjectsOfType<Building>().ToList();
     }
     // server -> client
     
     private void RPCCreateBuilding(Building unit,int i)
     {
         unit.CivManager = this;
-        unit.transform.position = new Vector3 (GameManager.singleton.npcHexes[i]. transform.position.x , 1 , GameManager.singleton.npcHexes[i]. transform.position.z );
+        unit.transform.position = new Vector3 (GameManager.instance.npcHexes[i]. transform.position.x , 1 , GameManager.instance.npcHexes[i]. transform.position.z );
         unit.transform.rotation = Quaternion.Euler(-90,0,0); 
-        unit.Hex = GameManager.singleton.npcHexes[i];
+        unit.Hex = GameManager.instance.npcHexes[i];
         unit.Hex.Building = unit;
-        foreach (var item in GameManager.singleton.buildings)
+        foreach (var item in GameManager.instance.buildings)
         {
             if(item == null) continue;
             if(item.isOwned)

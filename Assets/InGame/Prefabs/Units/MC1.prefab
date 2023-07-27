@@ -111,6 +111,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  pillageButton: {fileID: 7847697493056150210}
   civManager: {fileID: 0}
   hex: {fileID: 0}
   side: 0
@@ -297,6 +298,36 @@ MonoBehaviour:
         m_CallState: 2
   _movementPoints: 2
   _currentMovementPoints: 2
+  EnemyResourceEventOpen:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1113163169887892027}
+        m_TargetAssemblyTypeName: Unit, Assembly-CSharp
+        m_MethodName: TogglePillageButtonInteractableOpen
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  EnemyResourceEventClose:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1113163169887892027}
+        m_TargetAssemblyTypeName: Unit, Assembly-CSharp
+        m_MethodName: TogglePillageButtonInteractableClose
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &671811955279829656
 GameObject:
   m_ObjectHideFlags: 0
@@ -2486,7 +2517,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 71067212650806420, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.00012207031
+      value: -250
       objectReference: {fileID: 0}
     - target: {fileID: 71067212650806420, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -2504,6 +2535,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 182791979902435410, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_text
+      value: Pillage
+      objectReference: {fileID: 0}
     - target: {fileID: 2404227950337544896, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.146
@@ -2520,9 +2555,49 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4035656696206492464, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035656696206492464, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035656696206492464, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1113163169887892027}
+    - target: {fileID: 4035656696206492464, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035656696206492464, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PillageButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035656696206492464, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Unit, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035656696206492464, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 4315283396775697552, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
       propertyPath: m_TargetGraphic
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4475317285427743221, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 101.3269
+      objectReference: {fileID: 0}
+    - target: {fileID: 4475317285427743221, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 45.4102
+      objectReference: {fileID: 0}
+    - target: {fileID: 4475317285427743221, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -2538,3 +2613,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 71067212650806420, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
   m_PrefabInstance: {fileID: 6118447032119417330}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7847697493056150210 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4035656696206492464, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+  m_PrefabInstance: {fileID: 6118447032119417330}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

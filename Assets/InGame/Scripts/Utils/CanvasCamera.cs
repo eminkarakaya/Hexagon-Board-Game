@@ -13,6 +13,6 @@ public class CanvasCamera : MonoBehaviour
     }
     void LateUpdate()
     {
-        transform.LookAt(target.position);
+        transform.LookAt(-target.position);
     }
 }

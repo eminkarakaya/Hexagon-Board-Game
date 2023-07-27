@@ -72,18 +72,18 @@ public class SettlerMovement : Movement
     protected void RPCShow()
     {
         movementSystem = InitMovementSystem();
-        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.SelectedMoveable != null)
         {
-            movementSystem.ShowRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+            movementSystem.ShowRange(UnitManager.Instance.SelectedMoveable,UnitManager.Instance.SelectedMoveable.Movement);
         }
     }
     [ClientRpc]
     protected void RPCHide()
     {
         movementSystem = InitMovementSystem();
-        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.selectedUnit.Movable != null)
+        if(UnitManager.Instance.selectedUnit != null && UnitManager.Instance.SelectedMoveable != null)
         {
-            movementSystem.HideRange(UnitManager.Instance.selectedUnit.Movable,UnitManager.Instance.selectedUnit.Movable.Movement);
+            movementSystem.HideRange(UnitManager.Instance.SelectedMoveable,UnitManager.Instance.SelectedMoveable.Movement);
         }
         
     }

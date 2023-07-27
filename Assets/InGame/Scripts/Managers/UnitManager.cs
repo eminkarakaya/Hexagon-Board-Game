@@ -12,13 +12,12 @@ public class UnitManager : SingletonMirror<UnitManager>
     [SerializeField] private UnityEvent OnSelectedUnit;
     [SerializeField] private AttackSystem attackSystem;
     [SerializeField] private bool playersTurn = true;
-    public bool PlayersTurn { get => playersTurn; private set{} }
 
-
+    
     [SerializeField]
     public ISelectable selectedUnit;
     private Hex previouslySelectedHex;
-
+    public IMovable SelectedMoveable;
     public void HandleESC()
     {
         if(selectedUnit != null)
@@ -29,13 +28,17 @@ public class UnitManager : SingletonMirror<UnitManager>
 
     public void HandleUnitSelected(Transform unit)
     {
-        if (PlayersTurn == false)
-            return;
         ISelectable selectableReference = unit.GetComponent<ISelectable>();
         if(selectableReference.Side == Side.Enemy)
         {
             return;
         }
+        if(unit.TryGetComponent(out IMovable movable))
+        {
+            SelectedMoveable = movable;
+        }
+        else
+            SelectedMoveable = null;
        
         if (CheckIfTheSameUnitSelected(selectableReference))
             return;
@@ -65,7 +68,7 @@ public class UnitManager : SingletonMirror<UnitManager>
 
     public void HandleTerrainSelected(GameObject hexGO) // terraine sol clıck
     {
-        if (selectedUnit == null || PlayersTurn == false)
+        if (selectedUnit == null)
         {
             return;
         }
@@ -73,7 +76,7 @@ public class UnitManager : SingletonMirror<UnitManager>
     }
     public void HandleTerrainSelectedRightClick(GameObject hexGO) // move
     {
-        if(selectedUnit == null || PlayersTurn == false)
+        if(selectedUnit == null)
             return;
         Hex selectedHex = hexGO.GetComponent<Hex>();
         if(selectedHex.isReachable == false) return;
@@ -85,7 +88,7 @@ public class UnitManager : SingletonMirror<UnitManager>
 
     public void HandleUnitSelectedRightClick(GameObject gameObject)
     {
-        if(selectedUnit == null || PlayersTurn == false)
+        if(selectedUnit == null)
             return;
         Hex selectedHex = gameObject.GetComponent<ISelectable>().Hex;
         if (/*HandleHexOutOfRange(selectedHex.HexCoordinates) ||*/ HandleSelectedHexIsUnitHex(selectedHex.HexCoordinates))
@@ -132,10 +135,4 @@ public class UnitManager : SingletonMirror<UnitManager>
         return false;
     }
 
-
-    private void ResetTurn(Movement selectedUnit)
-    {
-        // selectedUnit.MovementFinished -= ResetTurn;
-        PlayersTurn = true;
-    }
 }

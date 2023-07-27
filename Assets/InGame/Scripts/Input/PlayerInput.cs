@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class PlayerInput : MonoBehaviour
 {
+    public LayerMask ignoredLayer;
     public UnityEvent<Vector3> PointerClick;
     public UnityEvent<Vector3> PointerRightClick;
     public UnityEvent ESCEvent; 
@@ -26,10 +27,10 @@ public class PlayerInput : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(0))
         {
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
-            }
+            // if (EventSystem.current.IsPointerOverGameObject())
+            // {
+            //     return;
+            // }
             Vector3 mousePos = Input.mousePosition;
             PointerClick?.Invoke(mousePos);
         }
@@ -38,10 +39,10 @@ public class PlayerInput : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(1))
         {
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
-            }
+            // if (EventSystem.current.IsPointerOverGameObject())
+            // {
+            //     return;
+            // }
             Vector3 mousePos = Input.mousePosition;
             PointerRightClick?.Invoke(mousePos);
         }

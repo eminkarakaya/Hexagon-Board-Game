@@ -22,7 +22,6 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     [SerializeField] private Side side;
     public Side Side {get => side;set{side = value;}}
 
-    public Vector3Int Position { get; set; }
     public Canvas Canvas { get => _canvas; set{_canvas = value;} }
     [SerializeField] private List<GameObject> visions;
     public List<GameObject> Visions => visions;
@@ -30,33 +29,17 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     public Vision Vision { get; set; }
     public HP hp { get; set; }
     public Outline Outline { get; set; }
-    public IMovable Movable { get; set; }
+    // public IMovable Movable { get; set; }
 
-    [SerializeField] UnityEngine.Canvas _canvas;
+    [SerializeField] Canvas _canvas;
     #endregion
 
     #region Mirror and Unity Callback
-    // public override void OnStartAuthority()
-    // {
-    //     if(civManager == null)
-    //     {
-    //         CivManager = PlayerManager.FindPlayerManager();
-    //     }
-    //     if(civManager.TryGetComponent(out PlayerManager playerManager))
-    //     {
-    //         playerManager.liveUnits.Add(this);
-    //         Debug.Log(playerManager,playerManager);
-    //     }
-    // }
-    
-    public override void OnStartClient()
-    {
+   
+    private IEnumerator Start() {
         Outline = GetComponent<Outline>();
         hp = GetComponent<HP>();
         Vision = GetComponent<Vision>();
-
-    }
-    private IEnumerator Start() {
         while(Hex == null)
         {
             yield return null;
@@ -360,7 +343,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     {
         
     }
-     public void OpenCanvas()
+    public void OpenCanvas()
     {
         Canvas.gameObject.SetActive(true);
     }
