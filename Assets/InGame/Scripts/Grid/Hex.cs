@@ -113,11 +113,11 @@ public class Hex : NetworkBehaviour
     }
     public bool IsEnemyBuilding()
     {
-        return Building != null && Building.Side == Side.Enemy;
+        return Building != null && (Building.Side == Side.Enemy || Building.Side == Side.None);
     }
     public bool IsEnemy()
     {
-        return Unit != null && Unit.Side == Side.Enemy;
+        return Unit != null && (Unit.Side == Side.Enemy || Unit.Side == Side.None);
     }
     public bool IsMeBuilding()
     {
@@ -126,7 +126,7 @@ public class Hex : NetworkBehaviour
     }
     public bool IsEnemyShip()
     {
-        return Ship != null && Ship.Side == Side.Enemy;
+        return Ship != null && (Ship.Side == Side.Enemy ||Ship.Side == Side.None);
     }
     public bool IsMePlane()
     {
@@ -148,6 +148,14 @@ public class Hex : NetworkBehaviour
     {
         return Settler != null && Settler.Side == Side.Ally;
     }
+    public bool IsAllyMine()
+    {
+        return resource.mine != null && resource.mine.Side == Side.Ally;
+    }
+    public bool IsAllyShip()
+    {
+        return Ship != null && Ship.Side == Side.Ally;
+    }
     public bool IsAllyBuilding()
     {
         return Building != null && Building.Side == Side.Ally;
@@ -158,8 +166,9 @@ public class Hex : NetworkBehaviour
     }
     public bool IsEnemySettler()
     {
-        return settler != null && settler.Side == Side.Enemy;
+        return settler != null && (settler.Side == Side.Enemy ||settler.Side == Side.None);
     }
+    
     public bool IsMeSettler()
     {
         return settler != null && settler.Side == Side.Me;
@@ -174,20 +183,13 @@ public class Hex : NetworkBehaviour
     }
     public bool IsEnemyMine()
     {
-        return resource.mine != null && resource.mine.Side == Side.Enemy;
+        return resource.mine != null && (resource.Side == Side.Enemy ||resource.Side == Side.None);
     }
     public bool IsMeMine()
     {
         return resource.mine != null && resource.mine.Side == Side.Me;
     }
-    public bool IsEnemyResource()
-    {
-        return resource.Side == Side.Enemy;
-    }
-    public bool IsMeResource()
-    {
-        return resource.Side == Side.Me;
-    }
+  
     
     public void ResetHighlight()
     {
@@ -223,6 +225,30 @@ public class Hex : NetworkBehaviour
     public void DisableHighligh()
     {
         highlight.ToggleGlow(false);
+    }
+    public Vision AnyUnit()
+    {
+        if(IsMe() ||IsAlly())
+        {
+            return Unit.GetComponent<Vision>();
+        }
+        else if(IsMeBuilding() ||IsAllyBuilding())
+        {
+            return Building.GetComponent<Vision>();
+        }
+        else if(IsMeSettler() ||IsAllySettler())
+        {
+            return Settler.GetComponent<Vision>();
+        }
+        else if(IsMeMine() ||IsAllyMine())
+        {
+            return resource.mine.GetComponent<Vision>();
+        }
+        else if(IsMeShip() || IsAllyShip())
+        {
+            return Ship.GetComponent<Vision>();
+        }
+        return null;
     }
 
     [ContextMenu("RoundPos")]

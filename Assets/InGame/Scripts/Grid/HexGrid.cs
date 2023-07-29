@@ -66,19 +66,19 @@ public class HexGrid : NetworkBehaviour
             if(item.Ship != null)
             {
 
-                if(item.Ship.Side == Side.Me)
+                if(item.Ship.Side == Side.Me ||item.Ship.Side == Side.Ally)
                     continue;
                     item.Ship.GetComponent<Vision>().HideVision(item);
             }
             if(item.Unit != null)
             {
-                if(item.Unit.Side == Side.Me)
+                if(item.Unit.Side == Side.Me || item.Unit.Side == Side.Ally)
                     continue;
                     item.Unit.GetComponent<Vision>().HideVision(item);
             }
             else if(item.Settler != null)
             {
-                if(item.Settler.Side == Side.Me)
+                if(item.Settler.Side == Side.Me || item.Settler.Side == Side.Ally)
                     continue;
                     item.Settler.GetComponent<Vision>().HideVision(item);
 

@@ -89,7 +89,7 @@ public class UnitMovement : Movement
             else if(lastHex.IsEnemySettler())
             {
                 GetComponent<Unit>().CivManager.Capture(lastHex.Settler.GetComponent<NetworkIdentity>());     
-                lastHex.Settler.StartCoroutine1(lastHex.Settler.GetComponent<NetworkIdentity>(),lastHex.Settler.gameObject,GetComponent<Unit>().CivManager);
+                lastHex.Settler.StartCaptureCoroutine(lastHex.Settler.GetComponent<NetworkIdentity>(),lastHex.Settler.gameObject,GetComponent<Unit>().CivManager);
             }
             if(lastHex.IsEnemyMine())
             {

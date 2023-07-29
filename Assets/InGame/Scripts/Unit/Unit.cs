@@ -158,7 +158,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
 
     #region  SETSIDE
 
-     public void SetSide(Side side,Outline outline)
+    public void SetSide(Side side,Outline outline)
     {
         this.side = side;
         if(outline == null) return;
@@ -174,6 +174,11 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         {
             outline.OutlineColor = Color.blue;
         }
+        // else if(side == Side.None)
+        // {
+        //     outline.OutlineColor = Color.black;
+
+        // }
     }
     [Command] private void CMDSetSide(NetworkIdentity identity,GameObject sideable)
     {
@@ -183,9 +188,14 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     {
         ISideable sideable1 = sideable.GetComponent<ISideable>();
         sideable1.CivManager = civManager;
+
         if(civManager.isOwned)
         {
             sideable1.SetSide(Side.Me,sideable1.Outline);
+        }
+        else if(civManager.team == this.CivManager.team)
+        {
+            sideable1.SetSide(Side.Ally,sideable1.Outline);
         }
         else
         {
@@ -262,5 +272,6 @@ public enum Side
 {
     Ally,
     Me,
-    Enemy
+    Enemy,
+    None
 }

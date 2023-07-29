@@ -70,11 +70,11 @@ public class GraphSearch
                 int nodeCost = neighbourHex.GetCost();
                 int currentCost = costSoFar[currentNode];
                 int newCost = currentCost + nodeCost;
-                if (neighbourHex.IsEnemy()  || neighbourHex.IsEnemySettler()|| neighbourHex.IsEnemyBuilding() )
+                if (neighbourHex.IsEnemy()  || neighbourHex.IsEnemySettler()|| neighbourHex.IsEnemyBuilding())
                 {
                     continue;   
                 }
-                if (neighbourHex.IsMeSettler())
+                if (neighbourHex.IsMeSettler() || neighbourHex.IsAllySettler())
                 {
                     continue;   
                 }
@@ -112,7 +112,7 @@ public class GraphSearch
                     {
                         continue;
                     }
-                    if(currentNodeHex.IsMeSettler() &&currentNode != startPoint )
+                    if((currentNodeHex.IsMeSettler() || currentNodeHex.IsAllySettler()) &&currentNode != startPoint )
                     {
                         continue;
                     }
@@ -130,7 +130,7 @@ public class GraphSearch
                     {
                         if(!meNodes.ContainsKey(neighbourPosition))
                         {
-                            if (neighbourHex.IsMeSettler())
+                            if (neighbourHex.IsMeSettler() || neighbourHex.IsAllySettler())
                             {
                                 meNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -146,7 +146,7 @@ public class GraphSearch
                             }
                             
                         }
-                            if (neighbourHex.IsMeSettler())
+                            if (neighbourHex.IsMeSettler() || neighbourHex.IsAllySettler())
                             {
                                 continue;
                             }
@@ -252,7 +252,7 @@ public class GraphSearch
                 {
                     continue;   
                 }
-                if (neighbourHex.IsMeSettler())
+                if (neighbourHex.IsMeSettler()|| neighbourHex.IsAllySettler())
                 {
                     continue;   
                 }
@@ -290,7 +290,7 @@ public class GraphSearch
                     {
                         continue;
                     }
-                    if(currentNodeHex.IsMeSettler() &&currentNode != startPoint )
+                    if((currentNodeHex.IsMeSettler() || currentNodeHex.IsAllySettler()) &&currentNode != startPoint )
                     {
                         continue;
                     }
@@ -308,7 +308,7 @@ public class GraphSearch
                     {
                         if(!meNodes.ContainsKey(neighbourPosition))
                         {
-                            if (neighbourHex.IsMeSettler())
+                            if (neighbourHex.IsMeSettler() || neighbourHex.IsAllySettler())
                             {
                                 meNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -324,7 +324,7 @@ public class GraphSearch
                             }
                             
                         }
-                            if (neighbourHex.IsMeSettler())
+                            if (neighbourHex.IsMeSettler() || neighbourHex.IsAllySettler())
                             {
                                 continue;
                             }
@@ -797,7 +797,7 @@ public class GraphSearch
                     {
                         continue;
                     }
-                    if (neighbourHex.IsMe())
+                    if (neighbourHex.IsMe() || neighbourHex.IsAlly())
                     {
                         continue;   
                     }
@@ -835,7 +835,7 @@ public class GraphSearch
                     {
                         continue;
                     }
-                    if(currentHex.IsMe() &&currentNode != startPoint )
+                    if((currentHex.IsMe() || currentHex.IsAlly()) &&currentNode != startPoint )
                     {
                         continue;
                     }
@@ -855,7 +855,7 @@ public class GraphSearch
                     {
                         if(!meNodes.ContainsKey(neighbourPosition))
                         {
-                            if (neighbourHex.IsMe())
+                            if (neighbourHex.IsMe() || neighbourHex.IsAlly())
                             {
                                 meNodes[neighbourPosition] = currentNode;
                                 continue;
@@ -872,7 +872,7 @@ public class GraphSearch
                             
                         }
                         
-                        if (neighbourHex.IsMe())
+                        if (neighbourHex.IsMe() || neighbourHex.IsAlly())
                         {
                             continue;
                         }

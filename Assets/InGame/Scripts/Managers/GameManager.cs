@@ -7,8 +7,8 @@ using TMPro;
 
 public class GameManager : NetworkBehaviour
 {
-    public TMP_Text goldText,goldPerTurnText;
-    public TMP_Text nextTurnTipText;
+    public TMP_Text goldText,goldPerRoundText;
+    public TMP_Text nextRoundTipText;
     public HoverTip hoverTip;
     public Button OrderButton;
     public static GameManager instance;

@@ -65,7 +65,7 @@ public class AIManager : CivManager
 
     }
 
-    public override void NextTurnBtn()
+    public override void NextRoundBtn()
     {
 
     }
@@ -85,7 +85,7 @@ public class AIManager : CivManager
 
     }
 
-    public override void NextTurn()
+    public override void NextRound()
     {
 
     }

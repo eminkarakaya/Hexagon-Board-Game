@@ -63,7 +63,7 @@ public class Resource : NetworkBehaviour
     }
     [TargetRpc] private void TargetSetText(NetworkConnectionToClient conn,CivManager civManager)
     {
-        civManager.SetGoldPerTurnText();
+        civManager.SetGoldPerRoundText();
     }
     [Command(requiresAuthority = false)] public void CMDAddGold(CivManager civManager)
     {
@@ -120,11 +120,11 @@ public class Resource : NetworkBehaviour
     }
     public void RemoveGoldPerTurn(CivManager civManager)
     {
-        civManager.GoldPerTurn -= Gold;
+        civManager.GoldPerRound -= Gold;
 
     }
     public void AddGoldPerTurn(CivManager civManager)
     {
-        civManager.GoldPerTurn += Gold;
+        civManager.GoldPerRound += Gold;
     }
 }

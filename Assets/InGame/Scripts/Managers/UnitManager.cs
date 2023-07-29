@@ -29,7 +29,7 @@ public class UnitManager : SingletonMirror<UnitManager>
     public void HandleUnitSelected(Transform unit)
     {
         ISelectable selectableReference = unit.GetComponent<ISelectable>();
-        if(selectableReference.Side == Side.Enemy)
+        if(selectableReference.Side != Side.Me)
         {
             return;
         }

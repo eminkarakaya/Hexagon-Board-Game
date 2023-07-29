@@ -22,11 +22,12 @@ public class CivUI : NetworkBehaviour
         {
             if(item.isLocalPlayer)
             {
+                item.CMDSetTeam(selectCiv.team);
                 item.CMDSetName(selectCiv.nameInputField.text);
                 // item.nickname = selectCiv.nameInputField.text;
                 item.CMDSetCivData(civData.civType);
                 item.civType = civData.civType;
-
+            
             }
         }
     }

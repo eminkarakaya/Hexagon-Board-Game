@@ -11,7 +11,7 @@ public struct ResourceBtn
     public ResourceType resourceType;
     public Button button;
 }
-public class HarborSettler : Settler
+public class Worker : Settler
 {
     
     [SerializeField] private List<ResourceBtn> resourceBtns = new List<ResourceBtn>();
@@ -85,17 +85,18 @@ public class HarborSettler : Settler
         mine.Hex.resource.mine = mine;
         mine.CivManager = CivManager;
         CivManager.CMDAddOwnedObject(mine.gameObject);
-        var mines = FindObjectsOfType<Mine>().ToList();
-        foreach (var item in mines)
-        {
-            if(item == null) continue;
-            if(item.isOwned)
+        
+            if(mine.isOwned)
             {
-                item.SetSide(Side.Me,item.GetComponent<Outline>());
+                mine.SetSide(Side.Me,mine.GetComponent<Outline>());
+            }
+            else if(mine.CivManager.team == this.CivManager.team)
+            {
+                mine.SetSide(Side.Ally,mine.GetComponent<Outline>());
             }
             else
-                item.SetSide(Side.Enemy,item.GetComponent<Outline>());
-        }
+                mine.SetSide(Side.Enemy,mine.GetComponent<Outline>());
+        
         CivManager.SetTeamColor(mine.gameObject);
         Result.HideRange(this,Movement);  
         UnitManager.Instance.selectedUnit = null;

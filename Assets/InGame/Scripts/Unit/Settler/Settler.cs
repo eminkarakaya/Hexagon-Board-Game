@@ -14,7 +14,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
     public Transform Transform { get => transform;}
-    [SerializeField] protected GameObject buildingPrefab;
+    [SerializeField] protected GameObject buildingPrefab,harborPrefab;
     public Hex Hex { get => _hex; set{_hex = value;} }
     [SerializeField] private Hex _hex;
     public Movement Movement { get; set; }
@@ -36,15 +36,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     #region Mirror and Unity callbacks
     public override void OnStopAuthority()
     {
-        // CloseCanvas();
-        // civManager.CMDHideAllUnits();
-        // Movement.HideRangeStopAuthority();
         UnitManager.Instance.ClearOldSelection();
-    }
-    
-
-    private void Awake() {
-
     }
     private void Start() {
         Outline = GetComponent<Outline>();
@@ -115,17 +107,34 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
 
     public void CreateBuildingOnClick()
     {
-        CMDCreateBuilding();
+        if(Hex.isCoast )
+        {
+            CMDCreateHarbor();
+        }
+        else
+        {
+            CMDCreateBuilding();
+        }
         TaskComplate();
         civManager.CMDRemoveOwnedObject(this.gameObject);
     }
     [Command]
+    public virtual void CMDCreateHarbor()
+    {
+        
+        if(Hex.Building != null) return;
+        Harbor harbor = Instantiate(harborPrefab).GetComponent<Harbor>();
+        NetworkServer.Spawn(harbor.gameObject,connectionToClient);
+        RPCCreateBuilding(harbor);
+    }
+    [Command]
     public virtual void CMDCreateBuilding()
     {
+        
         if(Hex.Building != null) return;
-        Building unit = Instantiate(buildingPrefab).GetComponent<Building>();
-        NetworkServer.Spawn(unit.gameObject,connectionToClient);
-        RPCCreateBuilding(unit);
+        Building building = Instantiate(buildingPrefab).GetComponent<Building>();
+        NetworkServer.Spawn(building.gameObject,connectionToClient);
+        RPCCreateBuilding(building);
     }
     [ClientRpc] // server -> client
     protected void RPCCreateBuilding(Building building)
@@ -135,18 +144,18 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         building.Hex = Hex;
         building.Hex.Building = building;
         building.CivManager = civManager;
-        civManager.CMDAddOwnedObject(building.gameObject);
-        var buildings = FindObjectsOfType<Building>().ToList();
-        foreach (var item in buildings)
+        civManager.CMDAddOwnedObject(building.gameObject);        
+        if(building.isOwned)
         {
-            if(item == null) continue;
-            if(item.isOwned)
-            {
-                item.SetSide(Side.Me,item.GetComponent<Outline>());
-            }
-            else
-                item.SetSide(Side.Enemy,item.GetComponent<Outline>());
+            building.SetSide(Side.Me,building.GetComponent<Outline>());
         }
+        else if(building.CivManager.team == this.CivManager.team)
+        {
+            building.SetSide(Side.Ally,building.GetComponent<Outline>());
+        }
+        else
+            building.SetSide(Side.Enemy,building.GetComponent<Outline>());
+        
         civManager.SetTeamColor(building.gameObject);
         Result.HideRange(this,Movement);  
         UnitManager.Instance.selectedUnit = null;
@@ -172,7 +181,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         }
     }
     
-    public IEnumerator wait(CivManager attackableCivManager)
+    public IEnumerator CaptureCoroutine(CivManager attackableCivManager)
     {
         this.civManager.CMDRemoveOwnedObject(this.gameObject); //requestauthority = false
         this.CivManager = attackableCivManager;
@@ -203,17 +212,15 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         else
             outline.OutlineColor = Color.blue;
     }
-    public void StartCoroutine1(NetworkIdentity identity,GameObject sideable,CivManager civManager)
+    public void StartCaptureCoroutine(NetworkIdentity identity,GameObject sideable,CivManager civManager)
     {
         // civManager.Capture(identity);
-        StartCoroutine(wait(civManager));
+        StartCoroutine(CaptureCoroutine(civManager));
     }
     protected virtual void ToggleButtonsVirtual(bool state)
     {
 
     }
-    
-
     public void ToggleButtons(bool state)
     {
         ToggleButtonsVirtual(state);
