@@ -30,25 +30,76 @@ public class CivDataUI : NetworkBehaviour
     {
         dealUI.declareWarBtn.onClick.AddListener( ()=>
         {
-            civManager.CMDDeclareWar(civManager.gameObject,_civManager);
-            civManager.CMDDeclareWar(_civManager.gameObject,civManager);
+            _civManager.CMDDeclareWar(civManager.gameObject,_civManager);
+            _civManager.CMDDeclareWar(_civManager.gameObject,civManager);
+            _civManager.CMDDeclareWar2(civManager);
+            
+            CMDDeclareWar(_civManager);
+            CMDDeclareWar(civManager);
         });
         dealUI.declarePeaceBtn.onClick.AddListener(()=>
         {
-            civManager.CMDDeclarePeace(civManager.gameObject,_civManager);
-            civManager.CMDDeclarePeace(_civManager.gameObject,civManager);
-            
+            CMDDeclarePeace(civManager);
+            CMDDeclarePeace(_civManager);
+            _civManager.CMDDeclarePeace(civManager.gameObject,_civManager);
+            _civManager.CMDDeclarePeace(_civManager.gameObject,civManager);
+            _civManager.CMDDeclarePeace2(civManager);
         });
     }
-    
+    [Command(requiresAuthority = false)]  public void CMDDeclarePeace(CivManager civManager)
+    {
+        RPCDeclarePeace(civManager);
+    }
+    [Command(requiresAuthority = false)]  public void CMDDeclareWar(CivManager civManager)
+    {
+        RPCDeclareWar(civManager);
+    }
+    [ClientRpc] public void RPCDeclarePeace(CivManager civManager)
+    {
+        foreach (var item in civManager.civDataUI.dealUI.relationShipUIs)
+        {
+            if(civManager.savastigiCivler.Contains(item.civManager))
+            {
+                Debug.Log(item+ " item ",item);
+                item.relationShipImage.sprite = GameSettingsScriptable.Instance.notrSprite;
+            }
+        }
+    }
+    [ClientRpc] public void RPCDeclareWar(CivManager civManager)
+    {
+        foreach (var item in civManager.civDataUI.dealUI.relationShipUIs)
+        {
+            if(civManager.savastigiCivler.Contains(item.civManager))
+            {
+                item.relationShipImage.sprite = GameSettingsScriptable.Instance.warSprite;
+            }
+        }
+    }
+   
     public void SetNicknameText()
     {
         dealUI = Instantiate(dealUIPrefab);
+        dealUI.civManager = civManager;
+        foreach (var item in FindObjectsOfType<CivManager>())
+        {
+            var ui = Instantiate(GameSettingsScriptable.Instance.RelationShipsPrefab.gameObject,dealUI.parent).GetComponent<RelationShipUI>();
+            ui.civManager = item;
+            ui.civImage.sprite = item.civData.civImage;
+            if(item.Side == Side.Ally)
+            {
+                ui.relationShipImage.sprite = GameSettingsScriptable.Instance.allySprite;
+            }
+            else if(item.Side == Side.Enemy)
+            {
+                ui.relationShipImage.sprite = GameSettingsScriptable.Instance.warSprite;
+            }
+
+            dealUI.relationShipUIs.Add(ui);
+        }
         civManager.civDataUI = this;
         hoverTip.GetComponent<HoverTip>().tipToShow = civManager.nickname;
         dealUI.civText.text = civData.civName;
         dealUI.userNameText.text = civManager.nickname;
-        dealUI.relationShipText.text = "Friendly";
         
         if(civManager.isOwned)
         {

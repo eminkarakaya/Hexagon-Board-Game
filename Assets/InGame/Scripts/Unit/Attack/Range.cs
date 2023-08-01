@@ -18,6 +18,7 @@ public class Range : Attack
         }
         if(damagable.hp.TryGetComponent(out BuildingHP buildingHP)) return;
         damagable.hp.Death(damagable,attackable);
+        Debug.Log("ranged + " + range);
         // AttackEvent?.Invoke();
     }
 
@@ -26,14 +27,12 @@ public class Range : Attack
     private void CMDAttack(HP hp)
     {
         Attack(hp);
-        Debug.Log(hp.Hp +" hp.hpcmd");
     }
     [ClientRpc]
     public void Attack(HP hp)
     {
         if(hp != null && hp.Hp >= 0)
         {
-            Debug.Log(hp.Hp +" hp.hpcmd");
             hp.Hp -= _damagePower;
         }
 

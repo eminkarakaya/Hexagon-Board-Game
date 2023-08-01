@@ -1015,6 +1015,8 @@ public class GraphSearch
         return list;
     }
     
+    
+
     public static List<Vector3Int> GneratePathBFS(Vector3Int current, Dictionary<Vector3Int, Vector3Int?> visitedNodesDict)
     {
         List<Vector3Int> path = new List<Vector3Int>();

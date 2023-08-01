@@ -45,7 +45,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         hp = GetComponent<HP>();
         Movement = GetComponent<Movement>();
         Attack = GetComponent<Attack>();
-        AttackSystem = new MeeleAttack();
+        AttackSystem = new AttackSystem();
         if(TryGetComponent(out ShipMovement shipMovement))
         {
             Result = new ShipMovementSystem(this);
@@ -67,7 +67,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
 
     #region  SELECTABLE METHODS
     
-    int attackRange,moveRange;
+    public int attackRange,moveRange;
     public void OpenCanvas()
     {
         Canvas.gameObject.SetActive(true);
@@ -174,11 +174,10 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         {
             outline.OutlineColor = Color.blue;
         }
-        // else if(side == Side.None)
-        // {
-        //     outline.OutlineColor = Color.black;
-
-        // }
+        else if(side == Side.None)  
+        {
+            outline.OutlineColor = Color.black;
+        }
     }
     [Command] private void CMDSetSide(NetworkIdentity identity,GameObject sideable)
     {
@@ -264,7 +263,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         {   
             hex.resource.ChangeOwned(this);
         }
-        Debug.Log("kekw");
     }
 }
 

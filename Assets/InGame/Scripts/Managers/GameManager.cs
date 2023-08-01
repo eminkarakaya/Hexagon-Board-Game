@@ -19,6 +19,7 @@ public class GameManager : NetworkBehaviour
     public  List<Building> buildings;
     [SerializeField] private int count;
     public PlayerManager ownedPlayerManager;
+    [SyncVar] public int hexIndex;
 
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.

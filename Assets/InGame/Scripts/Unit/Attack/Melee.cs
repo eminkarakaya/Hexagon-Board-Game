@@ -22,6 +22,7 @@ public class Melee : Attack
             StartCoroutine(movement.MoveKill(damagable.Hex,damagable.hp.Hp<=0));
         }
         damagable.hp.Death(damagable,attackable);
+        Debug.Log("melee " + range);
         // AttackEvent?.Invoke();
         
     }

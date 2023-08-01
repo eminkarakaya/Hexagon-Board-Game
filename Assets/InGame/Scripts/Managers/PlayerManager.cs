@@ -13,7 +13,7 @@ public class PlayerManager : CivManager
 
     #region  properties
 
-
+    [SyncVar] public bool isStart;
     public Action NextRoundEvent;
 
 
@@ -40,27 +40,35 @@ public class PlayerManager : CivManager
 
     #region  unityMirrorCallbacks
     private void Awake() {
-        FindObjectOfType<SelectCiv>().button.onClick.AddListener(()=> StartCoroutine(StartGame()));
     }
-
+    private void Start() {
+        
+        if(isOwned)
+        {
+            
+            FindObjectOfType<SelectCiv>().button.onClick.AddListener(()=> StartCoroutine(StartGame()));
+        }
+    }
+    [Command] private void SetIsStart()
+    {
+        isStart = true;
+    }
     public IEnumerator StartGame()
     {
-
+        SetIsStart();
         while(gameManager == null)
         {
             gameManager = FindObjectOfType<GameManager>();
             yield return null;
         }
-        while(gameManager.playerCount != FindObjectsOfType<PlayerManager>().Length)
+        while(gameManager.playerCount != FindObjectsOfType<PlayerManager>().Where(x=>x.isStart == true).Count())
         {
-            Debug.Log("waiting other players..");
             yield return null;
         }
         // if(isOwned)
         //     CMDSetCivData();
         while(civData == null)
         {
-            Debug.Log("waitingCivData");
             yield return null;
         }
         if(isOwned)
@@ -68,16 +76,16 @@ public class PlayerManager : CivManager
             waitedPlayers = FindObjectsOfType<PlayerManager>().ToList();
             orderButton = gameManager.OrderButton;
             orderButton.onClick.AddListener(GetOrder);
-            orderButton.image.sprite = nextRoundSprite;
+            orderButton.image.sprite = GameSettingsScriptable.Instance.nextRoundSprite;
             tipText = gameManager.nextRoundTipText;
             hoverTip = gameManager.hoverTip;
             totalGoldText = gameManager.goldText;
             goldTextPerRound = gameManager.goldPerRoundText;
             gameManager.ownedPlayerManager = this;
             CMDCreateCivUI();
-            StartCoroutine(wait1());
             CMDCreateBuilding();
             GetOrderIcon();
+            StartCoroutine(wait1());
         }
 
     }
@@ -162,8 +170,8 @@ public class PlayerManager : CivManager
         NetworkServer.Spawn(building.gameObject,connectionToClient);
 
 
-        RPCCreateBuilding(building,gameManager.playersHexes.Count-1);
-
+        RPCCreateBuilding(building,gameManager.hexIndex);
+        gameManager.hexIndex ++;
         FindPlayerManager(building);
     }
 
@@ -171,9 +179,14 @@ public class PlayerManager : CivManager
     private void RPCCreateBuilding(Building building,int i)
     {
 
+        if( gameManager.playersHexes[i].Building != null)
+        {
+            i++;    
+        }
         gameManager.buildings = FindObjectsOfType<Building>().ToList();
         building.transform.position = new Vector3 (gameManager.playersHexes[i]. transform.position.x , 1 , gameManager.playersHexes[i]. transform.position.z );
         building.transform.rotation = Quaternion.Euler(-90,0,0);
+
         building.Hex = gameManager.playersHexes[i];
         building.Hex.Building = building;
         ownedObjs.Add(building.gameObject);
@@ -187,10 +200,14 @@ public class PlayerManager : CivManager
             else
                 item.SetSide(Side.Enemy,item.GetComponent<Outline>());
         }
+        
         var managers = FindObjectsOfType<PlayerManager>();
 
-        gameManager.playersHexes.RemoveAt(gameManager.playersHexes.Count-1);
         SetTeamColor(building.gameObject);
+    }
+    [Command] private void qwe()
+    {
+        
     }
     #endregion
 
@@ -312,7 +329,7 @@ public class PlayerManager : CivManager
     {
         if(orderList.Count == 0)
         {
-            orderButton.image.sprite = nextRoundSprite;
+            orderButton.image.sprite = GameSettingsScriptable.Instance.nextRoundSprite;
             tipText.text = NETX_ROUND_STRING;
         }
         else
@@ -329,7 +346,6 @@ public class PlayerManager : CivManager
         {
             item.TaskReset();
         }
-
     }
     public override void GetOrder()
     {
@@ -338,22 +354,22 @@ public class PlayerManager : CivManager
             // orderlist bıttıyse
 
             // next round butonuna basıldı mı basılmadı mı
-            if(orderButton.image.sprite == nextRoundSprite)
+            if(orderButton.image.sprite == GameSettingsScriptable.Instance.nextRoundSprite)
             {
                 NextRoundBtn();
                 UnitManager.Instance.ClearOldSelection();
+                
                 return;
             }
-            if(orderButton.image.sprite == waitingSprite)
+            if(orderButton.image.sprite == GameSettingsScriptable.Instance.waitingSprite)
             {
                 CMDAddWaitingList();
-                orderButton.image.sprite = nextRoundSprite;
+                orderButton.image.sprite = GameSettingsScriptable.Instance.nextRoundSprite;
                 return;
             }
-            orderButton.image.sprite = nextRoundSprite;
+            orderButton.image.sprite = GameSettingsScriptable.Instance.nextRoundSprite;
             return;
         }
-
         // sıradakı objeyı seciyo
         orderList[orderList.Count-1].LeftClick();
         UnitManager.Instance.HandleUnitSelected(orderList[orderList.Count-1].Transform);
@@ -365,7 +381,7 @@ public class PlayerManager : CivManager
         RPCRemoveWaitingList();
         if(isOwned)
         {
-            orderButton.image.sprite = waitingSprite;
+            orderButton.image.sprite = GameSettingsScriptable.Instance.waitingSprite;
             tipText.text = WAITING_OTHER_PLAYERS;
         }
         SetWaitedListTip();
@@ -446,7 +462,6 @@ public class PlayerManager : CivManager
         GetOrderIcon();
         // TotalGold += GoldPerTurn;
         SetTotalGoldText();
-        Debug.Log("next round");
     }
 
 

@@ -9,7 +9,7 @@ public class SettlerMovementSystemSeaAndLand : SettlerMovementSystem
     {
         CalculateRange(movement,hexGrid);
     }
-
+    
     public override void CalculateRange(IMovable selectedUnit, HexGrid hexGrid)
     {
         hexGrid = GameObject.FindObjectOfType<HexGrid>();

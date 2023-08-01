@@ -56,14 +56,6 @@ public interface IAttackable
     public CivManager CivManager { get; set; }
 
 }
-public class MeeleAttack : AttackSystem,IAttackable
-{
-    public Vector3Int Position { get; set; }
-    public Attack Attack { get; set; }
-    public AttackSystem AttackSystem { get; set; }
-    public Hex Hex { get; set; }
-    public CivManager CivManager { get; set; }
-}
 public interface ISideable
 {
     public Hex Hex { get; set; }

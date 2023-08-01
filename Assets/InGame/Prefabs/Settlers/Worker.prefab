@@ -121,9 +121,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Settler, Assembly-CSharp
-        m_MethodName: CreateBuildingOnClick
+      - m_Target: {fileID: 8878252520059848393}
+        m_TargetAssemblyTypeName: Worker, Assembly-CSharp
+        m_MethodName: CreateMineOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -301,9 +301,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Settler, Assembly-CSharp
-        m_MethodName: CreateBuildingOnClick
+      - m_Target: {fileID: 8878252520059848393}
+        m_TargetAssemblyTypeName: Worker, Assembly-CSharp
+        m_MethodName: CreateMineOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -680,9 +680,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Settler, Assembly-CSharp
-        m_MethodName: CreateBuildingOnClick
+      - m_Target: {fileID: 8878252520059848393}
+        m_TargetAssemblyTypeName: Worker, Assembly-CSharp
+        m_MethodName: CreateMineOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -826,6 +826,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2672695369983916974, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4812727721276683137}
+    - target: {fileID: 2672695369983916974, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2769939887181010484, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.146
@@ -882,6 +890,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3804588410588588219, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4122694095726791937, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -934,6 +946,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 223
       objectReference: {fileID: 0}
+    - target: {fileID: 6267479206188588259, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8878252520059848393}
+    - target: {fileID: 6267479206188588259, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TaskComplate
+      objectReference: {fileID: 0}
     - target: {fileID: 6772246837785268306, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -960,7 +980,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8302346154622672150, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       propertyPath: m_Name
-      value: HarborSettler
+      value: Worker
       objectReference: {fileID: 0}
     - target: {fileID: 8463490505885570191, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -1057,14 +1077,12 @@ MonoBehaviour:
   - {fileID: 5754377130816420763}
   _side: 0
   resourceBtns:
-  - resourceType: 1
-    button: {fileID: 0}
   - resourceType: 4
-    button: {fileID: 0}
+    button: {fileID: 8200035223560702842}
   - resourceType: 2
-    button: {fileID: 0}
+    button: {fileID: 3998802332729061404}
   - resourceType: 3
-    button: {fileID: 0}
+    button: {fileID: 5585750828063900873}
 --- !u!1 &5754377130816420763 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9090025504956994828, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}

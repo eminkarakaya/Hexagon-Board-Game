@@ -9,6 +9,7 @@ using TMPro;
 
 public abstract class CivManager : NetworkBehaviour
 {
+    public List<CivManager> savastigiCivler = new List<CivManager>();
     public CivDataUI civDataUI;
     public Side Side;
     [SyncVar] public int team;
@@ -17,7 +18,6 @@ public abstract class CivManager : NetworkBehaviour
     [SyncVar] public int TotalGold ;
     public string nickname;
     protected Button orderButton;
-    [SerializeField] protected Sprite nextRoundSprite,waitingSprite;    
     [SerializeField] protected List<ITaskable> orderList = new List<ITaskable>();
     [SerializeField] protected GameObject buildingPrefab;
     [SyncVar] [SerializeField] public List<GameObject> ownedObjs = new List<GameObject>();
@@ -89,49 +89,78 @@ public abstract class CivManager : NetworkBehaviour
     {
         this.team = team;
     }
+
+
+
+
+
+
+
+
+
+
     [Command(requiresAuthority = false)] public void CMDDeclarePeace(GameObject conn,CivManager civManager)
     {
         NetworkConnectionToClient conn1 = conn.GetComponent<NetworkIdentity>().connectionToClient;
         TargetDeclarePeace(conn1,civManager);
         RPCDeclarePeace(civManager);
     }
-    [ClientRpc] public void RPCDeclarePeace(CivManager civManager)
-    {
-        // buton degısıklıgı
-        civManager.civDataUI.dealUI.declarePeaceBtn.onClick.AddListener(()=>civDataUI.dealUI.declarePeaceBtn.gameObject.SetActive(false));
-        civManager.civDataUI.dealUI.declarePeaceBtn.onClick.AddListener(()=>civDataUI.dealUI.declareWarBtn.gameObject.SetActive(true));
-
-    }
+    
     [TargetRpc] public void TargetDeclarePeace(NetworkConnectionToClient conn,CivManager civManager)
     {
+        civManager.Side = Side.Ally;
         List<ISideable> sideables = civManager.ownedObjs.Where(x=> x.TryGetComponent(out ISideable sideable)).Select(x=>x.GetComponent<ISideable>()).ToList();
-        // List<ISideable> sideables = ownedObjs.Where(x=> x.TryGetComponent(out ISideable sideable)).Select(x =>x.GetComponent<ISideable>()).ToList();
         foreach (var item in sideables)
         {
             item.SetSide(Side.None,item.Outline);
         }
+        civManager.civDataUI.dealUI.declarePeaceBtn.gameObject.SetActive(false);
+        civManager.civDataUI.dealUI.declareWarBtn.gameObject.SetActive(true);
     }
+    
     
     [Command(requiresAuthority = false)] public void CMDDeclareWar(GameObject conn,CivManager civManager)
     {
         NetworkConnectionToClient conn1 = conn.GetComponent<NetworkIdentity>().connectionToClient;
         TargetDeclareWar(conn1,civManager);
     }
-    [ClientRpc] public void RPCDeclareWar(CivManager civManager)
+    [Command] public void CMDDeclareWar2(CivManager civManager)
     {
-        civManager.civDataUI.dealUI.declareWarBtn.onClick.AddListener(()=>civDataUI.dealUI.declareWarBtn.gameObject.SetActive(false));
-        civManager.civDataUI.dealUI.declareWarBtn.onClick.AddListener(()=>civDataUI.dealUI.declarePeaceBtn.gameObject.SetActive(true));
+        RPCDeclareWar(civManager);
+        civManager.RPCDeclareWar(this);
     }
+    [Command] public void CMDDeclarePeace2(CivManager civManager)
+    {
+        RPCDeclarePeace(civManager);
+        civManager.RPCDeclarePeace(this);
+    }
+    [ClientRpc] private void RPCDeclarePeace(CivManager civManager)
+    {
+        if(this.savastigiCivler.Contains(civManager))
+            this.savastigiCivler.Remove(civManager);
+
+    }
+    [ClientRpc] private void RPCDeclareWar(CivManager civManager)
+    {
+        if(!this.savastigiCivler.Contains(civManager))
+            this.savastigiCivler.Add(civManager);
+    }
+    
     //1. parametre hangı civmanagerde yapılacagı 2. parametre hangi civ managere savaş acılacagı
     [TargetRpc] public void TargetDeclareWar(NetworkConnectionToClient conn,CivManager civManager)
     {
-        
+        civManager.Side = Side.Enemy;
         List<ISideable> sideables = civManager.ownedObjs.Where(x=> x.TryGetComponent(out ISideable sideable)).Select(x=>x.GetComponent<ISideable>()).ToList();
         foreach (var item in sideables)
         {
             item.SetSide(Side.Enemy,item.Outline);
         }
+        civManager.civDataUI.dealUI.declareWarBtn.gameObject.SetActive(false);
+        civManager.civDataUI.dealUI.declarePeaceBtn.gameObject.SetActive(true);
     }
+
+
+
 
     #region  ownedObject
 
@@ -193,7 +222,6 @@ public abstract class CivManager : NetworkBehaviour
         List<Vision> allUnits = FindObjectsOfType<Hex>().Select(x=>x.AnyUnit()).Where(x=>x != null ).ToList();
         foreach (var item in allUnits)
         {
-            // Debug.Log(item + " a " + item.visionable + " a " + item.visionable.Hex , item);
             item.ShowVision(item.visionable.Hex);
         }
     }

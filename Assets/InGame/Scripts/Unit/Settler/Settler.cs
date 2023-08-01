@@ -145,17 +145,17 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         building.Hex.Building = building;
         building.CivManager = civManager;
         civManager.CMDAddOwnedObject(building.gameObject);        
-        if(building.isOwned)
-        {
-            building.SetSide(Side.Me,building.GetComponent<Outline>());
-        }
-        else if(building.CivManager.team == this.CivManager.team)
-        {
-            building.SetSide(Side.Ally,building.GetComponent<Outline>());
-        }
-        else
-            building.SetSide(Side.Enemy,building.GetComponent<Outline>());
-        
+        // if(building.isOwned)
+        // {
+        //     building.SetSide(Side.Me,building.GetComponent<Outline>());
+        // }
+        // else if(building.CivManager.team == this.CivManager.team)
+        // {
+        //     building.SetSide(Side.Ally,building.GetComponent<Outline>());
+        // }
+        // else
+        //     building.SetSide(Side.Enemy,building.GetComponent<Outline>());
+        building.SetSide(this.Side,building.GetComponent<Outline>());
         civManager.SetTeamColor(building.gameObject);
         Result.HideRange(this,Movement);  
         UnitManager.Instance.selectedUnit = null;
@@ -209,8 +209,14 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         {
             outline.OutlineColor = Color.red;
         }
-        else
+        else if(side == Side.Ally)
+        {
             outline.OutlineColor = Color.blue;
+        }
+        else if(side == Side.None)
+        {
+            outline.OutlineColor = Color.black;
+        }
     }
     public void StartCaptureCoroutine(NetworkIdentity identity,GameObject sideable,CivManager civManager)
     {
@@ -228,12 +234,13 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
 
     public void TaskComplate()
     {
-        Debug.Log("TASK COMPLATE");
+        CivManager.RemoveOrderList(this);
     }
 
     public void TaskReset()
     {
-        
+        civManager.AddOrderList(this);
+        Movement.ResetMovementPoint();
     }
     #endregion
 }

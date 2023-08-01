@@ -107,32 +107,32 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     [ClientRpc]
     private void RPCCreateMC1(Unit unit)
     {
-        Debug.Log(unit ,unit);
         unit.CivManager = _civManager;
         unit.Hex = Hex;
         unit.Hex.Unit = unit;
-        if(unit.isOwned)
-        {
-            unit.SetSide(Side.Me,unit.GetComponent<Outline>());
-        }
-        else
-        {
-            foreach (var item in FindObjectsOfType<PlayerManager>())
-            {
-                if(item.isOwned)
-                {
-                    if(unit.CivManager.team == item.team)
-                    {
-                        unit.SetSide(Side.Ally,unit.GetComponent<Outline>());
-                        CivManager.CMDAddOwnedObject(unit.gameObject);
-                        CivManager.CMDHideAllUnits();
-                        CivManager.CMDShowAllUnits();
-                        return;
-                    }
-                }
-            }
-            unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
-        }
+        // if(unit.isOwned)
+        // {
+        //     unit.SetSide(Side.Me,unit.GetComponent<Outline>());
+        // }
+        // else
+        // {
+        //     foreach (var item in FindObjectsOfType<PlayerManager>())
+        //     {
+        //         if(item.isOwned)
+        //         {
+        //             if(unit.CivManager.team == item.team)
+        //             {
+        //                 unit.SetSide(Side.Ally,unit.GetComponent<Outline>());
+        //                 CivManager.CMDAddOwnedObject(unit.gameObject);
+        //                 CivManager.CMDHideAllUnits();
+        //                 CivManager.CMDShowAllUnits();
+        //                 return;
+        //             }
+        //         }
+        //     }
+        //     unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
+        // }
+        unit.SetSide(side,unit.GetComponent<Outline>());
         CivManager.CMDAddOwnedObject(unit.gameObject);
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();
@@ -172,29 +172,29 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         unit.Hex = Hex;
         unit.Hex.Settler = unit;
         _civManager.CMDAddOwnedObject(unit.gameObject);
-        if(unit.isOwned)
-        {
-            unit.SetSide(Side.Me,unit.GetComponent<Outline>());
-        }
-        else
-        {
-            foreach (var item in FindObjectsOfType<PlayerManager>())
-            {
-                if(item.isOwned)
-                {
-                    if(unit.CivManager.team == item.team)
-                    {
-                        unit.SetSide(Side.Ally,unit.GetComponent<Outline>());
-                        CivManager.CMDAddOwnedObject(unit.gameObject);
-                        CivManager.CMDHideAllUnits();
-                        CivManager.CMDShowAllUnits();
-                        return;
-                    }
-                }
-            }
-            unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
-        }
-        
+        // if(unit.isOwned)
+        // {
+        //     unit.SetSide(Side.Me,unit.GetComponent<Outline>());
+        // }
+        // else
+        // {
+        //     foreach (var item in FindObjectsOfType<PlayerManager>())
+        //     {
+        //         if(item.isOwned)
+        //         {
+        //             if(unit.CivManager.team == item.team)
+        //             {
+        //                 unit.SetSide(Side.Ally,unit.GetComponent<Outline>());
+        //                 CivManager.CMDAddOwnedObject(unit.gameObject);
+        //                 CivManager.CMDHideAllUnits();
+        //                 CivManager.CMDShowAllUnits();
+        //                 return;
+        //             }
+        //         }
+        //     }
+        //     unit.SetSide(Side.Enemy,unit.GetComponent<Outline>());
+        // }
+        unit.SetSide(side,unit.GetComponent<Outline>());
 
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();
@@ -260,6 +260,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         {
             SetSide(Side.Enemy,Outline);
         }
+        
     }
     
     public IEnumerator wait(CivManager attackableCivManager)
@@ -288,8 +289,14 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         {
             outline.OutlineColor = Color.red;
         }
-        else
+        else if(side == Side.Ally)
+        {
             outline.OutlineColor = Color.blue;
+        }
+        else if(side == Side.None)
+        {
+            outline.OutlineColor = Color.black;
+        }
 
     }
     #endregion
@@ -328,30 +335,30 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         ship.Hex = Hex;
         ship.Hex.Ship = ship;
         _civManager.CMDAddOwnedObject(ship.gameObject);
-        if(ship.isOwned)
-        {
-            ship.SetSide(Side.Me,ship.GetComponent<Outline>());
-        }
-        else
-        {
-            foreach (var item in FindObjectsOfType<PlayerManager>())
-            {
-                if(item.isOwned)
-                {
-                    if(ship.CivManager.team == item.team)
-                    {
-                        ship.SetSide(Side.Ally,ship.GetComponent<Outline>());
-                        CivManager.CMDAddOwnedObject(ship.gameObject);
-                        CivManager.CMDHideAllUnits();
-                        CivManager.CMDShowAllUnits();
-                        return;
-                    }
-                }
-            }
-            ship.SetSide(Side.Enemy,ship.GetComponent<Outline>());
-        }
+        // if(ship.isOwned)
+        // {
+        //     ship.SetSide(Side.Me,ship.GetComponent<Outline>());
+        // }
+        // else
+        // {
+        //     foreach (var item in FindObjectsOfType<PlayerManager>())
+        //     {
+        //         if(item.isOwned)
+        //         {
+        //             if(ship.CivManager.team == item.team)
+        //             {
+        //                 ship.SetSide(Side.Ally,ship.GetComponent<Outline>());
+        //                 CivManager.CMDAddOwnedObject(ship.gameObject);
+        //                 CivManager.CMDHideAllUnits();
+        //                 CivManager.CMDShowAllUnits();
+        //                 return;
+        //             }
+        //         }
+        //     }
+        //     ship.SetSide(Side.Enemy,ship.GetComponent<Outline>());
+        // }
         
-        
+        ship.SetSide(side,ship.GetComponent<Outline>());
        
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();

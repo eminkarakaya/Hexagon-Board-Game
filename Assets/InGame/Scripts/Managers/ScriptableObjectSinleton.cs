@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class ScriptableObjectSinleton<T> : ScriptableObject where T : ScriptableObject
+public class ScriptableObjectSinleton<T> : ScriptableObject where T : ScriptableObjectSinleton<T>
 {
     private static T _instance = null;
     public static T Instance
@@ -12,7 +12,9 @@ public class ScriptableObjectSinleton<T> : ScriptableObject where T : Scriptable
         {
             if(_instance == null)
             {
+                Debug.Log(Resources.FindObjectsOfTypeAll<GameSettingsScriptable>().Length);
                 T [] results = Resources.FindObjectsOfTypeAll<T>();
+
                 if(results.Length == 0)
                 {
                     Debug.LogError("Singleton lengt = 0");
@@ -30,15 +32,5 @@ public class ScriptableObjectSinleton<T> : ScriptableObject where T : Scriptable
             return _instance;
         }
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

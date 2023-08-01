@@ -13,7 +13,6 @@ public struct ResourceBtn
 }
 public class Worker : Settler
 {
-    
     [SerializeField] private List<ResourceBtn> resourceBtns = new List<ResourceBtn>();
     [Command] public override void CMDCreateBuilding()
     {
