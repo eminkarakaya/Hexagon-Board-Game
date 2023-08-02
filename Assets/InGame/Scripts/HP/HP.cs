@@ -14,18 +14,12 @@ public class HP : NetworkBehaviour
             civManager = PlayerManager.FindPlayerManager();
         Hp = _maxHp;
     }
-    
-    public virtual void Death()
-    {   
-        if(_hp <= 0 )
-        {
-            civManager.DestroyObj(gameObject);
-        } 
-    }
+                                // ddamage alan      // damage atan
     public virtual void Death(IDamagable damagable,IAttackable attackable)
     {   
         if(_hp <= 0 )
         {
+            
             civManager.DestroyObj(gameObject);
         } 
     }

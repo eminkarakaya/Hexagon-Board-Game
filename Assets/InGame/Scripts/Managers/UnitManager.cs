@@ -121,8 +121,8 @@ public class UnitManager : SingletonMirror<UnitManager>
     {
         previouslySelectedHex = selectedHex;
         selectedUnit.RightClick(selectedHex);
-        selectedUnit.RightClick2(selectedHex);
-        ClearOldSelection();
+        // selectedUnit.RightClick2(selectedHex);
+        // ClearOldSelection();
     }
 
     private bool HandleSelectedHexIsUnitHex(Vector3Int hexPosition)

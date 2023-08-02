@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror;
 public class Range : Attack
 {
-
+                                    // ddamage alan      // damage atan
     public override void AttackUnit(IDamagable damagable,IAttackable attackable)
     {
         if(GetComponent<Movement>().GetCurrentMovementPoints()==0) return;

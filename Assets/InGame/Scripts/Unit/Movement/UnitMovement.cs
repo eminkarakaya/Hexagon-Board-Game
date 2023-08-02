@@ -34,10 +34,11 @@ public class UnitMovement : Movement
         // if(lastHex != nextHex && nextHex.IsEnemyBuilding())
         //     yield break;
         
-        if(nextHex.IsEnemy() || nextHex.IsEnemyBuilding() ||nextHex.IsEnemyShip())
-        {
-            yield break;
-        }
+        // if(nextHex.IsEnemy() || nextHex.IsEnemyBuilding() ||nextHex.IsEnemyShip())
+        // {
+        //     yield break;
+        // }
+        
 
         // Movementstart
         float timeElapsed = 0f;
@@ -52,16 +53,6 @@ public class UnitMovement : Movement
 
         // MovementFinishEvents
         
-        playerManager.CMDHideAllUnits();
-        
-        CMDHide();
-        CMDSetHex(nextHex,Moveable.Hex);
-        this.Moveable.Hex = nextHex;
-
-        transform.position = endPos;
-        playerManager.CMDShowAllUnits();
-        CMDShow();
-        CurrentMovementPoints -= 1;
         if(pathPositions.Count > 0)
         {
             StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),lastHex,rotationDuration,movementSystem));

@@ -22,6 +22,7 @@ public abstract class MovementSystem
             return;
         }
         if(UnitManager.Instance.selectedUnit == null) return;
+        currentPath.Clear();
         HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
         CalculateRange(movable,hexGrid);
         IEnumerable<Vector3Int> poses = movementRange.GetRangePositions();

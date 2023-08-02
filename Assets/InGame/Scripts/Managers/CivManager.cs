@@ -74,6 +74,11 @@ public abstract class CivManager : NetworkBehaviour
     }
     [Command] public void DestroyObj(GameObject obj)
     {
+        CMDRemoveOwnedObject(obj);
+        if(orderList.Contains(obj.GetComponent<ITaskable>()))
+        {
+            RemoveOrderList(obj.GetComponent<ITaskable>());
+        }
         Destroy(obj);
     }
     public void SetTeamColor(GameObject obj)

@@ -103,6 +103,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     {
         if(Movement.CurrentMovementPoints == 0)
             return false;
+        // if(Attack.TryGetComponent(out Melee melee))
+        //     return false;
         if(moveRange == 0 && (selectedHex.IsEnemy()  || selectedHex.IsEnemyBuilding() || selectedHex.IsEnemyShip()))
         {
             Movement.StartCoroutineRotationUnit(Movement,selectedHex.transform.position,selectedHex);
@@ -112,6 +114,9 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     }
     public void RightClick(Hex selectedHex)
     {
+        UnitManager.Instance.ClearOldSelection();
+        LeftClick();
+        UnitManager.Instance.HandleUnitSelected(this.transform);
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
         moveRange = Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range).Count;
         
@@ -124,7 +129,9 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             // Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
             Result.CalculateRange(this,hexGrid);
             Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
+            Movement.CurrentMovementPoints -= moveRange;
         }
+        
         
     } 
     public void RightClick2(Hex selectedHex)

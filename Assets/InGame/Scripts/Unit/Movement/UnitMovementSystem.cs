@@ -19,6 +19,8 @@ public class UnitMovementSystem : MovementSystem
     
     public override List<Vector3Int> ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid,int attackRange)
     {
+        currentPath.Clear();
+        
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
         if(hex.isVisible)
         {
@@ -31,10 +33,21 @@ public class UnitMovementSystem : MovementSystem
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
                     Vector3Int? enemyHex = null;
-                    currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,attackRange);
-                    foreach (Vector3Int hexPosition in currentPath)
+                    List<Vector3Int> tempCurrentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,attackRange);
+                    // currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,attackRange);
+
+                    foreach (Vector3Int hexPosition in tempCurrentPath)
                     {
-                        hexGrid.GetTileAt(hexPosition).HighlightPath();                    
+                        Hex hex1 = hexGrid.GetTileAt(hexPosition);
+                        hex1.HighlightPath();                    
+                        if(hex1.IsEnemy() || hex1.IsEnemyBuilding() ||hex1.IsEnemyShip())
+                        {
+
+                        }
+                        else
+                        {
+                            currentPath.Add(hex1.HexCoordinates);
+                        }
                     }
                     
                 }
@@ -145,16 +158,28 @@ public class UnitMovementSystem : MovementSystem
             
             else
             {
+                
+
                 if(movementRange.GetRangePositions().Contains(selectedHexPosition))
                 {
                     foreach (Vector3Int hexPosition in currentPath)
                     {
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
-                    currentPath = movementRange.GetPathTo(selectedHexPosition);
-                    foreach (Vector3Int hexPosition in currentPath)
+                    List<Vector3Int> tempCurrentPath =  movementRange.GetPathTo(selectedHexPosition);
+                    // currentPath = movementRange.GetPathTo(selectedHexPosition);
+                    foreach (Vector3Int hexPosition in tempCurrentPath)
                     {
-                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                        Hex hex1 = hexGrid.GetTileAt(hexPosition);
+                        hex1.HighlightPath();                    
+                        if(hex1.IsEnemy() || hex1.IsEnemyBuilding() ||hex1.IsEnemyShip())
+                        {
+
+                        }
+                        else
+                        {
+                            currentPath.Add(hex1.HexCoordinates);
+                        }
                     }
                 }
                 return currentPath;
@@ -163,17 +188,33 @@ public class UnitMovementSystem : MovementSystem
         }
         else
         {
+            
+
             if(movementRange.GetRangePositions().Contains(selectedHexPosition))
             {
                 foreach (Vector3Int hexPosition in currentPath)
                 {
                     hexGrid.GetTileAt(hexPosition).ResetHighlight();
                 }
-                currentPath = movementRange.GetPathTo(selectedHexPosition);
-                foreach (Vector3Int hexPosition in currentPath)
+                List<Vector3Int> tempCurrentPath =  movementRange.GetPathTo(selectedHexPosition);
+                // currentPath = movementRange.GetPathTo(selectedHexPosition);
+                foreach (Vector3Int hexPosition in tempCurrentPath)
                 {
-                    hexGrid.GetTileAt(hexPosition).HighlightPath();
+                    Hex hex1 = hexGrid.GetTileAt(hexPosition);
+                    hex1.HighlightPath();                    
+                    if(hex1.IsEnemy() || hex1.IsEnemyBuilding() ||hex1.IsEnemyShip())
+                    {
+
+                    }
+                    else
+                    {
+                        currentPath.Add(hex1.HexCoordinates);
+                    }
                 }
+            }
+            foreach (var item in currentPath)
+            {
+                Debug.Log(item,hexGrid.GetTileAt(item));
             }
             return currentPath;
         }
