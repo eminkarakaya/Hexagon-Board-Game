@@ -86,20 +86,6 @@ public abstract class Movement : NetworkBehaviour
         Vector3 firstTarget = pathPositions.Dequeue();
         Hex firstHex = pathHexes.Dequeue();
         StartCoroutine(RotationCoroutine(firstTarget,firstHex,lastHex,rotationDuration,movementSystem,isMove));
-        
-        
-        
-        playerManager.CMDHideAllUnits();
-        
-        CMDHide();
-        CMDSetHex(lastHex,Moveable.Hex);
-        this.Moveable.Hex = lastHex;
-
-        // transform.position = lastHex.transform;
-        playerManager.CMDShowAllUnits();
-        CMDShow();
-
-        
     }
     protected IEnumerator RotationCoroutine(Vector3 endPos,Hex endHex,Hex hex, float rotationDuration,MovementSystem movementSystem,bool isMove = true)
     {
