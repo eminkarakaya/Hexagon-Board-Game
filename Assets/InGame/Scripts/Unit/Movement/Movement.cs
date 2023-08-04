@@ -6,6 +6,7 @@ using UnityEngine.Events;
 
 public abstract class Movement : NetworkBehaviour
 {
+    
     #region  props
     protected IMovable Moveable;
     public float h = 1.2f;

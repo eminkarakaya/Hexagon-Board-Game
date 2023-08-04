@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class AttackSystem 
 {
+    public AttackSystem(IAttackable attackable)
+    {
+        GetRange(attackable);
+    }
     [SerializeField] private HexGrid hexGrid;
     BFSResult rangeInfo;
     public void GetRange(IAttackable selectedUnit)
@@ -37,6 +41,7 @@ public class AttackSystem
     }
     public bool CheckEnemyInRange(Hex enemyHex)
     {
+        Debug.Log(rangeInfo+ "rangeInfo");
         return rangeInfo.rangeNodesDict.ContainsKey(enemyHex.HexCoordinates);
     }
 }

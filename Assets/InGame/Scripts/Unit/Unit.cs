@@ -45,7 +45,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         hp = GetComponent<HP>();
         Movement = GetComponent<Movement>();
         Attack = GetComponent<Attack>();
-        AttackSystem = new AttackSystem();
         if(TryGetComponent(out ShipMovement shipMovement))
         {
             Result = new ShipMovementSystem(this);
@@ -103,7 +102,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     {
         if(Movement.CurrentMovementPoints == 0)
             return false;
-        if(moveRange == 0 && (selectedHex.IsEnemy()  || selectedHex.IsEnemyBuilding() || selectedHex.IsEnemyShip()))
+        AttackSystem = new AttackSystem(this);
+        if(moveRange == 0 &&  AttackSystem.CheckEnemyInRange(selectedHex) && (selectedHex.IsEnemy()  || selectedHex.IsEnemyBuilding() || selectedHex.IsEnemyShip()))
         {
             Movement.StartCoroutineRotationUnit(Movement,selectedHex.transform.position,selectedHex);
             return true;
@@ -143,6 +143,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             Result = new UnitMovementSystem(this);
         Result.ShowRange(this,Movement);
         // AttackSystem.GetRange(this);
+        AttackSystem = new AttackSystem(this);
         attackRange = AttackSystem.ShowRange(this);
         // FindObjectOfType<HexGrid>().DrawBorders(Hex);
     }
