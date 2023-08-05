@@ -2,13 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.Events;
+
 public class BuildingHP : HP
 {
-    public override void Death(IDamagable damagable, IAttackable attackable)
+    public override void Death(IDamagable damagable, IAttackable attackable, UnityEvent action = null)
     {
         if(Hp <= 0 )
         {
-            
+            if(action != null)
+            {
+                action?.Invoke();
+            }
+
             attackable.CivManager.CMDHideAllUnits();
             attackable.CivManager.Capture(GetComponent<NetworkIdentity>());
             TeamColor [] teamColors = GetComponent<Building>().transform.GetComponentsInChildren<TeamColor>();

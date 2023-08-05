@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Mirror;
 public class Melee : Attack
 {
@@ -17,11 +18,37 @@ public class Melee : Attack
         {
             CMDAttack(damagable.hp);
         }
-        if(TryGetComponent(out UnitMovement movement))
+
+        // kill events
+        foreach (var item in funcs)
         {
-            StartCoroutine(movement.MoveKill(damagable.Hex,damagable.hp.Hp<=0));
+
+            if(item == Funcs.MoveKill)
+            {
+                if(TryGetComponent(out UnitMovement movement0))
+                {
+                    StartCoroutine (movement0.MoveKill(damagable.Hex,damagable.hp.Hp<=0));
+                }
+            }
+            if(item == Funcs.TakeHostage)
+            {
+                if(TryGetComponent(out UnitMovement movement1))
+                {
+                    movement1.TakeHostage(damagable.Hex,damagable.hp.Hp<=0);
+                }
+            }
+
+            // switch (item)
+            // {
+                
+            //     case Funcs.MoveKill:
+            //     break;
+            //     case Funcs.TakeHostage:
+            //     break;
+            // }
         }
-        damagable.hp.Death(damagable,attackable);
+        damagable.hp.Death(damagable,attackable,killEvent);
+        
         Debug.Log("melee " + range);
         // AttackEvent?.Invoke();
         

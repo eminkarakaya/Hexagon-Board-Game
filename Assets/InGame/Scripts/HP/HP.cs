@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 using Mirror;
 public class HP : NetworkBehaviour
@@ -14,13 +15,24 @@ public class HP : NetworkBehaviour
             civManager = PlayerManager.FindPlayerManager();
         Hp = _maxHp;
     }
+
+    public void DefaultDeathAction()
+    {
+        civManager.DestroyObj(gameObject);
+    }
                                 // ddamage alan      // damage atan
-    public virtual void Death(IDamagable damagable,IAttackable attackable)
+    public virtual void Death(IDamagable damagable, IAttackable attackable, UnityEvent action = null)
     {   
         if(_hp <= 0 )
         {
-            
-            civManager.DestroyObj(gameObject);
+            if(action == null)
+            {
+                civManager.DestroyObj(gameObject);
+            }
+            else
+            {
+                action?.Invoke();
+            }
         } 
     }
 }

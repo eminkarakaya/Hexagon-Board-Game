@@ -98,6 +98,44 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
 
         }
     }
+
+    public void StartCaptureCoroutine(NetworkIdentity identity,GameObject sideable,CivManager civManager)
+    {
+        // civManager.Capture(identity);
+        StartCoroutine(CaptureCoroutine(civManager));
+    }
+    public IEnumerator CaptureCoroutine(CivManager attackableCivManager)
+    {
+        this.civManager.CMDRemoveOwnedObject(this.gameObject); //requestauthority = false
+        this.CivManager = attackableCivManager;
+        while(GetComponent<NetworkIdentity>().isOwned == false)
+        {
+            yield return null;
+
+        }
+        CMDSetSide(attackableCivManager);
+        attackableCivManager.SetTeamColor(this.gameObject);
+        
+        attackableCivManager.CMDShowAllUnits();
+        attackableCivManager.CMDAddOwnedObject(this.gameObject); //requestauthority = false
+
+    }
+    [Command] public void CMDSetSide(CivManager civManager)
+    {
+        RPGSetSide(civManager);
+    }
+    [ClientRpc] private void RPGSetSide(CivManager civManager)
+    {
+        this.CivManager = civManager;
+        if(civManager.isOwned)
+        {
+            SetSide(Side.Me,Outline);
+        }
+        else
+        {
+            SetSide(Side.Enemy,Outline);
+        }
+    }
     public bool CheckAttackOrMove(Hex selectedHex)
     {
         if(Movement.CurrentMovementPoints == 0)

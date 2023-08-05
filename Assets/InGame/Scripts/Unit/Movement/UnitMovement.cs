@@ -102,11 +102,26 @@ public class UnitMovement : Movement
         }
         Moveable.ToggleButtons(true);
     }
-    
+    public void TakeHostage(Hex hex,bool state)
+    {
+        if(state)
+        {
+            Debug.Log("take hostage");
+            playerManager.CMDHideAllUnits();
+            CMDHide();
+
+            GetComponent<Unit>().CivManager.Capture(hex.Unit.GetComponent<NetworkIdentity>());     
+            hex.Unit.StartCaptureCoroutine(hex.Unit.GetComponent<NetworkIdentity>(),hex.Unit.gameObject,GetComponent<Unit>().CivManager);
+
+            playerManager.CMDShowAllUnits();
+            CMDShow();
+        }
+    }
     public IEnumerator MoveKill(Hex hex,bool state)
     {
         if(state)
         {
+            Debug.Log("movekill");
             playerManager.CMDHideAllUnits();
             
             CMDHide();

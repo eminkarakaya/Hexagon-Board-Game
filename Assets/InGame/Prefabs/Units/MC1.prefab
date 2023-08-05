@@ -122,8 +122,6 @@ MonoBehaviour:
   - {fileID: 671811955279829656}
   - {fileID: 1113163170176909489}
   orderImage: {fileID: 21300000, guid: 72e7643c92ef003419089e9d11d03696, type: 3}
-  attackRange: 0
-  moveRange: 0
 --- !u!114 &1113163169887892024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,6 +137,10 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  funcs: 0100000002000000
+  killEvent:
+    m_PersistentCalls:
+      m_Calls: []
   _damageText: {fileID: 1113163169317611573}
   _damagePower: 10
   AttackEvent:
@@ -224,7 +226,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _hpText: {fileID: 1113163169271220256}
-  _hp: 20
+  _hp: 0
   _maxHp: 20
   civManager: {fileID: 0}
 --- !u!114 &7558886659957355886
