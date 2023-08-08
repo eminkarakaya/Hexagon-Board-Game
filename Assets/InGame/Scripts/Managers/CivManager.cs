@@ -75,11 +75,10 @@ public abstract class CivManager : NetworkBehaviour
     [Command] public void DestroyObj(GameObject obj)
     {
         CMDRemoveOwnedObject(obj);
-        if(orderList.Contains(obj.GetComponent<ITaskable>()))
-        {
-            RemoveOrderList(obj.GetComponent<ITaskable>());
-        }
-        Destroy(obj);
+
+        CMDRemoveOrderList(obj,obj);
+        
+        
     }
     public void SetTeamColor(GameObject obj)
     {
@@ -185,12 +184,46 @@ public abstract class CivManager : NetworkBehaviour
     {
         RPCRemoveOwnedObj(obj);
     }
+    [TargetRpc] private void TargetRemoveOrderList(NetworkConnectionToClient conn,GameObject taskable)
+    {
+        PlayerManager playerManager = null;
+        foreach (var item in FindObjectsOfType<PlayerManager>())
+        {
+            if(item.isOwned)
+            {
+                playerManager = item;
+                break;
+            }
+        }
+        if(taskable.TryGetComponent(out ITaskable taskable1))
+        {
+            if(taskable1 == null) return;
+            if(playerManager.orderList.Contains(taskable1))
+            {
+                playerManager.orderList.Remove(taskable1);
+            }
+            playerManager.GetOrderIcon();
+        }
+        
+        Destroy(taskable);
+    }
+    [Command(requiresAuthority = false)] public void CMDRemoveOrderList(GameObject conn, GameObject taskable)
+    {
+        TargetRemoveOrderList(conn.GetComponent<NetworkIdentity>().connectionToClient,taskable);
+    }
     [ClientRpc] private void RPCRemoveOwnedObj(GameObject obj)
     {
-
-        if(ownedObjs.Contains(obj))
+        PlayerManager playerManager = null;
+        foreach (var item in FindObjectsOfType<PlayerManager>())
         {
-            ownedObjs.Remove(obj);
+            if(item.isOwned)
+            {
+                playerManager = item;
+            }
+        }
+        if(playerManager.ownedObjs.Contains(obj))
+        {
+            playerManager.ownedObjs.Remove(obj);
         }
     }
     #endregion

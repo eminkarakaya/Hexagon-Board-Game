@@ -19,6 +19,11 @@ public class UnitMovementSystem : MovementSystem
     
     public override List<Vector3Int> ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid,int attackRange)
     {
+
+        if(hexGrid.GetTileAt(selectedHexPosition).GetHexInAnimation())
+        {
+            return null;
+        }
         currentPath.Clear();
         
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
@@ -42,7 +47,7 @@ public class UnitMovementSystem : MovementSystem
                         hex1.HighlightPath();                    
                         if(hex1.IsEnemy() || hex1.IsEnemyBuilding() ||hex1.IsEnemyShip())
                         {
-
+                            return currentPath;
                         }
                         else
                         {
@@ -50,6 +55,9 @@ public class UnitMovementSystem : MovementSystem
                         }
                     }
                     
+                }
+                foreach (var item in currentPath)
+                {
                 }
                 return currentPath;
             }
@@ -131,6 +139,8 @@ public class UnitMovementSystem : MovementSystem
                     }
                     Vector3Int? enemyHex = null;
                     currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,attackRange);
+                    List<Vector3Int> tempCurrentPath =  movementRange.GetPathMeGrid(selectedHexPosition,out enemyHex,hexGrid);
+                    
                     foreach (Vector3Int hexPosition in currentPath)
                     {
                         hexGrid.GetTileAt(hexPosition).HighlightPath();
@@ -147,10 +157,19 @@ public class UnitMovementSystem : MovementSystem
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
                     Vector3Int? meHex = null;
-                    currentPath = movementRange.GetPathMeGrid(selectedHexPosition,out meHex,hexGrid);
-                    foreach (Vector3Int hexPosition in currentPath)
+                    List<Vector3Int> tempCurrentPath =  movementRange.GetPathMeGrid(selectedHexPosition,out meHex,hexGrid);
+                    foreach (Vector3Int hexPosition in tempCurrentPath)
                     {
-                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                        Hex hex1 = hexGrid.GetTileAt(hexPosition);
+                        hex1.HighlightPath();                    
+                        if(hex1.IsEnemy() || hex1.IsEnemyBuilding() ||hex1.IsEnemyShip())
+                        {
+                            return currentPath;
+                        }
+                        else
+                        {
+                            currentPath.Add(hex1.HexCoordinates);
+                        }
                     }
                 }
                 return currentPath;
@@ -174,13 +193,16 @@ public class UnitMovementSystem : MovementSystem
                         hex1.HighlightPath();                    
                         if(hex1.IsEnemy() || hex1.IsEnemyBuilding() ||hex1.IsEnemyShip())
                         {
-
+                            return currentPath;
                         }
                         else
                         {
                             currentPath.Add(hex1.HexCoordinates);
                         }
                     }
+                }
+                foreach (var item in currentPath)
+                {
                 }
                 return currentPath;
             }
@@ -204,7 +226,10 @@ public class UnitMovementSystem : MovementSystem
                     hex1.HighlightPath();                    
                     if(hex1.IsEnemy() || hex1.IsEnemyBuilding() ||hex1.IsEnemyShip())
                     {
-
+                        foreach (var item in currentPath)
+                        {
+                        }
+                        return currentPath;
                     }
                     else
                     {
@@ -214,7 +239,6 @@ public class UnitMovementSystem : MovementSystem
             }
             foreach (var item in currentPath)
             {
-                Debug.Log(item,hexGrid.GetTileAt(item));
             }
             return currentPath;
         }

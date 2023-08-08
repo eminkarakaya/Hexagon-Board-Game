@@ -5,9 +5,9 @@ using Mirror;
 public class Range : Attack
 {
                                     // ddamage alan      // damage atan
-    public override void AttackUnit(IDamagable damagable,IAttackable attackable)
+    public override IEnumerator AttackUnit(IDamagable damagable,IAttackable attackable,float movementDuration)
     {
-        if(GetComponent<Movement>().GetCurrentMovementPoints()==0) return;
+        if(GetComponent<Movement>().GetCurrentMovementPoints()==0) yield break;
         if(isServer)
         {
             Attack(damagable.hp);            
@@ -16,7 +16,7 @@ public class Range : Attack
         {
             CMDAttack(damagable.hp);
         }
-        if(damagable.hp.TryGetComponent(out BuildingHP buildingHP)) return;
+        if(damagable.hp.TryGetComponent(out BuildingHP buildingHP)) yield break;
         damagable.hp.Death(damagable,attackable);
         Debug.Log("ranged + " + range);
         // AttackEvent?.Invoke();

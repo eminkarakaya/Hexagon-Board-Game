@@ -6,6 +6,7 @@ using Mirror;
 [SelectionBase]
 public class Hex : NetworkBehaviour
 {
+    [SyncVar] private bool IsInAnimation;
     public Resource resource;
     public List<MeshRenderer> Edges = new List<MeshRenderer>(); // 1 nw 2 ne 3 e 4 se 5 sw 6 w
     public bool isCoast;
@@ -42,6 +43,14 @@ public class Hex : NetworkBehaviour
         resource = GetComponent<Resource>();
         hexCoordinates = GetComponent<HexCoordinates>();
         highlight = GetComponent<GlowHighlight>();
+    }
+    [Command(requiresAuthority = false)] public void SetHexInAnimation(bool state)
+    {
+        IsInAnimation = state;
+    }
+    public bool GetHexInAnimation()
+    {
+        return IsInAnimation;
     }
     public void OpenEdge(int index, bool state)
     {

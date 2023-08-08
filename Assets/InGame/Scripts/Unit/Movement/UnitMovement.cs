@@ -26,18 +26,18 @@ public class UnitMovement : Movement
     }
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex nextHex,Hex lastHex,MovementSystem movementSystem)
     {
+        animator.SetBool("Move",true);
         Moveable.ToggleButtons(false);
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
-        if(lastHex != nextHex && nextHex.IsEnemySettler())
-            yield break;
-        // if(lastHex != nextHex && nextHex.IsEnemyBuilding())
-        //     yield break;
-        
-        if(nextHex.IsEnemy() || nextHex.IsEnemyBuilding() ||nextHex.IsEnemyShip())
+        if(nextHex.IsEnemy() || nextHex.IsEnemySettler() || nextHex.IsEnemyBuilding())
         {
             yield break;
         }
+        if(lastHex != nextHex && nextHex.IsEnemySettler())
+            yield break;
+        
+       
 
         // Movementstart
         float timeElapsed = 0f;
@@ -64,6 +64,7 @@ public class UnitMovement : Movement
         CurrentMovementPoints -= 1;
         if(pathPositions.Count > 0)
         {
+            animator.SetBool("Move",false);
             StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),lastHex,rotationDuration,movementSystem));
         }
         else
@@ -101,6 +102,8 @@ public class UnitMovement : Movement
             }
         }
         Moveable.ToggleButtons(true);
+        animator.SetBool("Move",false);
+        lastHex.SetHexInAnimation (false);
     }
     public void TakeHostage(Hex hex,bool state)
     {
@@ -121,7 +124,6 @@ public class UnitMovement : Movement
     {
         if(state)
         {
-            Debug.Log("movekill");
             playerManager.CMDHideAllUnits();
             
             CMDHide();

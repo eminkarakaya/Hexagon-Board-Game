@@ -8,7 +8,7 @@ using TMPro;
 public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IVisionable,IDamagable, ISideable,ITaskable
 {
     #region PROPERTiES
-
+    
     public Button pillageButton;
     [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
@@ -18,9 +18,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     [SyncVar] [SerializeField] private Hex hex;
     public Hex Hex {get => hex; set {hex = value;}}
     [SerializeField] private Side side;
-   
-    
-   
     public MovementSystem Result { get ; set ; }
     public Vector3Int Position { get ; set ; }
     [SerializeField] Canvas canvas;
@@ -41,6 +38,15 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     public Sprite OrderSprite { get =>orderImage; set {orderImage = value;} }
     #endregion
     #region Mirror and Unity Callback
+
+    private void OnValidate() {
+        SkinnedMeshRenderer [] renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if(!Visions.Contains(renderers[i].gameObject))
+                Visions.Add(renderers[i].gameObject);
+        }
+    }
     private void Start() {
         hp = GetComponent<HP>();
         Movement = GetComponent<Movement>();
@@ -66,7 +72,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
 
     #region  SELECTABLE METHODS
     
-    int attackRange,moveRange;
+    int attackRange;
+    int? moveRange;
     public void OpenCanvas()
     {
         Canvas.gameObject.SetActive(true);
@@ -79,21 +86,22 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     
     protected void AttackUnit(Hex hex)
     {
+        Debug.Log("2");
         // Movement.StartCoroutineRotationUnit(Movement,hex.transform.position,hex);
         if(TryGetComponent(out Attack attack))
         {
             if(hex.Building != null && hex.Building.Side == Side.Enemy)
             {
-                attack.AttackUnit(hex.Building,GetComponent<Unit>());
+                StartCoroutine (attack.AttackUnit(hex.Building,GetComponent<Unit>(),.2f));
             }
             else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
-                attack.AttackUnit(hex.Unit,GetComponent<Unit>());
+                StartCoroutine(attack.AttackUnit(hex.Unit,GetComponent<Unit>(),.2f));
             }
             else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)
             {
 
-                attack.AttackUnit(hex.Ship,GetComponent<Ship>());
+                StartCoroutine (attack.AttackUnit(hex.Ship,GetComponent<Ship>(),.2f));
             }
 
         }
@@ -150,9 +158,18 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     }
     public void RightClick(Hex selectedHex)
     {
+        if(!isOwned) return;
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
-        moveRange = Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range).Count;
-        
+        List<Vector3Int> path = Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
+        if(path == null)
+        {
+            return;
+        }
+        moveRange = path.Count;
+        if(moveRange == null)
+        {
+            return;
+        }
         if(CheckAttackOrMove(selectedHex))
         {
             AttackUnit(selectedHex);
@@ -163,6 +180,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             Result.CalculateRange(this,hexGrid);
             Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
         }
+        UnitManager.Instance.ClearOldSelection();
         
     } 
     public void RightClick2(Hex selectedHex)

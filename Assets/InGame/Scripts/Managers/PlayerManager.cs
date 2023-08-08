@@ -329,6 +329,10 @@ public class PlayerManager : CivManager
     {
         if(orderList.Count == 0)
         {
+            // Debug.Log(orderButton + " orderButton ");
+            // Debug.Log(orderButton.image + " orderButton.image");
+            // Debug.Log(orderButton.image.sprite + " orderButton.image.sprite");
+            // Debug.Log(GameSettingsScriptable.Instance.nextRoundSprite+ " orderButton.image.sprite");
             orderButton.image.sprite = GameSettingsScriptable.Instance.nextRoundSprite;
             tipText.text = NETX_ROUND_STRING;
         }
@@ -341,6 +345,8 @@ public class PlayerManager : CivManager
 
     public override void ResetOrderIndex()
     {
+        
+        ownedObjs = ownedObjs.Where(x=>x.transform.gameObject != null).ToList();
         orderList = ownedObjs.Where(x=> x.TryGetComponent(out ITaskable selectable) ).Select(x=>x.GetComponent<ITaskable>()).ToList();
         foreach (var item in orderList)
         {
@@ -480,6 +486,7 @@ public class PlayerManager : CivManager
         {
             orderList.Remove(taskable);
         }
+        
 
         GetOrderIcon();
     }

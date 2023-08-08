@@ -41,7 +41,6 @@ public class AttackSystem
     }
     public bool CheckEnemyInRange(Hex enemyHex)
     {
-        Debug.Log(rangeInfo+ "rangeInfo");
         return rangeInfo.rangeNodesDict.ContainsKey(enemyHex.HexCoordinates);
     }
 }

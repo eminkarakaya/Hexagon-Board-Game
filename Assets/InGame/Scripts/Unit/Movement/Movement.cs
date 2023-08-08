@@ -8,6 +8,7 @@ public abstract class Movement : NetworkBehaviour
 {
     
     #region  props
+    [SerializeField] protected Animator animator;
     protected IMovable Moveable;
     public float h = 1.2f;
 
@@ -24,6 +25,9 @@ public abstract class Movement : NetworkBehaviour
     protected MovementSystem movementSystem;
     #endregion
     #region  unity methods
+    private void OnValidate() {
+        animator = GetComponentInChildren<Animator>();
+    }
     protected void Start() {
         if(playerManager == null)
             playerManager = PlayerManager.FindPlayerManager();
@@ -84,8 +88,10 @@ public abstract class Movement : NetworkBehaviour
         pathHexes = new Queue<Hex>(currentPath);
         
         if(currentPathTemp.Count == 0) return;
+        
         Vector3 firstTarget = pathPositions.Dequeue();
         Hex firstHex = pathHexes.Dequeue();
+        lastHex.SetHexInAnimation (true);
         StartCoroutine(RotationCoroutine(firstTarget,firstHex,lastHex,rotationDuration,movementSystem,isMove));
     }
     protected IEnumerator RotationCoroutine(Vector3 endPos,Hex endHex,Hex hex, float rotationDuration,MovementSystem movementSystem,bool isMove = true)
@@ -139,7 +145,6 @@ public abstract class Movement : NetworkBehaviour
     }
     public IEnumerator RotationUnit(Movement firstUnit,Vector3 endPos,Hex hex)
     {
-        Debug.Log("attack2");
         Quaternion startRotation = firstUnit.transform.rotation;
         endPos.y = firstUnit.transform.position.y;
         Vector3 direction = endPos - firstUnit.transform.position;
@@ -178,11 +183,11 @@ public abstract class Movement : NetworkBehaviour
                 yield return null;
             }
 
-            StartCoroutine(MoveUnit(firstUnit,endPos,startPos));
+            StartCoroutine(MoveUnit(firstUnit.gameObject,endPos,startPos,movementDuration));
 
        
     }
-    protected IEnumerator MoveUnit(Movement unit,Vector3 endPos,Vector3 startPos )
+    public static IEnumerator MoveUnit(GameObject unit,Vector3 endPos,Vector3 startPos ,float movementDuration,System.Action action = null)
     {
         float timeElapsed = 0f;
         while(timeElapsed<movementDuration)
@@ -192,7 +197,7 @@ public abstract class Movement : NetworkBehaviour
             unit.transform.position = Vector3.Lerp(startPos,endPos,lerpStep);
             yield return null;
         }
-
+        action?.Invoke();
     }
     #endregion
     protected virtual void CMDHide(){}
@@ -261,19 +266,17 @@ public abstract class Movement : NetworkBehaviour
         {
             if(hex.Building != null && hex.Building.Side == Side.Enemy)
             {
-                attack.AttackUnit(hex.Building,GetComponent<Unit>());
+                StartCoroutine (attack.AttackUnit(hex.Building,GetComponent<Unit>(),.2f));
             }
             else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
             {
-                attack.AttackUnit(hex.Unit,GetComponent<Unit>());
+                StartCoroutine (attack.AttackUnit(hex.Unit,GetComponent<Unit>(),.2f));
             }
             else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)
             {
-                attack.AttackUnit(hex.Ship,GetComponent<Unit>());
+                StartCoroutine (attack.AttackUnit(hex.Ship,GetComponent<Unit>(),.2f));
 
             }
-
-
         }
     }
     #endregion

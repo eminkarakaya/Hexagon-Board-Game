@@ -85,6 +85,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
 
     public void RightClick(Hex selectedHex)
     {
+        if(!isOwned) return;
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
         if(TryGetComponent(out SettlerMovementSeaAndLand settlerMovementSeaAndLand))
@@ -94,8 +95,9 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         else
             Result = new SettlerMovementSystem(this);
         Result.CalculateRange(this,hexGrid);
-        Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
-        Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
+        List<Vector3Int> path = Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
+
+        Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),hexGrid.GetTileAt (path[path.Count-1]));
     }
 
     public void RightClick2(Hex selectedHex)

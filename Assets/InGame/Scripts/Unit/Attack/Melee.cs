@@ -5,11 +5,54 @@ using UnityEngine.Events;
 using Mirror;
 public class Melee : Attack
 {
-    
-    public override void AttackUnit(IDamagable damagable,IAttackable attackable)
+    public float attackTime;
+    private AnimationClip clip;
+    [SerializeField] private float moveDur;
+    private void Start() {
+        UpdateAnimClipTimes();
+    }
+    public void UpdateAnimClipTimes()
     {
-        if(GetComponent<Movement>().GetCurrentMovementPoints()==0) return;
-        if(damagable.Hex.IsWater()) return;
+        AnimationClip[] clips = networkAnimator.animator.runtimeAnimatorController.animationClips;
+        foreach(AnimationClip clip in clips)
+        {
+            switch(clip.name)
+            {
+                case "SwordAttackAnim":
+                    attackTime = clip.length;
+                    break;
+            }
+        }
+    }
+    public override IEnumerator AttackUnit(IDamagable damagable,IAttackable attackable,float movementDuration)
+    {
+        if(GetComponent<Movement>().GetCurrentMovementPoints()==0) yield break;
+        if(damagable.Hex.IsWater()) yield break;
+        
+        float timeElapsed = 0f;
+        while(timeElapsed<movementDuration)
+        {
+            timeElapsed += Time.deltaTime;
+            float lerpStep = timeElapsed / movementDuration;
+            transform.position = Vector3.Lerp(transform.position,TransformUtils.FixY(damagable.Hex.transform.position),lerpStep);
+            yield return null;
+        }
+
+        StartCoroutine(OpenTransparentMaterial(attackTime/2));
+        networkAnimator.SetTrigger("Attack");
+        timeElapsed = 0f;
+        bool isHalf = false;
+        while(timeElapsed<attackTime)
+        {
+            timeElapsed += Time.deltaTime;
+            if(timeElapsed > attackTime/2 && !isHalf)
+            {
+                isHalf = true;
+            }
+            yield return null;
+        }
+        
+                StartCoroutine(CloseTransparentMaterial(attackTime/2));
         if(isServer)
         {
             Attack(damagable.hp);            
@@ -37,21 +80,19 @@ public class Melee : Attack
                     movement1.TakeHostage(damagable.Hex,damagable.hp.Hp<=0);
                 }
             }
-
-            // switch (item)
-            // {
-                
-            //     case Funcs.MoveKill:
-            //     break;
-            //     case Funcs.TakeHostage:
-            //     break;
-            // }
         }
         damagable.hp.Death(damagable,attackable,killEvent);
-        
-        Debug.Log("melee " + range);
-        // AttackEvent?.Invoke();
-        
+        if(damagable.hp.Hp > 0)
+        {
+            timeElapsed = 0f;
+            while(timeElapsed<movementDuration)
+            {
+                timeElapsed += Time.deltaTime;
+                float lerpStep = timeElapsed / movementDuration;
+                transform.position = Vector3.Lerp(transform.position,TransformUtils.FixY(attackable.Hex.transform.position),lerpStep);
+                yield return null;
+            }
+        } 
     }
     [Command]
     protected void CMDAttack(HP hp)

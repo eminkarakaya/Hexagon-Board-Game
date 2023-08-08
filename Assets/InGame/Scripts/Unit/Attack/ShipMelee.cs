@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class ShipMelee : Melee
 {
-    public override void AttackUnit(IDamagable damagable,IAttackable attackable)
+    public override IEnumerator AttackUnit(IDamagable damagable,IAttackable attackable,float movementDuration)
     {
-        if(GetComponent<Movement>().GetCurrentMovementPoints()==0) return;
-        if(!damagable.Hex.IsWater()  && !damagable.Hex.IsBuilding()) return;
+        if(GetComponent<Movement>().GetCurrentMovementPoints()==0) yield break;
+        if(!damagable.Hex.IsWater()  && !damagable.Hex.IsBuilding()) yield break;
         if(isServer)
         {
             Attack(damagable.hp);            
