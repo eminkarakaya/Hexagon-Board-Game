@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 public class BuildingHP : HP
 {
-    public override void Death(IDamagable damagable, IAttackable attackable, UnityEvent action = null)
+    public override void Death(IDamagable damagable, IAttackable attackable, bool kill,UnityEvent action = null)
     {
         if(Hp <= 0 )
         {

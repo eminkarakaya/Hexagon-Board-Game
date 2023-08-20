@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.Events;
+using TMPro;
 
 public abstract class Movement : NetworkBehaviour
 {
@@ -11,8 +12,8 @@ public abstract class Movement : NetworkBehaviour
     [SerializeField] protected Animator animator;
     protected IMovable Moveable;
     public float h = 1.2f;
-
-    [SerializeField] protected CivManager playerManager;
+    [SerializeField] private TMP_Text movePointText;
+  
     [SerializeField] protected float movementDuration = 1, rotationDuration = .3f;
     public UnityEvent<Movement> MovementFinished;
     public UnityEvent MovementPointFinished;
@@ -20,7 +21,11 @@ public abstract class Movement : NetworkBehaviour
     [SerializeField] protected int _movementPoints = 20;
     public int MovementPoints {get => _movementPoints;}
     [SerializeField] protected int _currentMovementPoints = 20;
-    public int CurrentMovementPoints {get => _currentMovementPoints; set{_currentMovementPoints = value; if(_currentMovementPoints == 0) MovementPointFinished?.Invoke();}}
+    public int CurrentMovementPoints {get => _currentMovementPoints; set{_currentMovementPoints = value; if(_currentMovementPoints == 0) MovementPointFinished?.Invoke();UpdateMovementPointUI();}}
+    private void UpdateMovementPointUI()
+    {
+        movePointText.text = MovementPoints.ToString() + "/" + CurrentMovementPoints.ToString();
+    }
     protected Queue<Vector3> pathPositions = new Queue<Vector3>();
     protected MovementSystem movementSystem;
     #endregion
@@ -29,8 +34,8 @@ public abstract class Movement : NetworkBehaviour
         animator = GetComponentInChildren<Animator>();
     }
     protected void Start() {
-        if(playerManager == null)
-            playerManager = PlayerManager.FindPlayerManager();
+
+
         Moveable = GetComponent<IMovable>();
     }
     #endregion
@@ -86,12 +91,11 @@ public abstract class Movement : NetworkBehaviour
     {
         pathPositions = new Queue<Vector3>(currentPathTemp);
         pathHexes = new Queue<Hex>(currentPath);
-        
         if(currentPathTemp.Count == 0) return;
         
         Vector3 firstTarget = pathPositions.Dequeue();
         Hex firstHex = pathHexes.Dequeue();
-        lastHex.SetHexInAnimation (true);
+        // lastHex.SetHexInAnimation (true);
         StartCoroutine(RotationCoroutine(firstTarget,firstHex,lastHex,rotationDuration,movementSystem,isMove));
     }
     protected IEnumerator RotationCoroutine(Vector3 endPos,Hex endHex,Hex hex, float rotationDuration,MovementSystem movementSystem,bool isMove = true)
@@ -114,6 +118,7 @@ public abstract class Movement : NetworkBehaviour
         }
         if(isMove)
         {
+            
             StartCoroutine(MovementCoroutine(endPos,endHex,hex,movementSystem));
         }
         else
@@ -135,6 +140,7 @@ public abstract class Movement : NetworkBehaviour
                 AttackUnit(hex);
                 MovementFinished?.Invoke(this);
             }
+
            
         }
 
@@ -250,8 +256,8 @@ public abstract class Movement : NetworkBehaviour
 
             CMDChangeHexes(firstUnit.Moveable.Hex,targetUnit.Moveable.Hex);
             // playerManager = FindObjectOfType<PlayerManager>();
-            playerManager.CMDHideAllUnits();
-            playerManager.CMDShowAllUnits();
+            Moveable.CivManager.CMDHideAllUnits();
+            Moveable.CivManager.CMDShowAllUnits();
             firstUnit.CurrentMovementPoints -= 1;
             targetUnit.CurrentMovementPoints -= 1;
 

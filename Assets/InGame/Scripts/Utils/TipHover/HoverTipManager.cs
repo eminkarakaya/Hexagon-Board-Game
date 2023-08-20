@@ -5,12 +5,16 @@ using TMPro;
 using System;
 
 public class HoverTipManager : MonoBehaviour
-{
+{  
+    public static HoverTipManager instance;
     public TMP_Text tipText;
     public RectTransform tipWindow;
 
     public static Action<string,Vector2> OnMouseHover;
     public static Action OnMouseLoseFocus;
+    private void Awake() {
+        instance = this;
+    }
     private void OnEnable() {
         OnMouseHover += ShowTip;
         OnMouseLoseFocus += HideTip;
@@ -30,9 +34,11 @@ public class HoverTipManager : MonoBehaviour
         tipWindow.gameObject.SetActive(true);
         tipWindow.transform.position = new Vector2(mousePos.x , mousePos.y);
     }
-    private void HideTip()
+    public void HideTip()
     {
         tipText.text = default;
         tipWindow.gameObject.SetActive(false);
     }
+
+   
 }

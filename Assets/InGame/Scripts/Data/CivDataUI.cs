@@ -60,7 +60,6 @@ public class CivDataUI : NetworkBehaviour
         {
             if(civManager.savastigiCivler.Contains(item.civManager))
             {
-                Debug.Log(item+ " item ",item);
                 item.relationShipImage.sprite = GameSettingsScriptable.Instance.notrSprite;
             }
         }

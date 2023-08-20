@@ -8,7 +8,18 @@ using TMPro;
 public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IVisionable,IDamagable, ISideable,ITaskable
 {
     #region PROPERTiES
+
+    [Header("UI")]
+    [SerializeField] private Image unitImage;
     
+    
+    [Header("UI Data")]
+    
+    [SerializeField] private Sprite unitSprite;
+
+
+    int attackRange;
+    int? moveRange;
     public Button pillageButton;
     [SyncVar] [SerializeField] private  CivManager civManager;
     public CivManager CivManager {get => civManager;set {civManager = value;}}
@@ -59,7 +70,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             Result = new UnitMovementSystem(this);
         Outline = GetComponent<Outline>();
         Movable = GetComponent<IMovable>();
-        pillageButton.onClick.AddListener(()=> PillageButton(Hex.gameObject));
+        pillageButton.onClick.AddListener(()=> PillageButton(Hex.gameObject.transform));
+        UpdateUI();
     }
     public override void OnStopAuthority()
     {
@@ -70,10 +82,16 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     }
     #endregion
 
+    private void UpdateUI()
+    {
+        unitImage.sprite = unitSprite;
+        
+    }
+    
+
     #region  SELECTABLE METHODS
     
-    int attackRange;
-    int? moveRange;
+    
     public void OpenCanvas()
     {
         Canvas.gameObject.SetActive(true);
@@ -86,7 +104,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     
     protected void AttackUnit(Hex hex)
     {
-        Debug.Log("2");
         // Movement.StartCoroutineRotationUnit(Movement,hex.transform.position,hex);
         if(TryGetComponent(out Attack attack))
         {
@@ -94,14 +111,14 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             {
                 StartCoroutine (attack.AttackUnit(hex.Building,GetComponent<Unit>(),.2f));
             }
-            else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
-            {
-                StartCoroutine(attack.AttackUnit(hex.Unit,GetComponent<Unit>(),.2f));
-            }
             else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)
             {
 
                 StartCoroutine (attack.AttackUnit(hex.Ship,GetComponent<Ship>(),.2f));
+            }
+            else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
+            {
+                StartCoroutine(attack.AttackUnit(hex.Unit,GetComponent<Unit>(),.2f));
             }
 
         }
@@ -122,7 +139,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
 
         }
         CMDSetSide(attackableCivManager);
-        attackableCivManager.SetTeamColor(this.gameObject);
+        attackableCivManager.CMDSetTeamColor(this.gameObject);
         
         attackableCivManager.CMDShowAllUnits();
         attackableCivManager.CMDAddOwnedObject(this.gameObject); //requestauthority = false
@@ -141,7 +158,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         }
         else
         {
-            SetSide(Side.Enemy,Outline);
+            SetSide(Side.None,Outline);
         }
     }
     public bool CheckAttackOrMove(Hex selectedHex)
@@ -161,6 +178,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         if(!isOwned) return;
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
         List<Vector3Int> path = Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
+        
         if(path == null)
         {
             return;
@@ -231,11 +249,11 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         {
             outline.OutlineColor = Color.blue;
         }
-        // else if(side == Side.None)
-        // {
-        //     outline.OutlineColor = Color.black;
+        else if(side == Side.None)
+        {
+            outline.OutlineColor = Color.black;
 
-        // }
+        }
     }
     [Command] private void CMDSetSide(NetworkIdentity identity,GameObject sideable)
     {
@@ -256,7 +274,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         }
         else
         {
-            sideable1.SetSide(Side.Enemy,sideable1.Outline);
+            sideable1.SetSide(Side.None,sideable1.Outline);
         }
     }
     // public void Capture(NetworkIdentity identity,GameObject _gameObject)
@@ -315,13 +333,12 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     {
         pillageButton.interactable = false;
     }
-    public void PillageButton(GameObject target)
+    public void PillageButton(Transform target)
     {
         if(target.TryGetComponent(out Hex hex))
         {   
             hex.resource.ChangeOwned(this);
         }
-        Debug.Log("kekw");
     }
 }
 

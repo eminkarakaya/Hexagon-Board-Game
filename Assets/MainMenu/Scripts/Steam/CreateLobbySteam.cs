@@ -111,7 +111,6 @@ public class CreateLobbySteam : NetworkBehaviour
     {
         foreach (var item in SteamNetworkManager.LocalPlayers.Values)
         {
-            Debug.Log( item,item);
             item.CMDBeginGame();
         }
     }

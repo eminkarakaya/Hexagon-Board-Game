@@ -30,4 +30,5 @@ public class HoverTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         yield return new WaitForSeconds(timeToWait);
         ShowMessage();
     }
+    
 }

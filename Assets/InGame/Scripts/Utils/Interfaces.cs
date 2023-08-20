@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 public interface IDamagable
 {
+    public CivManager CivManager { get; set; }
     public HP hp { get; set; }
     public Hex Hex { get; set; }
     
@@ -25,6 +26,7 @@ public interface IVisionable
 }
 public interface IMovable
 {
+    public CivManager CivManager { get; set; }
     public void ToggleButtons(bool state);
     public Movement Movement { get; set; }
     public MovementSystem Result { get; set; }

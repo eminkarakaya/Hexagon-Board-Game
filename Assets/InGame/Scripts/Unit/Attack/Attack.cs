@@ -8,10 +8,13 @@ using System;
 
 public enum Funcs
 {
-    MoveKill = 1 , TakeHostage  = 2
+    MoveKill = 1 , TakeHostage  = 2 , Default = 3
 }
 public abstract class Attack : NetworkBehaviour
 {
+
+    [SerializeField] private TMP_Text attackText;
+    public float attackTime;
     Dictionary<Renderer,Material[]> transparentMaterialDict = new Dictionary<Renderer, Material[]>(); 
     Dictionary<Renderer,Material[]> originalMaterialDict = new Dictionary<Renderer, Material[]>(); 
     Dictionary<Color,Material> cachedGlowMaterials = new Dictionary<Color, Material>(); 
@@ -28,16 +31,16 @@ public abstract class Attack : NetworkBehaviour
     protected int DamagePower { get; set; }
     public int range = 1;
     private void Awake() {
-        PrepareMaterialDictionaries();
-        originalColor = transparentMaterial.GetColor("_Color");
     }
     private void OnValidate() {
         
         networkAnimator = GetComponent<NetworkAnimator>();
     }
     private void Start() {
-        SetDamage(_damagePower);
         attackable = GetComponent<IAttackable>();
+        PrepareMaterialDictionaries();
+        originalColor = transparentMaterial.GetColor("_Color");
+        SetDamage(_damagePower);
     }
     protected IEnumerator CloseTransparentMaterial(float dur)
     {
@@ -58,7 +61,6 @@ public abstract class Attack : NetworkBehaviour
                     renderer.material.SetColor("_BaseColor",color);
                 }
             }
-            Debug.Log(mat ,mat);
             yield return null;
         }
         

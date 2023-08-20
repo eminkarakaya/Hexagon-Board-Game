@@ -8,6 +8,15 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
 {
     
     #region Properties
+
+
+    [Header("UI")]
+    [SerializeField] private Image buildIcon;
+
+    [Header("UI DATA")]
+    [SerializeField] private Sprite unitSprite;
+
+    [Space(10)]
     [SerializeField] private GameObject shipRange;
     [SyncVar] [SerializeField] protected  CivManager _civManager;
     public CivManager CivManager {get => _civManager;set {_civManager = value;}}
@@ -15,7 +24,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     
     [Header("Prefabs")]
 
-    [SerializeField] private GameObject mc1,settler,mc1Range,harborSettler;
+    [SerializeField] private GameObject warrior,settler,archer,worker;
     [SerializeField] protected GameObject ship;
     public Hex Hex { get => hex; set{hex = value;} }
     [SyncVar] [SerializeField] private Hex hex = null;
@@ -48,6 +57,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
             CivManager = PlayerManager.FindPlayerManager();
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();
+        UpdateUI();
     }
 
     public override void OnStopAuthority()
@@ -56,6 +66,10 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     }
 
     #endregion
+    private void UpdateUI()
+    {
+        buildIcon.sprite = unitSprite;
+    }
    
     #region  CREATE Unit
     
@@ -67,21 +81,21 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         if(CivManager == null)
             CivManager = PlayerManager.FindPlayerManager();
         // CivManager.ownedObjs.Add(unit.gameObject);
-        RPCCreateMC1(unit);
+        RPCCreateWarrior(unit);
         FindPlayerManager(unit);
-        _civManager.SetTeamColor(unit.gameObject);
+        _civManager.CMDSetTeamColor(unit.gameObject);
     }
     #region  CMDCreate Units
-    [Command] private void CMDCreateMC1()
+    [Command] private void CMDCreateWarrior()
     {
         if(Hex.Unit != null) return;
-        Unit unit = Instantiate(mc1,transform.position,Quaternion.identity).GetComponent<Unit>();
+        Unit unit = Instantiate(warrior,transform.position,Quaternion.identity).GetComponent<Unit>();
         CreateUnit(unit);
     }
-    [Command] private void CMDCreateMC1Range()
+    [Command] private void CMDCreateArcher()
     {
         if(Hex.Unit != null) return;
-        Unit unit = Instantiate(mc1Range,transform.position,Quaternion.identity).GetComponent<Unit>();
+        Unit unit = Instantiate(archer,transform.position,Quaternion.identity).GetComponent<Unit>();
         CreateUnit(unit);
     }
     
@@ -99,13 +113,13 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         {
             yield return null;
         }
-        unit.CivManager.SetTeamColor(this.gameObject);
+        unit.CivManager.CMDSetTeamColor(this.gameObject);
 
     }
     
    
     [ClientRpc]
-    private void RPCCreateMC1(Unit unit)
+    private void RPCCreateWarrior(Unit unit)
     {
         unit.CivManager = _civManager;
         unit.Hex = Hex;
@@ -137,13 +151,15 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();
     }
-    public void CreateMC1OnClick()
+    public void CreateWarriorOnClick()
     {
-        CMDCreateMC1();
+        HoverTipManager.instance.HideTip();
+        CMDCreateWarrior();
     }
-    public void CreateMC1OnClickRange()
+    public void CreateArcherOnClick()
     {
-        CMDCreateMC1Range();
+        HoverTipManager.instance.HideTip();
+        CMDCreateArcher();
     }
    
     #endregion
@@ -160,7 +176,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         {
             yield return null;
         }
-        unit.CivManager.SetTeamColor(this.gameObject);
+        unit.CivManager.CMDSetTeamColor(this.gameObject);
     
     }
     #region  CREATE SETTLER
@@ -207,7 +223,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
             CivManager = PlayerManager.FindPlayerManager();
         settler.CivManager = _civManager;
         RPCCreateSettler(settler);
-        _civManager.SetTeamColor(settler.gameObject);
+        _civManager.CMDSetTeamColor(settler.gameObject);
     }
     [Command]
     private void CMDCreateSettler()
@@ -217,21 +233,23 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         CreateSettler(unit);
     }
      [Command]
-    private void CMDCreateHarborSettler()
+    private void CMDCreateWorker()
     {
         if(Hex.Settler != null) return;
-        Settler unit = Instantiate(harborSettler,transform.position,Quaternion.identity).GetComponent<Settler>();
+        Settler unit = Instantiate(worker,transform.position,Quaternion.identity).GetComponent<Settler>();
         CreateSettler(unit);
     }
     
     public void CreateSettlerOnClick()
     {
+        HoverTipManager.instance.HideTip();
         CMDCreateSettler();
     }
 
-    public void CreateHarborSettlerOnClick()
+    public void CreateWorkerOnClick()
     {
-        CMDCreateHarborSettler();
+        HoverTipManager.instance.HideTip();
+        CMDCreateWorker();
     }
 
     #endregion
@@ -248,13 +266,10 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     }
     [ClientRpc] private void RPGSetSide(CivManager civManager)
     {
+        this.CivManager = civManager;
         if(civManager.isOwned)
         {
             SetSide(Side.Me,Outline);
-        }
-        else if(civManager.team == this.CivManager.team)
-        {
-            SetSide(Side.Ally,Outline);
         }
         else
         {
@@ -326,7 +341,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         CivManager.CMDAddOwnedObject(ship.gameObject);
         RPCCreateShip(ship);
         FindPlayerManager(ship);
-        _civManager.SetTeamColor(ship.gameObject);
+        _civManager.CMDSetTeamColor(ship.gameObject);
     }
     [ClientRpc]
     private void RPCCreateShip(Ship ship)
@@ -365,10 +380,12 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     }
     public void CreateShipOnClick()
     {
+        HoverTipManager.instance.HideTip();
         CMDCreateShip();
     }
     public void CreateShipOnClickRange()
     {
+        HoverTipManager.instance.HideTip();
         CMDCreateShipRange();
     }
 

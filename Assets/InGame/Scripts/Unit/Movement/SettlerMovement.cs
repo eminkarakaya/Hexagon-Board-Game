@@ -5,8 +5,9 @@ using Mirror;
 public class SettlerMovement : Movement
 { 
     
-    protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex hex,MovementSystem movementSystem)
+    protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex lastHex,MovementSystem movementSystem)
     {
+        animator.SetBool("Move",true);
         Moveable.ToggleButtons(false);
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
@@ -26,29 +27,30 @@ public class SettlerMovement : Movement
         // MovementFinish
         
         // MovementFinishEvents
-        playerManager.CMDHideAllUnits();
+        Moveable.CivManager.CMDHideAllUnits();
         
         CMDHide();
         CMDSetHex(endHex,Moveable.Hex);
         this.Moveable.Hex = endHex;
 
         transform.position = endPos;
-        playerManager.CMDShowAllUnits();
+        Moveable.CivManager.CMDShowAllUnits();
         CMDShow();
         CurrentMovementPoints -= 1;
         
         if(pathPositions.Count > 0)
         {
-            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),hex,rotationDuration,movementSystem));
+            animator.SetBool("Move",false);
+            StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),lastHex,rotationDuration,movementSystem));
         }
         else
         {
             
             MovementFinsihEvent(this);
-            if(hex.Settler != null && hex.Settler.Side == Side.Enemy)
+            if(lastHex.Settler != null && lastHex.Settler.Side == Side.Enemy)
             {
                 Quaternion startRotation = transform.rotation;
-                Vector3 direction = new Vector3(hex.transform.position.x,transform.position.y,hex.transform.position.z) - transform.position;
+                Vector3 direction = new Vector3(lastHex.transform.position.x,transform.position.y,lastHex.transform.position.z) - transform.position;
                 Quaternion endRotation = Quaternion.LookRotation(direction,Vector3.up);
                 timeElapsed = 0;
                 while(timeElapsed < rotationDuration)
@@ -61,7 +63,9 @@ public class SettlerMovement : Movement
                 transform.rotation = endRotation;
             }
         }
+        animator.SetBool("Move",false);
         Moveable.ToggleButtons(true);
+        
     }
      [Command]
     protected override void CMDShow()
@@ -90,6 +94,7 @@ public class SettlerMovement : Movement
     [Command]
     protected override void CMDHide()
     {
+       
        RPCHide();
     }
 

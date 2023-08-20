@@ -150,24 +150,39 @@ public class SettlerMovementSystem : MovementSystem
 
     public override void ShowRange(IMovable selectedUnit, Movement unit)
     {
-        if(UnitManager.Instance.selectedUnit == null) return;
+        if(UnitManager.Instance.selectedUnit  == null) return;
         if(UnitManager.Instance.selectedUnit != unit.GetComponent<ISelectable>()) return;
-
         HexGrid hexGrid = GameObject.FindObjectOfType<HexGrid>();
         CalculateRange(selectedUnit,hexGrid);
-        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.Movement.transform.position);
-        foreach (Vector3Int hexPosition in movementRange.GetRangePositions())
+        Vector3Int unitPos = hexGrid.GetClosestHex(selectedUnit.Hex.transform.position);
+        IEnumerable<Vector3Int> poses = movementRange.GetRangePositions();
+        IEnumerable<Vector3Int> enemyPoses = movementRange.GetRangeEnemiesPositions();
+        foreach (Vector3Int hexPosition in poses)
         {
-            if(unitPos == hexPosition) continue;
             Hex hex = hexGrid.GetTileAt(hexPosition);
+            if(unitPos == hexPosition) continue;
             // hex.EnableHighligh();
             hex.isReachable = true;
         }
-        foreach (Vector3Int hexPosition in movementRange.GetRangeEnemiesPositions())
+        
+        foreach (Vector3Int hexPosition in enemyPoses)
         {
             Hex hex = hexGrid.GetTileAt(hexPosition);
             hex.EnableHighlighEnemy();
             hex.isReachable = true;
         }
+        foreach (Vector3Int hexPosition in poses)
+        {
+            // if(unitPos == hexPosition) continue;
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hexGrid.DrawBorders(hex,unitPos);
+
+        }
+        foreach (Vector3Int hexPosition in enemyPoses)
+        {
+            Hex hex = hexGrid.GetTileAt(hexPosition);
+            hexGrid.DrawBorders(hex,unitPos);
+        }
+        
     }
 }

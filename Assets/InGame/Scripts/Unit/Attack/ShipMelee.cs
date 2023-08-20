@@ -20,7 +20,8 @@ public class ShipMelee : Melee
         {
             StartCoroutine(movement.MoveKill(damagable.Hex,damagable.hp.Hp<=0));
         }
-        damagable.hp.Death(damagable,attackable);
+        
+        damagable.hp.Death(damagable,attackable,true);
         
     }
 }

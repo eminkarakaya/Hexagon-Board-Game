@@ -22,24 +22,31 @@ public class Worker : Settler
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
         RPCCreateBuilding(unit);
         DeselectSettler();
+        Result.HideRange(this,Movement);  
+        UnitManager.Instance.selectedUnit = null;
+        NetworkServer.Destroy(this.gameObject);
+    }
+    private void OnDisable() {
+        if(isOwned)
+        Result.HideRange(this,Movement);
     }
     public override void SelectSettler()
     {
-        HexGrid hexGrid = FindObjectOfType<HexGrid>();
-        foreach (var item in hexGrid.GetHarborHex())
-        {  
-            item.EnableHighligh(); 
-        }
+        // HexGrid hexGrid = FindObjectOfType<HexGrid>();
+        // foreach (var item in hexGrid.GetHarborHex())
+        // {  
+        //     item.EnableHighligh(); 
+        // }
     }
-    public override void DeselectSettler()
-    {
-        base.DeselectSettler();
-        HexGrid hexGrid = FindObjectOfType<HexGrid>();
-        foreach (var item in hexGrid.GetHarborHex())
-        {  
-            item.DisableHighligh(); 
-        }
-    }
+    // public override void DeselectSettler()
+    // {
+        // base.DeselectSettler();
+        // HexGrid hexGrid = FindObjectOfType<HexGrid>();
+        // foreach (var item in hexGrid.GetHarborHex())
+        // {  
+        //     item.DisableHighligh(); 
+        // }
+    // }
     protected override void ToggleButtonsVirtual(bool state)
     {
         if(state == false)
@@ -75,6 +82,7 @@ public class Worker : Settler
         mine.Hex = Hex;
         RPCCreateMine(mine);
         DeselectSettler();
+        
     }
     [ClientRpc] public void RPCCreateMine(Mine mine)
     {
@@ -85,27 +93,21 @@ public class Worker : Settler
         mine.CivManager = CivManager;
         CivManager.CMDAddOwnedObject(mine.gameObject);
         
-            if(mine.isOwned)
-            {
-                mine.SetSide(Side.Me,mine.GetComponent<Outline>());
-            }
-            else if(mine.CivManager.team == this.CivManager.team)
-            {
-                mine.SetSide(Side.Ally,mine.GetComponent<Outline>());
-            }
-            else
-                mine.SetSide(Side.Enemy,mine.GetComponent<Outline>());
-        
-        CivManager.SetTeamColor(mine.gameObject);
+        mine.SetSide(this.Side,mine.GetComponent<Outline>());
+        CivManager.CMDSetTeamColor(mine.gameObject);
         Result.HideRange(this,Movement);  
         UnitManager.Instance.selectedUnit = null;
-        CivManager.DestroyObj(this.gameObject);
+        NetworkServer.Destroy(this.gameObject);
         mine.InitializeMine();
     }
     public void CreateMineOnClick()
     {
+        HoverTipManager.instance.HideTip();
+        
         CMDCreateMine();
         TaskComplate();
         CivManager.CMDRemoveOwnedObject(this.gameObject);
+
+        UnitManager.Instance.ClearOldSelection();
     }
 }

@@ -6,7 +6,7 @@ using Mirror;
 public class SteamNetworkManager : NetworkManager
 {
     public static SteamNetworkManager instance;
-    public static Dictionary<NetworkConnection,PlayerManager> LocalPlayers = new Dictionary<NetworkConnection, PlayerManager>();
+    public static Dictionary<NetworkConnection,PlayerManagerLobby> LocalPlayers = new Dictionary<NetworkConnection, PlayerManagerLobby>();
     public Transform playerPrefabParent;
     public override void Awake()
     {
@@ -20,19 +20,19 @@ public class SteamNetworkManager : NetworkManager
             GameObject player = startPos != null ? Instantiate(playerPrefab,startPos.position,startPos.rotation):Instantiate(playerPrefab);
             NetworkServer.AddPlayerForConnection(conn,player);
         CSteamID steamID = SteamMatchmaking.GetLobbyMemberByIndex(CreateLobbySteam.LobbyId,numPlayers-1);
-        var playerInfoDisplay = conn.identity.GetComponent<PlayerManager>().lobby;
-        conn.identity.GetComponent<PlayerManager>().CreateLobbyItem();
+        var playerInfoDisplay = conn.identity.GetComponent<PlayerManagerLobby>().lobby;
+        conn.identity.GetComponent<PlayerManagerLobby>().CreateLobbyItem();
         StartCoroutine (wait(playerInfoDisplay,conn,player,steamID));
     }
     private IEnumerator wait(PlayerInfoDisplay playerInfoDisplay,NetworkConnectionToClient conn,GameObject player,CSteamID steamID)
     {
         while(playerInfoDisplay == null)
         {
-            playerInfoDisplay = conn.identity.GetComponent<PlayerManager>().lobby;
+            playerInfoDisplay = conn.identity.GetComponent<PlayerManagerLobby>().lobby;
             yield return null;
         }
         playerInfoDisplay.SetSteamId(steamID.m_SteamID); 
-        LocalPlayers[conn] = player.GetComponent<PlayerManager>();
+        LocalPlayers[conn] = player.GetComponent<PlayerManagerLobby>();
 
     }
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
@@ -40,6 +40,6 @@ public class SteamNetworkManager : NetworkManager
         base.OnServerDisconnect(conn);
         LocalPlayers.Remove(conn);
     }
-    
+   
 
 }

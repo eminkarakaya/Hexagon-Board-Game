@@ -4,7 +4,10 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class BuildingManager : MonoBehaviour
+
+
 {
+    
     [SerializeField] private Building selectedBuilding;
     
     [SerializeField] private UnityEvent OnSelectedBuilding;

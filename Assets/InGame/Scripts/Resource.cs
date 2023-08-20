@@ -19,7 +19,7 @@ public class Resource : NetworkBehaviour
     [SerializeField] private CivManager civManager; 
     [SerializeField] private Side side;
     [SerializeField] private TMP_Text goldText;
-    [SerializeField] private Image resourceIcon,goldIcon;
+    [SerializeField] public Image resourceIcon,goldIcon;
     private Sprite sprite;
     [SerializeField] private ResourceType resourceType;
     public ResourceType ResourceType{get => resourceType; private set {resourceType = value;}}

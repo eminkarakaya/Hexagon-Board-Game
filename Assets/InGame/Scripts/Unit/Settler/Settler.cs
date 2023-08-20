@@ -34,6 +34,16 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     #endregion
 
     #region Mirror and Unity callbacks
+
+
+    private void OnValidate() {
+        SkinnedMeshRenderer [] renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if(!Visions.Contains(renderers[i].gameObject))
+                Visions.Add(renderers[i].gameObject);
+        }
+    }
     public override void OnStopAuthority()
     {
         UnitManager.Instance.ClearOldSelection();
@@ -58,7 +68,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     public virtual void SelectSettler()
     {
     }
-    public virtual void DeselectSettler()
+    public void DeselectSettler()
     {
         Result.HideRange(this,Movement);
 
@@ -86,6 +96,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     public void RightClick(Hex selectedHex)
     {
         if(!isOwned) return;
+        if(Movement.CurrentMovementPoints == 0) return;
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
         Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
         if(TryGetComponent(out SettlerMovementSeaAndLand settlerMovementSeaAndLand))
@@ -97,7 +108,9 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         Result.CalculateRange(this,hexGrid);
         List<Vector3Int> path = Result.ShowPath(selectedHex.HexCoordinates,hexGrid,1);
 
-        Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),hexGrid.GetTileAt (path[path.Count-1]));
+        if(path.Count != 0)
+            Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),hexGrid.GetTileAt (path[path.Count-1]));
+        UnitManager.Instance.ClearOldSelection();
     }
 
     public void RightClick2(Hex selectedHex)
@@ -109,6 +122,8 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
 
     public void CreateBuildingOnClick()
     {
+        HoverTipManager.instance.HideTip();
+        
         if(Hex.isCoast )
         {
             CMDCreateHarbor();
@@ -119,12 +134,17 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         }
         TaskComplate();
         civManager.CMDRemoveOwnedObject(this.gameObject);
+        civManager.CMDRemoveOrderList(this.gameObject,this.gameObject);
+        
     }
     [Command]
     public virtual void CMDCreateHarbor()
     {
         
         if(Hex.Building != null) return;
+        // Debug.Log(harborPrefab);
+        // Debug.Log(harborPrefab.GetComponent<Harbor>());
+        // Debug.Log(connectionToClient);
         Harbor harbor = Instantiate(harborPrefab).GetComponent<Harbor>();
         NetworkServer.Spawn(harbor.gameObject,connectionToClient);
         RPCCreateBuilding(harbor);
@@ -158,10 +178,10 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         // else
         //     building.SetSide(Side.Enemy,building.GetComponent<Outline>());
         building.SetSide(this.Side,building.GetComponent<Outline>());
-        civManager.SetTeamColor(building.gameObject);
+        civManager.CMDSetTeamColor(building.gameObject);
         Result.HideRange(this,Movement);  
         UnitManager.Instance.selectedUnit = null;
-        civManager.DestroyObj(this.gameObject);
+        NetworkServer.Destroy(this.gameObject);
     }
     #endregion
 
@@ -193,7 +213,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
 
         }
         CMDSetSide(attackableCivManager);
-        attackableCivManager.SetTeamColor(this.gameObject);
+        attackableCivManager.CMDSetTeamColor(this.gameObject);
         
         attackableCivManager.CMDShowAllUnits();
         attackableCivManager.CMDAddOwnedObject(this.gameObject); //requestauthority = false

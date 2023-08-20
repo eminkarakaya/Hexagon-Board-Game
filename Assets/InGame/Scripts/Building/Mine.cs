@@ -2,8 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.UI;
+using TMPro;
 public class Mine : NetworkBehaviour, ISelectable, IVisionable, ISideable
 {
+
+
+
+    #region  UI
+    [Header("UI")]
+    
+    [SerializeField] private Image unitImage;
+    [SerializeField] private Image resourceIcon;
+    [SerializeField] private TMP_Text mineTypeText,goldPerTurnText;
+
+    [Space(10)]
+    [Header("UI DATA")]
+    [SerializeField] private Sprite unitSprite;
+
+
+    #endregion
+
+
+
+    ResourceType resourceType;
+    
+    [Space(100)]
     [SerializeField] Outline outline;
     Resource resource;
     [SerializeField] UnityEngine.Canvas _canvas;
@@ -21,15 +45,21 @@ public class Mine : NetworkBehaviour, ISelectable, IVisionable, ISideable
     public Vision Vision { get; set; }
     public Outline Outline { get => outline; set{outline = value;} }
 
-
+    private void UpdateUI()
+    {
+        unitImage.sprite = unitSprite;
+        mineTypeText.text = Hex.resource.ResourceType.ToString();
+        goldPerTurnText.text = Hex.resource.Gold.ToString();
+        resourceIcon.sprite = Hex.resource.resourceIcon.sprite;
+    }
     public void InitializeMine() {
         resource = Hex.resource;
         if(isOwned)
         {
             CMDOpenActive(resource);
-            Debug.Log("isowned");
         }
         Outline = GetComponent<Outline>();
+        UpdateUI();
     }
     [Command] private void CMDOpenActive(Resource resource)
     {
@@ -60,6 +90,7 @@ public class Mine : NetworkBehaviour, ISelectable, IVisionable, ISideable
     public void OpenCanvas()
     {
         Canvas.gameObject.SetActive(true);
+        Debug.Log("opencanvas " , Canvas.gameObject);
     }
 
     public void RightClick(Hex selectedHex)
@@ -84,8 +115,14 @@ public class Mine : NetworkBehaviour, ISelectable, IVisionable, ISideable
         {
             outline.OutlineColor = Color.red;
         }
-        else
+        else if(side == Side.Ally)
+        {
             outline.OutlineColor = Color.blue;
+        }
+        else if(side == Side.None)
+        {
+            outline.OutlineColor = Color.black;
+        }
     }
     #endregion
     public IEnumerator wait(CivManager attackableCivManager)

@@ -20,10 +20,10 @@ public class UnitMovementSystem : MovementSystem
     public override List<Vector3Int> ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid,int attackRange)
     {
 
-        if(hexGrid.GetTileAt(selectedHexPosition).GetHexInAnimation())
-        {
-            return null;
-        }
+        // if(hexGrid.GetTileAt(selectedHexPosition).GetHexInAnimation())
+        // {
+        //     return null;
+        // }
         currentPath.Clear();
         
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
@@ -113,7 +113,6 @@ public class UnitMovementSystem : MovementSystem
             }
             else if(hex.Settler != null && hex.Settler.Side == Side.Enemy)
             {
-                
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
                     foreach (Vector3Int hexPosition in currentPath)
@@ -121,12 +120,44 @@ public class UnitMovementSystem : MovementSystem
                         hexGrid.GetTileAt(hexPosition).ResetHighlight();
                     }
                     Vector3Int? enemyHex = null;
-                    currentPath = movementRange.GetPathEnemyGridSettler(selectedHexPosition,out enemyHex,hexGrid,attackRange);
-                    foreach (Vector3Int hexPosition in currentPath)
+                    List<Vector3Int> tempCurrentPath = movementRange.GetPathEnemyGridSettler(selectedHexPosition,out enemyHex,hexGrid,attackRange);
+                    // currentPath = movementRange.GetPathEnemyGrid(selectedHexPosition,out enemyHex,hexGrid,attackRange);
+
+
+
+                    //  
+
+
+
+                    foreach (Vector3Int hexPosition in tempCurrentPath)
                     {
-                        hexGrid.GetTileAt(hexPosition).HighlightPath();
+                        Hex hex1 = hexGrid.GetTileAt(hexPosition);
+                        hex1.HighlightPath();                    
+                        if(hex1.IsEnemySettler())
+                        {
+                            currentPath.Add(hex1.HexCoordinates);
+                            return currentPath;
+                        }
+                        else
+                        {
+                            currentPath.Add(hex1.HexCoordinates);
+                        }
                     }
+                    
                 }
+                // if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
+                // {
+                //     foreach (Vector3Int hexPosition in currentPath)
+                //     {
+                //         hexGrid.GetTileAt(hexPosition).ResetHighlight();
+                //     }
+                //     Vector3Int? enemyHex = null;
+                //     currentPath = movementRange.GetPathEnemyGridSettler(selectedHexPosition,out enemyHex,hexGrid,attackRange);
+                //     foreach (Vector3Int hexPosition in currentPath)
+                //     {
+                //         hexGrid.GetTileAt(hexPosition).HighlightPath();
+                //     }
+                // }
                     return currentPath;
             }
             else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)

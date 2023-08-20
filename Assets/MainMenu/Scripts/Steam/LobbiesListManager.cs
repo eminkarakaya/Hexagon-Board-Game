@@ -2,8 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
+
 public class LobbiesListManager : MonoBehaviour
 {
+    [SerializeField] private Image progressBar;
+    [SerializeField] private GameObject loaderCanvasGO;
     public static LobbiesListManager instance;
     private void Awake() {
         instance = this;
@@ -42,4 +48,21 @@ public class LobbiesListManager : MonoBehaviour
         lobbiesMenu.SetActive(true);
         CreateLobbySteam.instance.GetLobbiesList();
     }    
+
+    public async void LoadScene(string sceneName,System.Action action)
+    {
+        var scene = SceneManager.LoadSceneAsync(sceneName);
+        scene.allowSceneActivation = false;
+        loaderCanvasGO.SetActive(true);
+        do
+        {
+            await Task.Delay(100);
+            progressBar.fillAmount = scene.progress;
+            
+        } while (scene.progress< .9f);
+
+        scene.allowSceneActivation = true;
+        loaderCanvasGO.SetActive(false);
+        action?.Invoke();
+    }
 }

@@ -8,34 +8,37 @@ public class UnitMovement : Movement
 {
     public UnityEvent EnemyResourceEventOpen,EnemyResourceEventClose;
      private void OnDrawGizmos() {
-        movementSystem = InitMovementSystem();
-        if(movementSystem.movementRange.allNodesDict2== null)
-        {
-            return;
-        }
-        HexGrid hexGrid = FindObjectOfType<HexGrid>();
-        foreach (var item in movementSystem.movementRange.allNodesDict2 )
-        {
-            Vector3 startPos =hexGrid.GetTileAt (item.Key).transform.position;
-            if( item.Value != null)
-            {
-                Vector3 valuePos = hexGrid.GetTileAt ((Vector3Int)item.Value).transform.position;
-                DrawArrow.ForGizmo(valuePos + Vector3.up * h,(startPos-valuePos),Color.red,.5f,25);
-            }
-        }
+        // movementSystem = InitMovementSystem();
+        // if(movementSystem.movementRange.allNodesDict2== null)
+        // {
+        //     return;
+        // }
+        // HexGrid hexGrid = FindObjectOfType<HexGrid>();
+        // foreach (var item in movementSystem.movementRange.allNodesDict2 )
+        // {
+        //     Vector3 startPos =hexGrid.GetTileAt (item.Key).transform.position;
+        //     if( item.Value != null)
+        //     {
+        //         Vector3 valuePos = hexGrid.GetTileAt ((Vector3Int)item.Value).transform.position;
+        //         DrawArrow.ForGizmo(valuePos + Vector3.up * h,(startPos-valuePos),Color.red,.5f,25);
+        //     }
+        // }
     }
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex nextHex,Hex lastHex,MovementSystem movementSystem)
     {
-        animator.SetBool("Move",true);
+        if(animator != null)
+        {
+            animator.SetBool("Move",true);
+        }
         Moveable.ToggleButtons(false);
         Vector3 startPos = transform.position;
         endPos.y = startPos.y;
-        if(nextHex.IsEnemy() || nextHex.IsEnemySettler() || nextHex.IsEnemyBuilding())
-        {
-            yield break;
-        }
-        if(lastHex != nextHex && nextHex.IsEnemySettler())
-            yield break;
+        // if(nextHex.IsEnemy() || nextHex.IsEnemySettler() || nextHex.IsEnemyBuilding())
+        // {
+        //     yield break;
+        // }
+        // if(lastHex != nextHex && nextHex.IsEnemySettler())
+        //     yield break;
         
        
 
@@ -52,19 +55,22 @@ public class UnitMovement : Movement
 
         // MovementFinishEvents
         
-        playerManager.CMDHideAllUnits();
+        Moveable.CivManager.CMDHideAllUnits();
         
-        CMDHide();
+        // CMDHide();
         CMDSetHex(nextHex,Moveable.Hex);
         this.Moveable.Hex = nextHex;
 
         transform.position = endPos;
-        playerManager.CMDShowAllUnits();
-        CMDShow();
+        Moveable.CivManager.CMDShowAllUnits();
+        // CMDShow();
         CurrentMovementPoints -= 1;
         if(pathPositions.Count > 0)
         {
-            animator.SetBool("Move",false);
+            if(animator != null)
+            {
+                animator.SetBool("Move",false);
+            }
             StartCoroutine(RotationCoroutine(pathPositions.Dequeue(),pathHexes.Dequeue(),lastHex,rotationDuration,movementSystem));
         }
         else
@@ -102,36 +108,38 @@ public class UnitMovement : Movement
             }
         }
         Moveable.ToggleButtons(true);
-        animator.SetBool("Move",false);
-        lastHex.SetHexInAnimation (false);
+        if(animator != null)
+        {
+            animator.SetBool("Move",false);
+        }
+        // lastHex.SetHexInAnimation (false);
     }
     public void TakeHostage(Hex hex,bool state)
     {
         if(state)
         {
-            Debug.Log("take hostage");
-            playerManager.CMDHideAllUnits();
-            CMDHide();
+            Moveable.CivManager.CMDHideAllUnits();
+            // CMDHide();
 
             GetComponent<Unit>().CivManager.Capture(hex.Unit.GetComponent<NetworkIdentity>());     
             hex.Unit.StartCaptureCoroutine(hex.Unit.GetComponent<NetworkIdentity>(),hex.Unit.gameObject,GetComponent<Unit>().CivManager);
 
-            playerManager.CMDShowAllUnits();
-            CMDShow();
+            Moveable.CivManager.CMDShowAllUnits();
+            // CMDShow();
         }
     }
     public IEnumerator MoveKill(Hex hex,bool state)
     {
         if(state)
         {
-            playerManager.CMDHideAllUnits();
+            Moveable.CivManager.CMDHideAllUnits();
             
             CMDHide();
             CMDSetHex(hex,Moveable.Hex);
             this.Moveable.Hex = hex;
 
             transform.position = new Vector3(hex.transform.position.x , 1 , hex.transform.position.z);
-            playerManager.CMDShowAllUnits();
+            Moveable.CivManager.CMDShowAllUnits();
             CMDShow();
             Vector3 startPos = transform.position;
             float timeElapsed = 0f;
