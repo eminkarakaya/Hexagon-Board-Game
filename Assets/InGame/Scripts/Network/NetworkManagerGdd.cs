@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
+using System.Linq;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
@@ -19,7 +20,12 @@ public class NetworkManagerGdd : NetworkManager
     /// </summary>
 
     #region Unity Callbacks
-
+    [ContextMenu("ASSIGN NETWORK OBJECTS")]
+    public void AssignNetworkObjects()
+    {
+        spawnPrefabs = Resources.LoadAll<GameObject>("").Where(x=>x.TryGetComponent(out NetworkIdentity networkIdentity) && !x.TryGetComponent(out PlayerManager playerManager)).ToList();
+    }
+    
     public override void Awake()
     {
         base.Awake();
@@ -28,6 +34,9 @@ public class NetworkManagerGdd : NetworkManager
     public override void OnValidate()
     {
         base.OnValidate();
+        #if UNITY_EDITOR
+        AssignNetworkObjects();
+        #endif
     }
 
     /// <summary>

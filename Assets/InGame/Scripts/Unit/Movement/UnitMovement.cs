@@ -57,13 +57,13 @@ public class UnitMovement : Movement
         
         Moveable.CivManager.CMDHideAllUnits();
         
-        // CMDHide();
+        CMDHide();
         CMDSetHex(nextHex,Moveable.Hex);
         this.Moveable.Hex = nextHex;
 
         transform.position = endPos;
         Moveable.CivManager.CMDShowAllUnits();
-        // CMDShow();
+        CMDShow();
         CurrentMovementPoints -= 1;
         if(pathPositions.Count > 0)
         {

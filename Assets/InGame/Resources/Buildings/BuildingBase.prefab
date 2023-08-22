@@ -2783,8 +2783,8 @@ MonoBehaviour:
   syncInterval: 0
   buildIcon: {fileID: 3207165572852885917}
   unitSprite: {fileID: 21300000, guid: 50094bb5b13ac7e4ba960853055ef8cb, type: 3}
-  shipRange: {fileID: 7802302833639718675, guid: 7762dce39c6b0d141b3553e2af662691, type: 3}
   _civManager: {fileID: 0}
+  shipRange: {fileID: 7802302833639718675, guid: 7762dce39c6b0d141b3553e2af662691, type: 3}
   warrior: {fileID: 8579927912025503147, guid: 4ab06ae823d5735458820839a5d55c07, type: 3}
   settler: {fileID: 8302346154622672150, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
   archer: {fileID: 4414703064788498592, guid: 86f7cb2ccf586d34dbe22a2374aadec9, type: 3}

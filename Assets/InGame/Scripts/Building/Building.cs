@@ -17,12 +17,12 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     [SerializeField] private Sprite unitSprite;
 
     [Space(10)]
-    [SerializeField] private GameObject shipRange;
     [SyncVar] [SerializeField] protected  CivManager _civManager;
     public CivManager CivManager {get => _civManager;set {_civManager = value;}}
 
     
     [Header("Prefabs")]
+    [SerializeField] private GameObject shipRange;
 
     [SerializeField] private GameObject warrior,settler,archer,worker;
     [SerializeField] protected GameObject ship;
@@ -44,7 +44,14 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     #endregion
 
     #region Mirror and Unity Callback
-   
+    private void OnValidate() {
+        shipRange = Resources.Load<GameObject>("Units/Ship Range");
+        warrior = Resources.Load<GameObject>("Units/Brute");
+        archer = Resources.Load<GameObject>("Units/Erika");
+        worker = Resources.Load<GameObject>("Settlers/Worker");
+        ship = Resources.Load<GameObject>("Units/Ship");
+        settler = Resources.Load<GameObject>("Settlers/Settler");
+    }
     private IEnumerator Start() {
         Outline = GetComponent<Outline>();
         hp = GetComponent<HP>();

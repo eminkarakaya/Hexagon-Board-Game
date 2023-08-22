@@ -300,6 +300,7 @@ public class PlayerManager : CivManager
             if(orderButton.image.sprite == GameSettingsScriptable.Instance.waitingSprite)
             {
                 CMDAddWaitingList();
+                
                 orderButton.image.sprite = GameSettingsScriptable.Instance.nextRoundSprite;
                 return;
             }
@@ -314,18 +315,18 @@ public class PlayerManager : CivManager
     }
     [ClientRpc] private void RPCNextTourBTN()
     {
-        RPCRemoveWaitingList();
+        RemoveWaitingList();
         if(isOwned)
         {
             orderButton.image.sprite = GameSettingsScriptable.Instance.waitingSprite;
             tipText.text = WAITING_OTHER_PLAYERS;
         }
-        SetWaitedListTip();
+            
         foreach (var item in FindObjectsOfType<PlayerManager>())
-        {
+        {   
             if(item.waitedPlayers.Count == 0)
             {
-                SetWaitedListTip();
+                // SetWaitedListTip();
                 if(item.isOwned)
                 {
                     item.NextRound();
@@ -334,26 +335,36 @@ public class PlayerManager : CivManager
         }
 
     }
+    private void CloseHoverTip()
+    {
+        hoverTip.tipToShow = string.Empty;
+    }
 
     public void SetWaitedListTip()
     {
-        if(!isOwned) return;
-        string str = string.Empty;
-        foreach (var item in waitedPlayers)
+        
+        foreach (var item in FindObjectsOfType<PlayerManager>())
         {
-            str += item.nickname + ", ";
+            if(item.isOwned)
+            {
+                string str = string.Empty;
+                foreach (var item1 in item.waitedPlayers)
+                {
+                    str += item1.nickname + ", ";
+                }
+                if(str == string.Empty) return;
+                str.Remove(str.Count()-3,3);
+                item.hoverTip.tipToShow = string.Empty;
+                item.hoverTip.tipToShow += str;
+            }
         }
-        if(str == string.Empty) return;
-        str.Remove(str.Count()-3,3);
-        hoverTip.tipToShow = string.Empty;
-        hoverTip.tipToShow += str;
     }
     [Command] public void CMDNextRoundBTN()
     {
         RPCNextTourBTN();
     }
 
-    public void RPCRemoveWaitingList()
+    public void RemoveWaitingList()
     {
         foreach (var item in FindObjectsOfType<PlayerManager>())
         {
@@ -365,6 +376,7 @@ public class PlayerManager : CivManager
                 }
             }
         }
+        SetWaitedListTip();
     }
     [Command]
     public void CMDAddWaitingList()
@@ -384,6 +396,9 @@ public class PlayerManager : CivManager
                 }
             }
         }
+        SetWaitedListTip();
+        if(isOwned)
+            CloseHoverTip();
         // if(!waitedPlayers.Contains(this))
         // {
         //     waitedPlayers.Add(this);
@@ -398,6 +413,7 @@ public class PlayerManager : CivManager
         GetOrderIcon();
         // TotalGold += GoldPerTurn;
         SetTotalGoldText();
+        // SetWaitedListTip();
     }
 
 
@@ -424,6 +440,7 @@ public class PlayerManager : CivManager
     public override void NextRoundBtn()
     {
         CMDNextRoundBTN();
+        
 
     }
     #endregion
