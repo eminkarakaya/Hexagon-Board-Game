@@ -353,6 +353,7 @@ public class PlayerManager : CivManager
                     str += item1.nickname + ", ";
                 }
                 if(str == string.Empty) return;
+                if(str.Length < 3) return;
                 str.Remove(str.Count()-3,3);
                 item.hoverTip.tipToShow = string.Empty;
                 item.hoverTip.tipToShow += str;

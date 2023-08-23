@@ -247,8 +247,10 @@ public abstract class CivManager : NetworkBehaviour
         }
         else
         {
+            CMDHideAllUnits();
             TargetRemoveOrderListPM(conn.GetComponent<NetworkIdentity>().connectionToClient,taskable);
             NetworkServer.Destroy(taskable);
+            CMDShowAllUnits();
         }
 
     }
