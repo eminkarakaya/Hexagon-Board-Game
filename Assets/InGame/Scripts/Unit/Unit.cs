@@ -165,7 +165,9 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     {
         if(Movement.CurrentMovementPoints == 0)
             return false;
+
         AttackSystem = new AttackSystem(this);
+        Debug.Log("moverange " + moveRange + " AttackSystem.CheckEnemyInRange(selectedHex)" + AttackSystem.CheckEnemyInRange(selectedHex));
         if(moveRange == 0 &&  AttackSystem.CheckEnemyInRange(selectedHex) && (selectedHex.IsEnemy()  || selectedHex.IsEnemyBuilding() || selectedHex.IsEnemyShip()))
         {
             Movement.StartCoroutineRotationUnit(Movement,selectedHex.transform.position,selectedHex);

@@ -995,7 +995,7 @@ public class GraphSearch
         allNodes.Remove(startPoint);
         foreach (var item in allNodes)
         {
-            if(hexGrid.GetTileAt (item.Key).IsEnemy() || hexGrid.GetTileAt (item.Key).IsEnemyBuilding())
+            if(hexGrid.GetTileAt (item.Key).IsEnemy() || hexGrid.GetTileAt (item.Key).IsEnemyBuilding() || hexGrid.GetTileAt (item.Key).IsEnemyShip())
             {
                 enemiesNodes.Add(item.Key,item.Value);
             }
@@ -1003,6 +1003,8 @@ public class GraphSearch
         }
         return new BFSResult{rangeNodesDict = enemiesNodes};
     }
+
+    
     public static List<Vector3Int> GetCloseseteHex(HexGrid hexGrid,Vector3Int current,Dictionary<Vector3Int, Vector3Int?> allNodesDict,int rangePoint)
     {
         List<Vector3Int> list = GneratePathBFS(current, allNodesDict);

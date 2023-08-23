@@ -13,6 +13,10 @@ public class SelectionManager : MonoBehaviour
     private void Awake() {
         if(_mainCamera == null) _mainCamera = Camera.main;
     }
+    public void HandleClickUI(GameObject result)
+    {        
+        UnitManager.Instance.HandleUnitSelected(result.transform);
+    }
     
     public void HandleClick(Vector3 mousePosition)
     {
@@ -58,6 +62,12 @@ public class SelectionManager : MonoBehaviour
     
     private bool FindTarget(Vector3 mousePosition,out GameObject result)
     {
+        if (EventSystem.current.IsPointerOverGameObject()) 
+        {
+            result = null;
+            return false;
+        }
+        
         RaycastHit hit;
         Ray ray = _mainCamera.ScreenPointToRay(mousePosition);
         if(Physics.Raycast(ray,out hit,10000f,selectionMask ))

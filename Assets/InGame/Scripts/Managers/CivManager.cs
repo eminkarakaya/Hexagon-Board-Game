@@ -36,6 +36,7 @@ public abstract class CivManager : NetworkBehaviour
         if(isOwned)
             totalGoldText.text = TotalGold.ToString();
     }
+    
 
     public void SetTotalGoldText()
     {

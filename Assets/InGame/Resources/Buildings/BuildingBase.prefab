@@ -2419,6 +2419,7 @@ GameObject:
   - component: {fileID: 3983840755407770131}
   - component: {fileID: 3594165388383988134}
   - component: {fileID: 4999254690246885208}
+  - component: {fileID: 2932132431818224603}
   m_Layer: 5
   m_Name: CityProps
   m_TagString: Untagged
@@ -2498,6 +2499,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorType: 0
+--- !u!114 &2932132431818224603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3004747590900205194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 932e51992b64b2a4eaed9163d71a5234, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3045159996791011793
 GameObject:
   m_ObjectHideFlags: 0
@@ -4977,6 +4990,7 @@ GameObject:
   - component: {fileID: 283415917854270167}
   - component: {fileID: 4096540977999090494}
   - component: {fileID: 6757536356518225270}
+  - component: {fileID: 5437827454580537977}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -5114,6 +5128,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorType: 1
+--- !u!114 &5437827454580537977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6606243659010169904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 932e51992b64b2a4eaed9163d71a5234, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6750281290184338358
 GameObject:
   m_ObjectHideFlags: 0

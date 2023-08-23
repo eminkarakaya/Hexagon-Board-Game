@@ -27,7 +27,7 @@ public class Melee : Attack
     {
         if(GetComponent<Movement>().GetCurrentMovementPoints()==0) yield break;
         // if(damagable.Hex.IsWater()) yield break;
-        
+        Debug.Log("attack");
         float timeElapsed = 0f;
         while(timeElapsed<movementDuration)
         {
