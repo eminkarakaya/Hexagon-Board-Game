@@ -141,4 +141,3 @@ public class Range : Attack
         // InflictDamage(hp);
     }
 }
-

@@ -234,7 +234,7 @@ public abstract class CivManager : NetworkBehaviour
             playerManager.GetOrderIcon();
         }
         Debug.Log(taskable + " destroy",taskable);
-        NetworkServer.Destroy(taskable);
+        
         UnitManager.Instance.ClearOldSelection();
         // taskable.SetActive(false);
         // Destroy(taskable,1);
@@ -248,6 +248,7 @@ public abstract class CivManager : NetworkBehaviour
         else
         {
             TargetRemoveOrderListPM(conn.GetComponent<NetworkIdentity>().connectionToClient,taskable);
+            NetworkServer.Destroy(taskable);
         }
 
     }

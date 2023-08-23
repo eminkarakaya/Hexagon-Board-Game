@@ -27,7 +27,6 @@ public class Melee : Attack
     {
         if(GetComponent<Movement>().GetCurrentMovementPoints()==0) yield break;
         // if(damagable.Hex.IsWater()) yield break;
-        Debug.Log("attack");
         float timeElapsed = 0f;
         while(timeElapsed<movementDuration)
         {
@@ -69,7 +68,6 @@ public class Melee : Attack
             {
                 if(TryGetComponent(out UnitMovement movement0))
                 {
-                    Debug.Log(damagable.hp + " damagable.hp");
                     if(damagable.hp.Hp<=0)
                         StartCoroutine (movement0.MoveKill(damagable.Hex,damagable.hp.Hp<=0));
                     else
