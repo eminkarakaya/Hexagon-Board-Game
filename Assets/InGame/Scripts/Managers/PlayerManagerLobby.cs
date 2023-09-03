@@ -81,11 +81,11 @@ public class PlayerManagerLobby : NetworkBehaviour
     public void TargetBeginGame () {
         // Additively load game scene
         SceneManager.LoadScene (1,LoadSceneMode.Additive);
-
+        
         lobby.gameObject.SetActive(false);
         playerManager =  Instantiate(playerManagerPrefab).GetComponent<PlayerManager>();
         NetworkServer.Spawn(playerManager.gameObject,this.gameObject);
-        Debug.Log(playerManager + " dspjıodfjsopadjohfjsopasdjıg ",playerManager);
+        
         StartCoroutine ( playerManager.StartGame());
         // StartCoroutine(playerManager.wait());
     }

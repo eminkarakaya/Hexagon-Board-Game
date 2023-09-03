@@ -103,8 +103,8 @@ using UnityEngine;
             return false;
         }
 
-        public void BeginGame (string _matchID) {
-            TurnManager turnManager = Instantiate (turnManagerPrefab).GetComponent<TurnManager> ();
+        public void BeginGame (string _matchID) { // server
+            // TurnManager turnManager = Instantiate (turnManagerPrefab).GetComponent<TurnManager> ();
 
             for (int i = 0; i < matches.Count; i++) {
                 if (matches[i].matchID == _matchID) {
@@ -113,8 +113,8 @@ using UnityEngine;
                     List<Player> players = new List<Player>();
 
                     foreach (var player in matches[i].players) {
-                        player.StartGame ();
-
+                        StartCoroutine (player.StartGame ());
+                        MainMenuManager.instance.CloseUI();
                         players.Add(player);
                     }
                     
@@ -123,7 +123,10 @@ using UnityEngine;
                 }
             }
         }
-
+        [ClientRpc] private void CloseUI()
+        {
+            
+        }
         public static string GetRandomMatchID () {
             string _id = string.Empty;
             for (int i = 0; i < 5; i++) {

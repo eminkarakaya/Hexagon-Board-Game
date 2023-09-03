@@ -102,7 +102,7 @@ public class Worker : Settler
     }
     public void CreateMineOnClick()
     {
-        HoverTipManager.instance.HideTip();
+        ToopltipManager.Hide();
         
         CMDCreateMine();
         TaskComplate();

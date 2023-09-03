@@ -62,13 +62,17 @@ public class Data
         return new Data(GetGold(),GetHealth(),GetGem(),GetLevel());
     }
 }
-public class MainMenuManager :MonoBehaviour
+public class MainMenuManager : MonoBehaviour
 {
+    public static MainMenuManager instance;
+    [SerializeField] private List<GameObject> UIandCameraEtc;
     int levelOffset = 1;
     public Data data;
     [SerializeField] private const string TITLE_DATA_KEY ="PlayerData";
     [SerializeField] private TextMeshProUGUI _goldText,_healthText,_gemText,_levelText;
-    
+    private void Awake() {
+        instance = this;
+    }
     void Start()
     {
         GetAppearance();
@@ -76,6 +80,20 @@ public class MainMenuManager :MonoBehaviour
     void OnDisable()
     {
         SaveAppearance();
+    }
+    public void CloseUI()
+    {
+        foreach (var item in UIandCameraEtc)
+        {
+            item.SetActive(false);
+        }
+    }
+    public void OpenUI()
+    {
+        foreach (var item in UIandCameraEtc)
+        {
+            item.SetActive(true);
+        }
     }
     public void GetAppearance()
     {
@@ -100,6 +118,7 @@ public class MainMenuManager :MonoBehaviour
             Debug.Log("NotData");
         }
     }
+    
     
     void OnDataSend(UpdateUserDataResult result)
     {

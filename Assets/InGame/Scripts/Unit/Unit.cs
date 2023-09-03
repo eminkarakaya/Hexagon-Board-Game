@@ -47,6 +47,10 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     public Transform Transform { get => transform;}
     [SerializeField] private Sprite orderImage;
     public Sprite OrderSprite { get =>orderImage; set {orderImage = value;} }
+    [SyncVar] [SerializeField] private bool isBuisy;
+    public bool IsBuisy { get => isBuisy;set{isBuisy = value;}}
+
+    public List<PropertiesStruct> attackProperties { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     #endregion
     #region Mirror and Unity Callback
 
@@ -75,9 +79,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     }
     public override void OnStopAuthority()
     {
-        // CloseCanvas();
-        // civManager.CMDHideAllUnits();
-        // Movement.HideRangeStopAuthority();
         UnitManager.Instance.ClearOldSelection();
     }
     #endregion
@@ -104,7 +105,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     
     protected void AttackUnit(Hex hex)
     {
-        // Movement.StartCoroutineRotationUnit(Movement,hex.transform.position,hex);
         if(TryGetComponent(out Attack attack))
         {
             if(hex.Building != null && hex.Building.Side == Side.Enemy)
@@ -126,12 +126,10 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
 
     public void StartCaptureCoroutine(NetworkIdentity identity,GameObject sideable,CivManager civManager)
     {
-        // civManager.Capture(identity);
         StartCoroutine(CaptureCoroutine(civManager));
     }
     public IEnumerator CaptureCoroutine(CivManager attackableCivManager)
     {
-        this.civManager.CMDRemoveOwnedObject(this.gameObject); //requestauthority = false
         this.CivManager = attackableCivManager;
         while(GetComponent<NetworkIdentity>().isOwned == false)
         {
@@ -142,7 +140,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         attackableCivManager.CMDSetTeamColor(this.gameObject);
         
         attackableCivManager.CMDShowAllUnits();
-        attackableCivManager.CMDAddOwnedObject(this.gameObject); //requestauthority = false
 
     }
     [Command] public void CMDSetSide(CivManager civManager)
@@ -195,7 +192,6 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         }   
         else
         {
-            // Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
             Result.CalculateRange(this,hexGrid);
             Result.MoveUnit(Movement,FindObjectOfType<HexGrid>(),selectedHex);
         }
@@ -217,14 +213,11 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         else
             Result = new UnitMovementSystem(this);
         Result.ShowRange(this,Movement);
-        // AttackSystem.GetRange(this);
         AttackSystem = new AttackSystem(this);
         attackRange = AttackSystem.ShowRange(this);
-        // FindObjectOfType<HexGrid>().DrawBorders(Hex);
     }
     public void Deselect()
     {
-        // Outline.enabled = false;
         Result.HideRange(this,Movement);
         AttackSystem.HideRange(this);
         
@@ -278,32 +271,9 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
             sideable1.SetSide(Side.None,sideable1.Outline);
         }
     }
-    // public void Capture(NetworkIdentity identity,GameObject _gameObject)
-    // {
-    //     CivManager.Capture(identity);
         
-    //     TeamColor [] teamColors = _gameObject.transform.GetComponentsInChildren<TeamColor>();
-    //     foreach (var item in teamColors)
-    //     {
-    //         item.SetColor(CivManager.civData);
-    //     }
-    //     StartCoroutine(wait(identity,_gameObject));
-    // }
-    // public IEnumerator wait(NetworkIdentity identity,GameObject sideable)
-    // {
-    //     while(GetComponent<NetworkIdentity>().isOwned == false)
-    //     {
-    //         yield return null;
             
-    //     }
 
-    //     civManager.CMDHideAllUnits();
-    //     CMDSetSide(identity,sideable);
-    // }
-    // public void StartCoroutine1(NetworkIdentity identity,GameObject sideable)
-    // {
-    //     StartCoroutine(wait(identity,sideable));
-    // }
     protected virtual void ToggleButtonsVirtual(bool state)
     {
 

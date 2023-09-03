@@ -12,15 +12,11 @@ public class AIManager : CivManager
         CMDCreateBuilding();
     }
     private void Start() {
-        // GetComponent<NetworkIdentity>().RemoveClientAuthority();
-        // GetComponent<NetworkIdentity>().AssignClientAuthority(GameManager.singleton.connection);
     }
-    // client -> server
     [Server]
     private void CMDCreateBuilding()
     {
         
-        // StartCoroutine(waitServerActive());
         AssignBuildings();
         Building unit = Instantiate(buildingPrefab).GetComponent<Building>();
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
@@ -34,7 +30,6 @@ public class AIManager : CivManager
         
         GameManager.instance.buildings = FindObjectsOfType<Building>().ToList();
     }
-    // server -> client
     
     private void RPCCreateBuilding(Building unit,int i)
     {

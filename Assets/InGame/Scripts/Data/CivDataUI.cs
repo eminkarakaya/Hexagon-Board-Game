@@ -13,7 +13,7 @@ public class CivDataUI : NetworkBehaviour
     public Image civImage;
     public CivManager civManager;
     public CivData civData;
-    [SerializeField] GameObject hoverTip;
+    [SerializeField] GameObject tooltipTrigger;
     public DealUI dealUI;
     List<DealUI> dealUIs = new List<DealUI>();
     public void OpenUI(bool state)
@@ -96,7 +96,7 @@ public class CivDataUI : NetworkBehaviour
             dealUI.relationShipUIs.Add(ui);
         }
         civManager.civDataUI = this;
-        hoverTip.GetComponent<HoverTip>().tipToShow = civManager.nickname;
+        tooltipTrigger.GetComponent<TooltipTrigger>().content = civManager.nickname;
         dealUI.civText.text = civData.civName;
         dealUI.userNameText.text = civManager.nickname;
         

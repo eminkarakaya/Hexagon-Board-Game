@@ -20,12 +20,13 @@ public class CivUI : NetworkBehaviour
         selectCiv.selectedImage.sprite = civData.civImage;
         foreach (var item in FindObjectsOfType<PlayerManager>())
         {
-            if(item.isLocalPlayer)
+            if(item.isOwned)
             {
                 item.CMDSetTeam(selectCiv.team);
                 item.CMDSetName(selectCiv.nameInputField.text);
                 // item.nickname = selectCiv.nameInputField.text;
-                item.CMDSetCivData(civData.civType);
+                GameManager gameManager = FindObjectOfType<GameManager>();
+                item.CMDSetCivData(civData.civType,gameManager);
                 item.civType = civData.civType;
             
             }

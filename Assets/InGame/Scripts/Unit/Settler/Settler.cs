@@ -31,6 +31,10 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     public IMovable Movable { get; set; }
 
     [SerializeField] private Side _side;
+    [SyncVar] [SerializeField] private bool isBuisy;
+    public bool IsBuisy { get => isBuisy;set{isBuisy = value;}}
+
+    public List<PropertiesStruct> attackProperties { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     #endregion
 
     #region Mirror and Unity callbacks
@@ -82,7 +86,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     public void LeftClick()
     {
         Outline.enabled = true;
-        // Result.ShowRange(this,Movement);
         Result.ShowRange(this,Movement);
         SelectSettler();
     }
@@ -122,7 +125,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
 
     public void CreateBuildingOnClick()
     {
-        HoverTipManager.instance.HideTip();
+        ToopltipManager.Hide();
         
         if(Hex.isCoast )
         {
@@ -142,9 +145,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     {
         
         if(Hex.Building != null) return;
-        // Debug.Log(harborPrefab);
-        // Debug.Log(harborPrefab.GetComponent<Harbor>());
-        // Debug.Log(connectionToClient);
         Harbor harbor = Instantiate(harborPrefab).GetComponent<Harbor>();
         NetworkServer.Spawn(harbor.gameObject,connectionToClient);
         RPCCreateBuilding(harbor);
@@ -158,7 +158,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         NetworkServer.Spawn(building.gameObject,connectionToClient);
         RPCCreateBuilding(building);
     }
-    [ClientRpc] // server -> client
     protected void RPCCreateBuilding(Building building)
     {
         building.transform.position = new Vector3 (Hex.transform.position.x , 1 , Hex.transform.position.z );
@@ -167,16 +166,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         building.Hex.Building = building;
         building.CivManager = civManager;
         civManager.CMDAddOwnedObject(building.gameObject);        
-        // if(building.isOwned)
-        // {
-        //     building.SetSide(Side.Me,building.GetComponent<Outline>());
-        // }
-        // else if(building.CivManager.team == this.CivManager.team)
-        // {
-        //     building.SetSide(Side.Ally,building.GetComponent<Outline>());
-        // }
-        // else
-        //     building.SetSide(Side.Enemy,building.GetComponent<Outline>());
         building.SetSide(this.Side,building.GetComponent<Outline>());
         civManager.CMDSetTeamColor(building.gameObject);
         Result.HideRange(this,Movement);  
@@ -205,7 +194,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     
     public IEnumerator CaptureCoroutine(CivManager attackableCivManager)
     {
-        this.civManager.CMDRemoveOwnedObject(this.gameObject); //requestauthority = false
         this.CivManager = attackableCivManager;
         while(GetComponent<NetworkIdentity>().isOwned == false)
         {
@@ -216,7 +204,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         attackableCivManager.CMDSetTeamColor(this.gameObject);
         
         attackableCivManager.CMDShowAllUnits();
-        attackableCivManager.CMDAddOwnedObject(this.gameObject); //requestauthority = false
 
     }
     public void SetSide(Side side, Outline outline)
@@ -242,7 +229,6 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     }
     public void StartCaptureCoroutine(NetworkIdentity identity,GameObject sideable,CivManager civManager)
     {
-        // civManager.Capture(identity);
         StartCoroutine(CaptureCoroutine(civManager));
     }
     protected virtual void ToggleButtonsVirtual(bool state)

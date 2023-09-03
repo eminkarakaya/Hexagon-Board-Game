@@ -61,10 +61,10 @@ public class Melee : Attack
             yield return null;
         }
         // kill events
-        foreach (var item in funcs)
+        foreach (var item in PropertiesEnumList)
         {
 
-            if(item == Funcs.MoveKill)
+            if(item.attackPropertiesEnum == PropertiesEnum.MoveKill)
             {
                 if(TryGetComponent(out UnitMovement movement0))
                 {
@@ -83,7 +83,7 @@ public class Melee : Attack
                     }
                 }
             }
-            if(item == Funcs.TakeHostage)
+            if(item.attackPropertiesEnum == PropertiesEnum.TakeHostage)
             {
                 if(TryGetComponent(out UnitMovement movement1))
                 {
@@ -105,18 +105,7 @@ public class Melee : Attack
                     }
                 }
             }
-            if(item == Funcs.Default)
-            {
-                // Debug.Log("default");
-                // timeElapsed = 0f;
-                // while(timeElapsed<movementDuration)
-                // {
-                //     timeElapsed += Time.deltaTime;
-                //     float lerpStep = timeElapsed / movementDuration;
-                //     transform.position = Vector3.Lerp(transform.position,TransformUtils.FixY(attackable.Hex.transform.position),lerpStep);
-                //     yield return null;
-                // }
-            }
+            
         }
          
         damagable.hp.Death(damagable,attackable,kill,killEvent);

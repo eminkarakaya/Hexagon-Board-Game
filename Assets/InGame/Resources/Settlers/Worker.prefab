@@ -827,6 +827,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 312742572184424162, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      propertyPath: _assetId
+      value: 2469934313
+      objectReference: {fileID: 0}
     - target: {fileID: 406499781130798246, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       propertyPath: m_text
       value: 'OIL
@@ -1116,6 +1120,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8302346154622672150, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 10079}
+    - targetCorrespondingSourceObject: {fileID: 8302346154622672150, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8579486157561750584}
     - targetCorrespondingSourceObject: {fileID: 4789344810278432504, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 10159}
@@ -1167,6 +1174,7 @@ MonoBehaviour:
   - {fileID: 4559790081254060193}
   - {fileID: 603063252843160864}
   _side: 0
+  isBuisy: 0
   resourceBtns:
   - resourceType: 4
     button: {fileID: 10490}
@@ -1214,6 +1222,21 @@ MonoBehaviour:
         m_CallState: 2
   _movementPoints: 4
   _currentMovementPoints: 4
+--- !u!114 &8579486157561750584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4812727721276683137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d17e718851449a6879986e45c458fb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!114 &6750273651796296177 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7804790472173236070, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}

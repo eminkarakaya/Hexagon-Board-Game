@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7565772262412586964}
   - component: {fileID: 7565772262412586970}
   - component: {fileID: 7565772262412586971}
+  - component: {fileID: -8924308395023512247}
   m_Layer: 0
   m_Name: PlayerManager
   m_TagString: Untagged
@@ -79,10 +80,24 @@ MonoBehaviour:
   hexGrid: {fileID: 6415209383831887827, guid: 56919fa60e0e44240aa635b8ba3acf71, type: 3}
   civData: {fileID: 11400000, guid: 9156276579117e645aecf05f543a5be6, type: 2}
   civType: 0
-  n: 3
   isStart: 0
   hoverTip: {fileID: 0}
   tipText: {fileID: 0}
   waitedPlayers: []
   gameManager: {fileID: 0}
   civUIPrefab: {fileID: 516047798649227374, guid: 0bb9411e3c5df2b4ab0e022f1e3cd68d, type: 3}
+--- !u!114 &-8924308395023512247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7565772262412586965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d17e718851449a6879986e45c458fb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0

@@ -24,6 +24,5 @@ public class BuildingHP : HP
             }
             StartCoroutine (GetComponent<Building>().wait(attackable.CivManager));
         } 
-        // StartCoroutine(Wait(damagable,attackable));
     }
 }

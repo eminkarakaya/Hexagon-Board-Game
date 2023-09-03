@@ -148,6 +148,8 @@ GameObject:
   - component: {fileID: 6175895667080155532}
   - component: {fileID: 2853219364625015595}
   - component: {fileID: 5836892506926468027}
+  - component: {fileID: 8963564015761723253}
+  - component: {fileID: -2270071139262688099}
   m_Layer: 5
   m_Name: RomeCivButton
   m_TagString: Untagged
@@ -282,4 +284,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e5c5b265ca9fed42b8ec8fe709b3ee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   civData: {fileID: 11400000, guid: ecc1986c615d2354a9b5f63208e13a83, type: 2}
+  selectCiv: {fileID: 0}
+--- !u!114 &8963564015761723253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849220073065048248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 3182467576
+  serverOnly: 0
+  visible: 0
+  hasSpawned: 0
+--- !u!114 &-2270071139262688099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849220073065048248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d17e718851449a6879986e45c458fb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0

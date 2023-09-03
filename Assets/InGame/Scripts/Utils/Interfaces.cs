@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 public interface IDamagable
 {
+    public List<PropertiesStruct> attackProperties{get;set;}
     public CivManager CivManager { get; set; }
     public HP hp { get; set; }
     public Hex Hex { get; set; }
+    public bool IsBuisy { get; set; }
     
 }
 public interface ITaskable
@@ -26,6 +28,8 @@ public interface IVisionable
 }
 public interface IMovable
 {
+    public List<PropertiesStruct> attackProperties{get;set;}
+    public bool IsBuisy { get; set; }
     public CivManager CivManager { get; set; }
     public void ToggleButtons(bool state);
     public Movement Movement { get; set; }
@@ -44,14 +48,13 @@ public interface ISelectable
     public void RightClick(Hex selectedHex);
     public void RightClick2(Hex selectedHex);
     public void Deselect();
-    // public IMovable Movable { get; set; }
     public Hex Hex { get; set; }
     
-    // public System.Action SelectEvent { get; set; }
 }
 
 public interface IAttackable
 {
+    public List<PropertiesStruct> attackProperties{get;set;}
     public Hex Hex { get; set; }
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }

@@ -6,12 +6,13 @@ using UnityEngine.UI;
 using TMPro;
 
 
+
      public class UILobby : MonoBehaviour {
 
         public static UILobby instance;
 
         [Header ("Host Join")]
-        [SerializeField] InputField joinMatchInput;
+        [SerializeField] TMP_InputField joinMatchInput;
         [SerializeField] List<Selectable> lobbySelectables = new List<Selectable> ();
         [SerializeField] Canvas lobbyCanvas;
         [SerializeField] Canvas searchCanvas;
@@ -20,7 +21,7 @@ using TMPro;
         [Header ("Lobby")]
         [SerializeField] Transform UIPlayerParent;
         [SerializeField] GameObject UIPlayerPrefab;
-        [SerializeField] Text matchIDText;
+        [SerializeField] TMP_Text matchIDText;
         [SerializeField] GameObject beginGameButton;
 
         GameObject localPlayerLobbyUI;
@@ -46,7 +47,7 @@ using TMPro;
                 lobbyCanvas.enabled = true;
 
                 if (localPlayerLobbyUI != null) Destroy (localPlayerLobbyUI);
-                localPlayerLobbyUI = SpawnPlayerUIPrefab (Player.localPlayer);
+                // localPlayerLobbyUI = SpawnPlayerUIPrefab (Player.localPlayer);
                 matchIDText.text = matchID;
                 beginGameButton.SetActive (true);
             } else {
@@ -65,7 +66,7 @@ using TMPro;
                 lobbyCanvas.enabled = true;
 
                 if (localPlayerLobbyUI != null) Destroy (localPlayerLobbyUI);
-                localPlayerLobbyUI = SpawnPlayerUIPrefab (Player.localPlayer);
+                // localPlayerLobbyUI = SpawnPlayerUIPrefab (Player.localPlayer);
                 matchIDText.text = matchID;
             } else {
                 lobbySelectables.ForEach (x => x.interactable = true);
@@ -81,13 +82,15 @@ using TMPro;
             beginGameButton.SetActive (false);
         }
 
-        public GameObject SpawnPlayerUIPrefab (Player player) {
-            GameObject newUIPlayer = Instantiate (UIPlayerPrefab, UIPlayerParent);
-            newUIPlayer.GetComponent<UIPlayer> ().SetPlayer (player);
-            newUIPlayer.transform.SetSiblingIndex (player.playerIndex - 1);
+        // public GameObject SpawnPlayerUIPrefab (Player player) {
+        //     GameObject newUIPlayer = Instantiate (UIPlayerPrefab, UIPlayerParent);
+            
+        //     newUIPlayer.GetComponent<UIPlayer> ().SetPlayer (player);
+        //     newUIPlayer.transform.SetSiblingIndex (player.playerIndex - 1);
 
-            return newUIPlayer;
-        }
+        //     return newUIPlayer;
+        // }
+       
 
         public void BeginGame () {
             Player.localPlayer.BeginGame ();

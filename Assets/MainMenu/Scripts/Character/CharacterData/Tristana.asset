@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baad70107fd7962429ef01443361929f, type: 3}
+  m_Name: Tristana
+  m_EditorClassIdentifier: 
+  ownedCount: 0
+  capacity: 20
+  charName: Tristana
+  level: 3
+  Properties:
+  - attackPropertiesEnum: 0
+    propertiesType: 0
+  - attackPropertiesEnum: 1
+    propertiesType: 0
+  Regions: 04000000
+  fullSprite: {fileID: 21300000, guid: 7981859fc826c1843ab5e829f57b15b4, type: 3}
+  selectedSprite: {fileID: 21300000, guid: 7981859fc826c1843ab5e829f57b15b4, type: 3}

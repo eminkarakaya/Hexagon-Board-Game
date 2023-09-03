@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2648385205017227964}
   - component: {fileID: 4363271964234488791}
   - component: {fileID: 771100593849400332}
+  - component: {fileID: 3013630213803018907}
   m_Layer: 0
   m_Name: ZanzibarCivManager
   m_TagString: Untagged
@@ -46,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneId: 0
-  _assetId: 0
+  _assetId: 2831266269
   serverOnly: 0
   visible: 0
   hasSpawned: 0
@@ -81,3 +82,18 @@ MonoBehaviour:
   hexGrid: {fileID: 0}
   civData: {fileID: 11400000, guid: 9156276579117e645aecf05f543a5be6, type: 2}
   civType: 0
+--- !u!114 &3013630213803018907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7896743616682116670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d17e718851449a6879986e45c458fb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0

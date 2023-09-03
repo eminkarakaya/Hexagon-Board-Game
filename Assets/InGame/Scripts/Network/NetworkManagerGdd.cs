@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
 using System.Linq;
+using System.Collections;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
@@ -12,7 +13,10 @@ using System.Linq;
 
 public class NetworkManagerGdd : NetworkManager
 {
-    public Dictionary<NetworkConnection,PlayerManager> LocalPlayers = new Dictionary<NetworkConnection, PlayerManager>();
+    [SerializeField] GameObject playerManagerPrefab;
+    public bool isInTransition;
+    [SerializeField] private string scene;
+    public Dictionary<NetworkConnection,Player> LocalPlayers = new Dictionary<NetworkConnection, Player>();
     /// <summary>
     public static new NetworkManagerGdd singleton { get; private set; }
     /// Runs on both Server and Client
@@ -23,7 +27,7 @@ public class NetworkManagerGdd : NetworkManager
     [ContextMenu("ASSIGN NETWORK OBJECTS")]
     public void AssignNetworkObjects()
     {
-        spawnPrefabs = Resources.LoadAll<GameObject>("").Where(x=>x.TryGetComponent(out NetworkIdentity networkIdentity) && !x.TryGetComponent(out PlayerManager playerManager)).ToList();
+        spawnPrefabs = Resources.LoadAll<GameObject>("").Where(x=>x.TryGetComponent(out NetworkIdentity networkIdentity) && !x.TryGetComponent(out Player playerManager)).ToList();
     }
     
     public override void Awake()
@@ -46,6 +50,55 @@ public class NetworkManagerGdd : NetworkManager
     public override void Start()
     {
         base.Start();
+        
+    }
+    IEnumerator AddPlayerDelayed(NetworkConnectionToClient conn)
+    {
+        NetworkIdentity [] identities = FindObjectsOfType<NetworkIdentity>();
+
+        foreach (var item in identities)
+        {
+            item.enabled = true;
+        }
+        conn.Send(new SceneMessage{sceneName = scene,sceneOperation = SceneOperation.LoadAdditive,customHandling = true});
+
+        GameObject pm = Instantiate(playerManagerPrefab);
+        yield return new WaitForEndOfFrame();
+
+        SceneManager.MoveGameObjectToScene(pm,SceneManager.GetSceneByName(scene));
+    }
+    IEnumerator LoadAdditive(string sceneName)
+    {
+        isInTransition = true;
+        if(mode == NetworkManagerMode.ClientOnly)
+        {
+            loadingSceneAsync = SceneManager.LoadSceneAsync(sceneName,LoadSceneMode.Additive);
+
+            while(loadingSceneAsync != null && !loadingSceneAsync.isDone)
+            {
+                yield return null;
+            }
+        }
+        NetworkClient.isLoadingScene = false;
+        isInTransition = false;
+        OnClientSceneChanged();
+    }
+    IEnumerator UnloadAdditive(string sceneName)
+    {
+        isInTransition = true;
+
+        if(mode == NetworkManagerMode.ClientOnly)
+        {
+            yield return SceneManager.UnloadSceneAsync(sceneName);
+            
+        }
+        NetworkClient.isLoadingScene = false;
+        isInTransition = false;
+        OnClientSceneChanged();
+    }
+    IEnumerator ServerLoadSubScene()
+    {
+        yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
     }
 
     /// <summary>
@@ -53,7 +106,7 @@ public class NetworkManagerGdd : NetworkManager
     /// </summary>
     public override void LateUpdate()
     {
-        
+        base.LateUpdate();
     }
 
     /// <summary>
@@ -110,7 +163,13 @@ public class NetworkManagerGdd : NetworkManager
     /// Called on the server when a scene is completed loaded, when the scene load was initiated by the server with ServerChangeScene().
     /// </summary>
     /// <param name="sceneName">The name of the new scene.</param>
-    public override void OnServerSceneChanged(string sceneName) { }
+    public override void OnServerSceneChanged(string sceneName) { 
+        base.OnServerSceneChanged(sceneName);
+        if(sceneName == scene)
+        {
+            StartCoroutine(ServerLoadSubScene());
+        }
+    }
 
     /// <summary>
     /// Called from ClientChangeScene immediately before SceneManager.LoadSceneAsync is executed
@@ -119,7 +178,16 @@ public class NetworkManagerGdd : NetworkManager
     /// <param name="newSceneName">Name of the scene that's about to be loaded</param>
     /// <param name="sceneOperation">Scene operation that's about to happen</param>
     /// <param name="customHandling">true to indicate that scene loading will be handled through overrides</param>
-    public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling) { }
+    public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling) { 
+        if(sceneOperation == SceneOperation.UnloadAdditive)
+        {
+            StartCoroutine(UnloadAdditive(newSceneName));
+        }
+        if(sceneOperation == SceneOperation.LoadAdditive)
+        {
+            StartCoroutine(LoadAdditive(newSceneName));
+        }
+    }
 
     /// <summary>
     /// Called on clients when a scene has completed loaded, when the scene load was initiated by the server.
@@ -127,7 +195,12 @@ public class NetworkManagerGdd : NetworkManager
     /// </summary>
     public override void OnClientSceneChanged()
     {
-        base.OnClientSceneChanged();
+        if(isInTransition == false)
+        {
+            base.OnClientSceneChanged();
+        }
+
+
     }
 
     #endregion
@@ -168,7 +241,8 @@ public class NetworkManagerGdd : NetworkManager
         player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
 
         NetworkServer.AddPlayerForConnection(conn, player);
-        LocalPlayers.Add(conn,player.GetComponent<PlayerManager>());
+        LocalPlayers.Add(conn,player.GetComponent<Player>());
+        // base.OnServerAddPlayer(conn);
     }
 
 

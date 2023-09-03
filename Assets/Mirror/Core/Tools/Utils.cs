@@ -62,7 +62,6 @@ namespace Mirror
             //             if (UnityEditor.EditorUtility.IsPersistent(identity.gameObject))
             //                 return false;
             // #endif
-
             return identity.gameObject.hideFlags != HideFlags.NotEditable &&
                 identity.gameObject.hideFlags != HideFlags.HideAndDontSave &&
                 identity.sceneId != 0;

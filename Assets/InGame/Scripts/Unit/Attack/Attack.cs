@@ -6,13 +6,10 @@ using Mirror;
 using UnityEngine.Events;
 using System;
 
-public enum Funcs
-{
-    MoveKill = 1 , TakeHostage  = 2 , Default = 3
-}
-public abstract class Attack : NetworkBehaviour
-{
 
+public abstract class Attack : NetworkBehaviour
+{   
+    public List<PropertiesStruct> PropertiesEnumList;
     [SerializeField] private TMP_Text attackText;
     public float attackTime;
     Dictionary<Renderer,Material[]> transparentMaterialDict = new Dictionary<Renderer, Material[]>(); 
@@ -21,7 +18,6 @@ public abstract class Attack : NetworkBehaviour
     [SerializeField] protected NetworkAnimator networkAnimator;
     public Color originalColor;
     public Material transparentMaterial,originalMaterial;
-    public List<Funcs> funcs;
     public UnityEvent killEvent;
     protected IAttackable attackable;
     [SerializeField] private TextMeshProUGUI _damageText;
@@ -31,6 +27,7 @@ public abstract class Attack : NetworkBehaviour
     protected int DamagePower { get; set; }
     public int range = 1;
     private void Awake() {
+        PropertiesEnumList = attackable.attackProperties;
     }
     private void OnValidate() {
         

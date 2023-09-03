@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20c9e8d8bc6aec141b0246ac6afa10be, type: 3}
+  m_Name: RegionData
+  m_EditorClassIdentifier: 
+  cardRegionPrefab: {fileID: 4785237919850594365, guid: f7d8140edfd68364abcf7c2fa9e4c977, type: 3}
+  regionDatas:
+  - regionType: 2
+    regionTip: {fileID: 0}
+    regionDescription: 
+    regionSprite: {fileID: 21300000, guid: c565cc228a812da4e91fd94ebcb4cbee, type: 3}
+  - regionType: 0
+    regionTip: {fileID: 0}
+    regionDescription: 
+    regionSprite: {fileID: 21300000, guid: bbedb24dba06d9b41a5ab3b0f1ff2218, type: 3}
+  - regionType: 1
+    regionTip: {fileID: 0}
+    regionDescription: 
+    regionSprite: {fileID: 21300000, guid: 2029a54a4a15342409a031a1fc9aa13a, type: 3}
+  - regionType: 3
+    regionTip: {fileID: 0}
+    regionDescription: 
+    regionSprite: {fileID: 21300000, guid: 0a7f1060a5bec5f42a4dfcfaffc9490c, type: 3}
+  - regionType: 6
+    regionTip: {fileID: 0}
+    regionDescription: 
+    regionSprite: {fileID: 21300000, guid: 6949aab7a0cad704cb5396c041351960, type: 3}
+  - regionType: 4
+    regionTip: {fileID: 0}
+    regionDescription: 
+    regionSprite: {fileID: 21300000, guid: e9a346281c806a6488d5c49d1c843382, type: 3}
+  - regionType: 5
+    regionTip: {fileID: 0}
+    regionDescription: 
+    regionSprite: {fileID: 21300000, guid: 112d9b549828dfb4f99c74e28ec2f2ff, type: 3}

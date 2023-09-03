@@ -9,7 +9,7 @@ public class GameManager : NetworkBehaviour
 {
     public TMP_Text goldText,goldPerRoundText;
     public TMP_Text nextRoundTipText;
-    public HoverTip hoverTip;
+    public TooltipTrigger tooltipTrigger;
     public Button OrderButton;
     public static GameManager instance;
     public int playerCount;

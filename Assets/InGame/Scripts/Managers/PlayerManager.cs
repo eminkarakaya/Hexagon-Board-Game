@@ -16,7 +16,7 @@ public class PlayerManager : CivManager
     public Action NextRoundEvent;
 
 
-    public HoverTip hoverTip;
+    public TooltipTrigger tooltipTrigger;
     public TMP_Text tipText;
     public const string NETX_ROUND_STRING = "Next Round",UNIT_NEEDS_ORDER = "Unit Needs Orders", WAITING_OTHER_PLAYERS = "Waiting Other Players";
     public List<PlayerManager> waitedPlayers = new List<PlayerManager>();
@@ -33,54 +33,58 @@ public class PlayerManager : CivManager
 
 
     #region  unityMirrorCallbacks
-    private void Awake() {
-
-    }
+    // private void Awake() {
+    //     NetworkIdentity [] identities = FindObjectsOfType<NetworkIdentity>();
+    //     foreach (var item in identities)
+    //     {
+    //         item.gameObject.SetActive(true);
+    //     }
+    // }
     private void Start() {
         if(isOwned)
         {
            
             FindObjectOfType<SelectCiv>().button.onClick.AddListener(()=> StartCoroutine(StartGame()));
+            
         }
     }
 
-    
     [Command] private void SetIsStart()
     {
         isStart = true;
     }
     public IEnumerator StartGame()
     {
-        SetIsStart();
-        while(gameManager == null)
-        {
-            gameManager = FindObjectOfType<GameManager>();
-            yield return null;
-        }
-        while(gameManager.playerCount != FindObjectsOfType<PlayerManager>().Where(x=>x.isStart == true).Count())
-        {
-            yield return null;
-        }
-        // if(isOwned)
-        //     CMDSetCivData();
-        while(civData == null)
-        {
-            yield return null;
-        }
         if(isOwned)
         {
+            SetIsStart();
+            while(gameManager == null)
+            {
+                gameManager = GameManager.instance;
+                yield return null;
+            }
+            while(gameManager.playerCount != FindObjectsOfType<PlayerManager>().Where(x=>x.isStart == true).Count())
+            {
+                yield return null;
+            }
+            // if(isOwned)
+            //     CMDSetCivData();
+            while(civData == null)
+            {
+                yield return null;
+            }
             
             waitedPlayers = FindObjectsOfType<PlayerManager>().ToList();
             orderButton = gameManager.OrderButton;
             orderButton.onClick.AddListener(GetOrder);
             orderButton.image.sprite = GameSettingsScriptable.Instance.nextRoundSprite;
             tipText = gameManager.nextRoundTipText;
-            hoverTip = gameManager.hoverTip;
+            tooltipTrigger = gameManager.tooltipTrigger;
             totalGoldText = gameManager.goldText;
             goldTextPerRound = gameManager.goldPerRoundText;
             gameManager.ownedPlayerManager = this;
-            CMDCreateCivUI();
-            CMDCreateBuilding();
+            CMDCreateCivUI(gameManager);
+            CMDCreateBuilding(gameManager);
             GetOrderIcon();
             StartCoroutine(wait1());
         }
@@ -96,13 +100,13 @@ public class PlayerManager : CivManager
     }
 
 
-    [Command] public void CMDSetCivData(int civDataIndex)
+    [Command] public void CMDSetCivData(int civDataIndex,GameManager gameManager)
     {
-        RPCSetCivData(civDataIndex);
+        RPCSetCivData(civDataIndex,gameManager);
     }
-    [ClientRpc] private void RPCSetCivData(int civDataIndex)
+    [ClientRpc] private void RPCSetCivData(int civDataIndex, GameManager gameManager)
     {
-        gameManager = FindObjectOfType<GameManager>();
+        // gameManager = FindObjectOfType<GameManager>();
         this.civData = gameManager.GetCivData(civDataIndex);
         // this.civType = index;
     }
@@ -127,7 +131,7 @@ public class PlayerManager : CivManager
     {
         nickname = str;
     }
-    [Command] private void CMDCreateCivUI()
+    [Command] private void CMDCreateCivUI(GameManager gameManager)
     {
         CivDataUI civDataUI = Instantiate(civUIPrefab,gameManager.civUIParent).GetComponent<CivDataUI>();
         NetworkServer.Spawn(civDataUI.gameObject,connectionToClient);
@@ -149,11 +153,10 @@ public class PlayerManager : CivManager
 
     #region  createBuilding
     [Command] // client -> server
-    private void CMDCreateBuilding()
+    private void CMDCreateBuilding(GameManager gameManager)
     {
         Building building = Instantiate(buildingPrefab).GetComponent<Building>();
         NetworkServer.Spawn(building.gameObject,connectionToClient);
-
 
         RPCCreateBuilding(building,gameManager.hexIndex);
         gameManager.hexIndex ++;
@@ -308,6 +311,11 @@ public class PlayerManager : CivManager
             return;
         }
         // sıradakı objeyı seciyo
+        while( orderList[orderList.Count-1] == null)
+        {
+            orderList.RemoveAt(orderList.Count-1);
+            GetOrder();
+        }
         orderList[orderList.Count-1].LeftClick();
         UnitManager.Instance.HandleUnitSelected(orderList[orderList.Count-1].Transform);
         Transform targetCameraTransform = orderList[orderList.Count-1].Transform;
@@ -337,7 +345,7 @@ public class PlayerManager : CivManager
     }
     private void CloseHoverTip()
     {
-        hoverTip.tipToShow = string.Empty;
+        tooltipTrigger.content = string.Empty;
     }
 
     public void SetWaitedListTip()
@@ -355,8 +363,8 @@ public class PlayerManager : CivManager
                 if(str == string.Empty) return;
                 if(str.Length < 3) return;
                 str.Remove(str.Count()-3,3);
-                item.hoverTip.tipToShow = string.Empty;
-                item.hoverTip.tipToShow += str;
+                item.tooltipTrigger.content = string.Empty;
+                item.tooltipTrigger.content += str;
             }
         }
     }
@@ -446,4 +454,9 @@ public class PlayerManager : CivManager
     }
     #endregion
 
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+    
+    }
 }

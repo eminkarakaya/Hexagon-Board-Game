@@ -6,9 +6,8 @@ using Mirror;
 [SelectionBase]
 public class Hex : NetworkBehaviour
 {
-    // [SyncVar] private bool IsInAnimation;
     public Resource resource;
-    public List<MeshRenderer> Edges = new List<MeshRenderer>(); // 1 nw 2 ne 3 e 4 se 5 sw 6 w
+    public List<MeshRenderer> Edges = new List<MeshRenderer>(); 
     public bool isCoast;
     public bool isVisible;
     public bool isReachable;
@@ -23,9 +22,6 @@ public class Hex : NetworkBehaviour
     [SerializeField] private GlowHighlight highlight;
     [SerializeField] private HexType hexType;
     [SerializeField] private HexCoordinates hexCoordinates;
-    // public Settler Settler { get; set; }
-    // public Building Building {get=>building; set {building = value;}}
-    // public Unit Unit {get => unit;  set{unit = value;}}
     public Vector3Int HexCoordinates => hexCoordinates.GetHexCoords();
     [SyncVar] [SerializeField] private Unit unit;
     [SyncVar] [SerializeField] private Settler settler;
@@ -44,14 +40,6 @@ public class Hex : NetworkBehaviour
         hexCoordinates = GetComponent<HexCoordinates>();
         highlight = GetComponent<GlowHighlight>();
     }
-    // [Command(requiresAuthority = false)] public void SetHexInAnimation(bool state)
-    // {
-    //     IsInAnimation = state;
-    // }
-    // public bool GetHexInAnimation()
-    // {
-    //     return IsInAnimation;
-    // }
     public void OpenEdge(int index, bool state)
     {
         Edges[index].enabled = state;
@@ -202,12 +190,10 @@ public class Hex : NetworkBehaviour
     
     public void ResetHighlight()
     {
-        // highlight.ResetGlowHighlight();
     }
     internal void HighlightPath()
     {
 
-        // highlight.HighlightValidPath();
     }
     public void DisableHighlighRange()
     {
