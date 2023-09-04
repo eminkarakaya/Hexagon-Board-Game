@@ -29,9 +29,6 @@ using UnityEngine.SceneManagement;
             matchMaker = FindObjectOfType<MatchMaker>();
 
         }
-        private void Update() {
-            Debug.Log(NetworkClient.spawned.Count);
-        }
         public override void OnStartClient () {
             if (isLocalPlayer) {
                 // Debug.Log("if");

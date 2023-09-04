@@ -23,7 +23,7 @@ public class SelectedUICharacter : MonoBehaviour, IDragHandler , IPointerDownHan
     }
     public void SetCountText()
     {
-        uICharacter.countText.text = DeckManager.Instance.selectedDeck.GetCharacterCountInDeck(this) + "/" + uICharacter.CharacterData.ownedCount + "("+uICharacter.CharacterData.capacity+")"; 
+        uICharacter.countText.text = DeckManager.Instance.selectedDeck.GetCharacterCountInDeck(this) + "/" + uICharacter.CharacterData.savedCharacterData.ownedCount + "("+uICharacter.CharacterData.capacity+")"; 
     }
     public void IncreaseCount()
     {

@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baad70107fd7962429ef01443361929f, type: 3}
   m_Name: Draven
   m_EditorClassIdentifier: 
-  ownedCount: 1
+  savedCharacterData:
+    characterID: 3
+    ownedCount: 0
+  cost: 0
   capacity: 20
   charName: Draven
   level: 3

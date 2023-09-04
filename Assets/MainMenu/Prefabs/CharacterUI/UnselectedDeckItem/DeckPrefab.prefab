@@ -148,6 +148,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8947535274449304729}
   - component: {fileID: 8005558639241697850}
+  - component: {fileID: -8406192645155918991}
   m_Layer: 5
   m_Name: DeckPrefab
   m_TagString: Untagged
@@ -224,6 +225,20 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!114 &-8406192645155918991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4019131434597507836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 334b1e8efe5cbcd438c48a4f312a80ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  background: {fileID: 7123390861671146034}
+  deckName: {fileID: 5936421312228048339}
 --- !u!1 &4922450207375498514
 GameObject:
   m_ObjectHideFlags: 0

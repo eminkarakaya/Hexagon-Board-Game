@@ -9,7 +9,7 @@ using TMPro;
 public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPointerUpHandler 
 {
 
-    
+    public bool moveable = false;
 
     [Header("UI")]
     [SerializeField] private Image backGroundImage;
@@ -64,12 +64,21 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
     
     public void SetCountText()
     {
-        countText.text = DeckManager.Instance.selectedDeck.GetCharacterCountInDeck(selectedUICharacter) + "/" + characterData.ownedCount + "("+characterData.capacity+")"; 
+        if(moveable)
+        {
+            countText.text = DeckManager.Instance.selectedDeck.GetCharacterCountInDeck(selectedUICharacter) + "/" + characterData.savedCharacterData.ownedCount + "("+characterData.capacity+")"; 
+        }
+        else
+        {
+            countText.text = characterData.savedCharacterData.ownedCount + "/"+ characterData.capacity; 
+
+        }
     }
     
     public void Buy(int count = 1)
     {
-        characterData.ownedCount ++;
+        characterData.savedCharacterData.ownedCount ++;
+        SetCountText();
     }
     
     
@@ -79,6 +88,16 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
     }
     public void OnDrag(PointerEventData eventData)
     {
+        if(!moveable) 
+        {
+            var scrollRect = GetComponentInParent<ScrollRect>();
+            eventData.pointerDrag = scrollRect.gameObject;
+            EventSystem.current.SetSelectedGameObject(scrollRect.gameObject);
+            
+            scrollRect.OnInitializePotentialDrag(eventData);    
+            scrollRect.OnBeginDrag(eventData);
+            return;
+        }
         if (eventData.button == PointerEventData.InputButton.Left)
         {
             if(isMoveUp && !isCreated)
@@ -139,6 +158,7 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
+            if(!moveable) return;
             selectedUICharacter = selectedGameobject.GetComponent<SelectedUICharacter>();
         }
         if (eventData.button == PointerEventData.InputButton.Right)
@@ -152,12 +172,12 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if(!moveable) return;
         if (eventData.button == PointerEventData.InputButton.Left)
         {
-            isCreated = false;
             if(addCondition)
             {
-                DeckManager.Instance.DeckAddItem(new DeckItem{uICharacter = this,selectedUICharacter =this.selectedUICharacter,characterData = characterData});
+                DeckManager.Instance.DeckAddItem(new DeckCharacterUIData{uICharacter = this,selectedUICharacter =this.selectedUICharacter,characterData = characterData});
                 addCondition = false;
                 
             }
@@ -166,6 +186,10 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
                 if(isCreated)
                     Destroy(selectedUICharacter.gameObject);
             }
+                
+
+            
+            isCreated = false;
             currentDragOffset = 0;
             selectedUICharacter = null;
             currentMoveUpOffset = 0;

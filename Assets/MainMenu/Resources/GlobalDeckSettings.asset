@@ -13,15 +13,17 @@ MonoBehaviour:
   m_Name: GlobalDeckSettings
   m_EditorClassIdentifier: 
   uICharacterPrefab: {fileID: 1780058517115693194, guid: 15808defa91e1674c9c738adeebb8b39, type: 3}
+  deckPrefab: {fileID: 4019131434597507836, guid: bd01fa16d93df5a43890c85f2059036e, type: 3}
   allCharacters:
   - {fileID: 11400000, guid: cbc38ac4123f53946a4507dd997a2f97, type: 2}
   - {fileID: 11400000, guid: 7bf4c05ea5ee2624cbe1540579a09f23, type: 2}
+  - {fileID: 11400000, guid: 76c05c4f99debd146b2e1c7b03714e89, type: 2}
+  - {fileID: 11400000, guid: f45c4b9802b4ec94bb0187df49579c12, type: 2}
   - {fileID: 11400000, guid: 657e0782c02babb41a220d3a903e5edc, type: 2}
   - {fileID: 11400000, guid: 6626b428767728e4b9b4f2c147492a7b, type: 2}
   - {fileID: 11400000, guid: 3960712bc2a257649b0e49266d88a94f, type: 2}
   - {fileID: 11400000, guid: 3cb9da9a632b7874781286ecc8980a35, type: 2}
   - {fileID: 11400000, guid: 76c05c4f99debd146b2e1c7b03714e89, type: 2}
-  - {fileID: 11400000, guid: f45c4b9802b4ec94bb0187df49579c12, type: 2}
   maxDeckCount: 10
   deckCardCapacity: 40
   deckHeroCapacity: 6
