@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uICharacterPrefab: {fileID: 1780058517115693194, guid: 15808defa91e1674c9c738adeebb8b39, type: 3}
   deckPrefab: {fileID: 4019131434597507836, guid: bd01fa16d93df5a43890c85f2059036e, type: 3}
+  selectedUICharacterPrefab: {fileID: 930785068528047847, guid: 5ef6a53bf637eb8438a84efdfe5f9793, type: 3}
   allCharacters:
   - {fileID: 11400000, guid: cbc38ac4123f53946a4507dd997a2f97, type: 2}
   - {fileID: 11400000, guid: 7bf4c05ea5ee2624cbe1540579a09f23, type: 2}
@@ -24,6 +25,25 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3960712bc2a257649b0e49266d88a94f, type: 2}
   - {fileID: 11400000, guid: 3cb9da9a632b7874781286ecc8980a35, type: 2}
   - {fileID: 11400000, guid: 76c05c4f99debd146b2e1c7b03714e89, type: 2}
+  allDecks:
+  - savedCharacterData:
+    - characterID: 3
+      ownedCount: 4
+    - characterID: 2
+      ownedCount: 2
+    deckName: 
+  - savedCharacterData:
+    - characterID: 5
+      ownedCount: 2
+    - characterID: 2
+      ownedCount: 5
+    deckName: 2declk
+  - savedCharacterData: []
+    deckName: 
+  - savedCharacterData:
+    - characterID: 2
+      ownedCount: 1
+    deckName: 
   maxDeckCount: 10
   deckCardCapacity: 40
   deckHeroCapacity: 6

@@ -12,7 +12,6 @@ public class ScriptableObjectSinleton<T> : ScriptableObject where T : Scriptable
         {
             if(_instance == null)
             {
-                Debug.Log(Resources.FindObjectsOfTypeAll<GameSettingsScriptable>().Length);
                 T [] results = Resources.FindObjectsOfTypeAll<T>();
 
                 if(results.Length == 0)

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   savedCharacterData:
     characterID: 5
-    ownedCount: 2
+    ownedCount: 4
   cost: 0
   capacity: 20
   charName: Hecarim

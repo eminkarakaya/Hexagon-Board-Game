@@ -4,11 +4,13 @@ using PlayFab;
 using PlayFab.ClientModels;
 using Newtonsoft.Json;
 using UnityEngine;
+using System.Linq;
+
 [CreateAssetMenu(menuName ="Deck/DeckSettings")]
 public class GlobalDeckSettingsSO : ScriptableObjectSinleton<GlobalDeckSettingsSO>
 {
     private const string TITLE_DATA_KEY ="CardData";
-    [SerializeField] private GameObject uICharacterPrefab,deckPrefab;
+    [SerializeField] private GameObject uICharacterPrefab,deckPrefab,selectedUICharacterPrefab;
     public List<CharacterData> allCharacters;
     public List<DeckAllData> allDecks;
     public int maxDeckCount = 10;
@@ -20,6 +22,8 @@ public class GlobalDeckSettingsSO : ScriptableObjectSinleton<GlobalDeckSettingsS
         var obj = Instantiate(uICharacterPrefab,parent);
         UICharacter uICharacter = obj.GetComponent<UICharacter>();
         uICharacter.SetCharacterData(characterData);
+        uICharacter.Initialize();
+        // uICharacter.SetCountText();
         return uICharacter;
     }   
     
@@ -28,6 +32,7 @@ public class GlobalDeckSettingsSO : ScriptableObjectSinleton<GlobalDeckSettingsS
         List<UICharacter> characterDatas = new List<UICharacter>();
         for (int i = 0; i < allCharacters.Count; i++)
         {
+            Debug.Log("createUICharacter");
             var obj = CreateUICharacter(allCharacters[i],parent);
             obj.moveable = moveable;
             characterDatas.Add (obj);
@@ -56,7 +61,45 @@ public class GlobalDeckSettingsSO : ScriptableObjectSinleton<GlobalDeckSettingsS
         return deckData;
     }
 
+    public DeckCharacterUIData CreateSelectedUICharacter(SavedCharacterData savedCharacterData,Transform parent)
+    {
+        CharacterData characterData = GetCharacterData(savedCharacterData.characterID);
+        SelectedUICharacter selectedUICharacter = Instantiate(selectedUICharacterPrefab,parent).GetComponent<SelectedUICharacter>();
+        UICharacter uICharacter = DeckManager.Instance.GetUICharacter(characterData);
+        selectedUICharacter.uICharacter = uICharacter;
+        selectedUICharacter.SetData();
+        selectedUICharacter.count = savedCharacterData.ownedCount;
+        DeckCharacterUIData deckCharacterUIData = new DeckCharacterUIData{characterData = characterData,selectedUICharacter = selectedUICharacter,uICharacter = uICharacter,count = savedCharacterData.ownedCount};
+        // uICharacter.SetCountText();
+        
+        return deckCharacterUIData;
+    }
+    public List<DeckCharacterUIData> CreateAllSelectedUICharacter(List<SavedCharacterData> savedCharacterData,Transform parent)
+    {
+        List<DeckCharacterUIData> deckCharacterUIData = new List<DeckCharacterUIData>();
+        for (int i = 0; i < savedCharacterData.Count; i++)
+        {
+            deckCharacterUIData.Add(CreateSelectedUICharacter(savedCharacterData[i],parent));
+        }
+        
 
+        
+        return deckCharacterUIData;
+    }
+    public CharacterData GetCharacterData(int ID)
+    {
+        foreach (var item in allCharacters)
+        {
+            if(item.savedCharacterData.characterID == ID)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    // public List<>
+    
 
 
 

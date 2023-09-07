@@ -9,21 +9,36 @@ using Newtonsoft.Json;
 using System.Linq;
 
 public class DeckManager : Singleton<DeckManager>
-{
+{   
+    /// <summary>
+    /// sadece olustururken kullanıyorum. canvası kapalı bı objenın altında olusturunca 
+    /// scale sı 0 oluyo bazen ondan burda olusturuyorum.
+    /// </summary>
+    public Transform createdParent; 
+
+    /// <summary>
+    /// test için eger acıksa ve save ypaarsam save ler sılınır.
+    /// </summary>
     public bool deleteDecks;
     [SerializeField] private TMP_InputField deckNameInputField;
     private const string TITLE_DATA_KEY ="DeckData";
     [SerializeField] private GameObject displayUICharacter;
     [SerializeField] private Transform displayUIParent,deckParent,playParent;
+
+    /// <summary>
+    /// buy canvası ve display UIChaaacter bulunur.
+    /// </summary>
     [Header("RightClickCanvas")]
     [SerializeField] private TMP_Text costText;
     [SerializeField] private TMP_Text rightClickCountText;
     [SerializeField] private Button buyButton;
     [SerializeField] private Image ppImage;
-    [SerializeField] private GameObject rightClickPanel;
+    [SerializeField] private Canvas rightClickPanel;
     private UICharacterDisplay display;
 
     public UICharacter currentRightClickedUICharacter;
+
+    [Space(10)]
     public List<UIDeck> allDecks = new List<UIDeck>();
     public TMP_Dropdown dropdownDeckCards,dropdownCollectionCards;
     public List<UICharacter> allCharacters;
@@ -31,11 +46,32 @@ public class DeckManager : Singleton<DeckManager>
     public Transform collectionCardsParent,collectionTempCardsParent;
     public Transform selectedCardsParent;
     public Deck selectedDeck;
-    bool isNew = false;
+    public UIDeck selectedUIDeck;
+    [SerializeField] private Canvas editDeckPanel;
+    public bool isNew = false;
     public void NewDeck()
     {
-        selectedDeck = new Deck(new DeckAllData());
+        selectedDeck = new Deck();
         isNew = true;
+        TranslateAllCharacters(editCardsParent,true);
+    }
+    public void SetDataUICharacters()
+    {
+        foreach (var item in allCharacters)
+        {
+            item.SetCountText();
+        }
+    }
+    public UICharacter GetUICharacter(CharacterData characterData)
+    {
+        foreach (var item in allCharacters)
+        {
+            if(item.CharacterData == characterData)
+            {
+                return item;
+            }
+        }
+        return null;
     }
     public void DeckAddItem(DeckCharacterUIData deckItem)
     {
@@ -48,16 +84,15 @@ public class DeckManager : Singleton<DeckManager>
     private void Start() {
         GetAppearance();
         GlobalDeckSettingsSO.Instance.GetAppearance();
-        allCharacters = GlobalDeckSettingsSO.Instance.CreateAllCharacters(editCardsParent,true);
-        
-        GlobalDeckSettingsSO.Instance.CreateAllCharacters(collectionCardsParent,false);
+        allCharacters = GlobalDeckSettingsSO.Instance.CreateAllCharacters(createdParent,true);
     }
     public void ListAllCharactersCollectionCards()
     {
-        foreach (var item in allCharacters)
-        {
-            item.transform.SetParent(collectionCardsParent);   
-        }
+        TranslateAllCharacters(collectionCardsParent,false);
+        // foreach (var item in allCharacters)
+        // {
+        //     item.transform.SetParent(collectionCardsParent);   
+        // }
     }
     public void ListOwnedCharactersCollectionCards()
     {
@@ -65,11 +100,14 @@ public class DeckManager : Singleton<DeckManager>
         {
             if(item.CharacterData.savedCharacterData.ownedCount == 0)
             {
-                item.transform.SetParent(collectionTempCardsParent);
+                TranslateCharacter(collectionTempCardsParent,false,item);
+                // item.transform.SetParent(collectionTempCardsParent);
+                
             }
             else
             {
-                item.transform.SetParent(collectionCardsParent);
+                TranslateCharacter(collectionCardsParent,false,item);
+                // item.transform.SetParent(collectionCardsParent);
             }
         }
     }
@@ -79,20 +117,23 @@ public class DeckManager : Singleton<DeckManager>
         {
             if(item.CharacterData.savedCharacterData.ownedCount == 0)
             {
-                item.transform.SetParent(collectionCardsParent);
+                TranslateCharacter(collectionCardsParent,false,item);
+                // item.transform.SetParent(collectionCardsParent);
             }
             else
             {
-                item.transform.SetParent(collectionTempCardsParent);
+                TranslateCharacter(collectionTempCardsParent,false,item);
+                // item.transform.SetParent(collectionTempCardsParent);
             }
         }
     }
     public void ListAllCharacters()
     {
-        foreach (var item in allCharacters)
-        {
-            item.transform.SetParent(editCardsParent);   
-        }
+        TranslateAllCharacters(editCardsParent,true);
+        // foreach (var item in allCharacters)
+        // {
+        //     item.transform.SetParent(editCardsParent);   
+        // }
     }
     public void ListOwnedCharacters()
     {
@@ -100,11 +141,13 @@ public class DeckManager : Singleton<DeckManager>
         {
             if(item.CharacterData.savedCharacterData.ownedCount == 0)
             {
-                item.transform.SetParent(editCardsParentTemp);
+                TranslateCharacter(editCardsParentTemp,true,item);
+                // item.transform.SetParent(editCardsParentTemp);
             }
             else
             {
-                item.transform.SetParent(editCardsParent);
+                TranslateCharacter(editCardsParent,true,item);
+                // item.transform.SetParent(editCardsParent);
             }
         }
     }
@@ -114,11 +157,13 @@ public class DeckManager : Singleton<DeckManager>
         {
             if(item.CharacterData.savedCharacterData.ownedCount == 0)
             {
-                item.transform.SetParent(editCardsParent);
+                TranslateCharacter(editCardsParent,true,item);
+                // item.transform.SetParent(editCardsParent);
             }
             else
             {
-                item.transform.SetParent(editCardsParentTemp);
+                TranslateCharacter(editCardsParentTemp,true,item);
+                // item.transform.SetParent(editCardsParentTemp);
             }
         }
     }
@@ -166,13 +211,13 @@ public class DeckManager : Singleton<DeckManager>
     }
     public void CloseRightclickCanvas()
     {
-        rightClickPanel.SetActive(false);
+        rightClickPanel.enabled = false;
         Destroy(display.gameObject);
         GlobalDeckSettingsSO.Instance.SaveCards();
     }
     public void OpenRightclickCanvas()
     {
-        rightClickPanel.SetActive(true);
+        rightClickPanel.enabled = true;
         display = CreateUICharacterDisplay();
         RightClickCanvasSetData();
         RightClickCanvasSetDataDisplay(display);
@@ -207,7 +252,69 @@ public class DeckManager : Singleton<DeckManager>
         display.CharacterData = currentRightClickedUICharacter.CharacterData;
         return display;
     }
+    public void OpenEditDeckPanel()
+    {
+        editDeckPanel.enabled = true;
+        deckNameInputField.text = selectedDeck.deckName;
+        TranslateAllCharacters(editCardsParent,true);
+    }
+    public void CloseEditDeckPanel()
+    {
+        editDeckPanel.enabled = false;
+    }
 
+    public void DiscardDeck()
+    {
+        for (int i = 0; i < selectedDeck.selectedCards.Count; i++)
+        {
+            Destroy (selectedDeck.selectedCards[i].selectedUICharacter.gameObject);
+        }
+        selectedDeck = null;
+        CloseEditDeckPanel();
+    }
+
+    public void OpenCardPanel()
+    {
+        OnToggleChangedCollection();
+        // TranslateAllCharacters(collectionCardsParent,false);
+    }
+    public void TranslateCharacter(Transform parent,bool moveable,UICharacter uICharacter)
+    {
+        uICharacter.transform.SetParent(parent);
+        uICharacter.moveable = moveable;
+        uICharacter.SetCountText();
+        uICharacter.transform.localScale = Vector3.one;
+    }
+    public void TranslateAllCharacters(Transform parent,bool moveable)
+    {
+        foreach (var item in allCharacters)
+        {
+            TranslateCharacter(parent,moveable,item);
+        }
+    }
+    public void TranslateAllDecks(Transform parent,bool isplay)
+    {
+        foreach (var item in allDecks)
+        {
+            item.transform.SetParent(parent);
+            item.isPlay = isplay;
+            item.transform.localScale = Vector3.one;
+            if (selectedUIDeck != null)
+            {
+                selectedUIDeck.DeselectEvent();
+                selectedDeck = null;
+            }
+        }
+    }
+
+    public void OpenPlayPlayersPanel()
+    {
+        TranslateAllDecks(playParent,true);
+    }
+    public void OpenCollectionDeckPanel()
+    {
+        TranslateAllDecks(deckParent,false);
+    }
 
     #region  Playfab
 
@@ -221,7 +328,6 @@ public class DeckManager : Singleton<DeckManager>
         {
             foreach (var item in allDecks)
             {
-                Debug.Log(item.deckAllData.deckName);
                 DeckAllData deckAllData = new DeckAllData{savedCharacterData = new List<SavedCharacterData>()};
                 deckAllData.savedCharacterData = item.deckAllData.savedCharacterData;
                 deckAllData.deckName = item.deckAllData.deckName;
@@ -243,7 +349,6 @@ public class DeckManager : Singleton<DeckManager>
     }
     void OnDataSend(UpdateUserDataResult result)
     {
-        Debug.Log("Successfull Data send");
     }
     public void GetDeckData()
     {
@@ -255,14 +360,14 @@ public class DeckManager : Singleton<DeckManager>
     }
     void OnDataRecived(GetUserDataResult result)
     {
-        Debug.Log("Recieved user data");
         if(result.Data != null && result.Data.ContainsKey(TITLE_DATA_KEY))
         {
             List<DeckAllData> deckDatas = JsonConvert.DeserializeObject<List<DeckAllData>>(result.Data[TITLE_DATA_KEY].Value);
                 allDecks.Clear();
             for (int i = 0; i < deckDatas.Count; i++)
             {
-                allDecks.Add(GlobalDeckSettingsSO.Instance.CreateUIDeck(deckDatas[i],deckParent));
+                UIDeck uIDeck = GlobalDeckSettingsSO.Instance.CreateUIDeck(deckDatas[i],deckParent);
+                allDecks.Add(uIDeck);
             }
             GlobalDeckSettingsSO.Instance.allDecks = allDecks.Select(x=>x.deckAllData).ToList();
             // CreateDeckUI();
@@ -271,13 +376,10 @@ public class DeckManager : Singleton<DeckManager>
         {
             SaveAppearance();
             GetAppearance();
-            Debug.Log("NotData");
         }
     }
     void OnError(PlayFabError error)
     {
-        Debug.Log("Error while logging in/create account");
-        Debug.Log(error.GenerateErrorReport());
     }
 
 
@@ -286,13 +388,39 @@ public class DeckManager : Singleton<DeckManager>
         selectedDeck.deckName = deckNameInputField.text;
         if(isNew)
         {
-            var obj = GlobalDeckSettingsSO.Instance.CreateUIDeck(new DeckAllData{savedCharacterData = selectedDeck.selectedCards.Select(x=>x.characterData.savedCharacterData).ToList(),deckName = selectedDeck.deckName},deckParent);
-            // Debug.Log(obj.deckAllData.savedCharacterData.Count + " obj.deckAllData.savedCharacterData.Count");
-            GlobalDeckSettingsSO.Instance.CreateUIDeck(new DeckAllData{savedCharacterData = selectedDeck.selectedCards.Select(x=>x.characterData.savedCharacterData).ToList(),deckName = selectedDeck.deckName},playParent);
+            DeckAllData deckAllData = new DeckAllData();
+            deckAllData.savedCharacterData = new List<SavedCharacterData>();
+            for (int i = 0; i < selectedDeck.selectedCards.Count; i++)
+            {
+                deckAllData.savedCharacterData.Add(new SavedCharacterData{characterID = selectedDeck.selectedCards[i].characterData.savedCharacterData.characterID,ownedCount = selectedDeck.selectedCards[i].count});
+            }
+            deckAllData.deckName = selectedDeck.deckName;
+            
+            var obj = GlobalDeckSettingsSO.Instance.CreateUIDeck(deckAllData,createdParent);
+            GlobalDeckSettingsSO.Instance.CreateUIDeck(deckAllData,createdParent);
             allDecks.Add(obj);            
-        }        
+        }       
+        else
+        {
+            DeckAllData deckAllData = new DeckAllData();
+            deckAllData.savedCharacterData = new List<SavedCharacterData>();
+            for (int i = 0; i < selectedDeck.selectedCards.Count; i++)
+            {
+                deckAllData.savedCharacterData.Add(new SavedCharacterData{characterID = selectedDeck.selectedCards[i].characterData.savedCharacterData.characterID,ownedCount = selectedDeck.selectedCards[i].count});
+            }
+            deckAllData.deckName = selectedDeck.deckName;
+            selectedUIDeck.SetDeckData(deckAllData);
+        } 
         SaveAppearance();
         isNew = false;
+        CloseEditDeckPanel();
+        for (int i = 0; i < selectedDeck.selectedCards.Count; i++)
+        {
+            Destroy (selectedDeck.selectedCards[i].selectedUICharacter.gameObject);
+        }
+        selectedDeck = null;
     }
+    
+
     #endregion
 }

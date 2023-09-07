@@ -7,6 +7,7 @@ using TMPro;
 
 public class SelectedUICharacter : MonoBehaviour, IDragHandler , IPointerDownHandler , IPointerUpHandler
 {
+    public CharacterData characterData;
     private Transform dragParent;
     [SerializeField] private SelectedUICharacter selectedUICharacter;
     [SerializeField] private GameObject selectedGameobject;
@@ -17,13 +18,16 @@ public class SelectedUICharacter : MonoBehaviour, IDragHandler , IPointerDownHan
 
     [SerializeField] private float dragOffset,currentDragOffset,moveUpOffset,currentMoveUpOffset,addConditionOffset;
     [SerializeField] private bool isCreated,isMoveUp,addCondition;
-    private void Start() {
+    public void Initialize() {
         dragParent = GameObject.Find("DragDropCanvas").transform;   
-        SetData();
     }
     public void SetCountText()
     {
-        uICharacter.countText.text = DeckManager.Instance.selectedDeck.GetCharacterCountInDeck(this) + "/" + uICharacter.CharacterData.savedCharacterData.ownedCount + "("+uICharacter.CharacterData.capacity+")"; 
+        countText.text = count.ToString();
+    }
+    public void SetCountTextUICharacter()
+    {
+        uICharacter.SetCountTextSelectedUI(this);
     }
     public void IncreaseCount()
     {
@@ -41,6 +45,7 @@ public class SelectedUICharacter : MonoBehaviour, IDragHandler , IPointerDownHan
         backgroundImage.sprite = uICharacter.CharacterData.selectedSprite;
         levelText.text = uICharacter.CharacterData.level.ToString();
         nameText.text = uICharacter.CharacterData.name;
+        
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -55,7 +60,7 @@ public class SelectedUICharacter : MonoBehaviour, IDragHandler , IPointerDownHan
             scrollRect.OnInitializePotentialDrag(eventData);    
             scrollRect.OnBeginDrag(eventData);
         }
-        if(!isCreated)
+        if(selectedUICharacter != null)
         {
             currentDragOffset += eventData.delta.x;
             currentMoveUpOffset += eventData.delta.y;
@@ -84,7 +89,7 @@ public class SelectedUICharacter : MonoBehaviour, IDragHandler , IPointerDownHan
         else
         {
             selectedUICharacter.gameObject.transform.position = eventData.position; 
-            if(currentDragOffset < addConditionOffset)
+            if(currentDragOffset > addConditionOffset)
             {
                 addCondition = true;
             }
@@ -103,7 +108,6 @@ public class SelectedUICharacter : MonoBehaviour, IDragHandler , IPointerDownHan
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        isCreated = false;
         if(addCondition)
         {
             DeckManager.Instance.DeckRemoveItem(this);
@@ -114,8 +118,11 @@ public class SelectedUICharacter : MonoBehaviour, IDragHandler , IPointerDownHan
         }
         else
         {
-            Destroy(selectedUICharacter.gameObject);
+
+            if(isCreated)
+                Destroy(selectedUICharacter.gameObject);
         }
+        isCreated = false;
         currentDragOffset = 0;
         selectedUICharacter = null;
         currentMoveUpOffset = 0;

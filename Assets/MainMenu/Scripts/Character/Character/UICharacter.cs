@@ -34,7 +34,7 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
     [SerializeField] private float dragOffset,currentDragOffset,moveUpOffset,currentMoveUpOffset,addConditionOffset;
     [SerializeField] private bool isCreated,isMoveUp,addCondition;
 
-    private void Start() {
+    public void Initialize() {
         dragParent = GameObject.Find("DragDropCanvas").transform;        
         regionTypes = characterData.Regions;
         foreach (var item in regionTypes)
@@ -57,16 +57,37 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
         backGroundImage.sprite = characterData.fullSprite;
         level = characterData.level;
         levelText.text = level.ToString();
-        SetCountText();
+        
         
         
     }
-    
+    public void SetCountTextSelectedUI(SelectedUICharacter selectedUICharacter)
+    {
+        if(moveable) 
+        {
+            
+            countText.text = DeckManager.Instance.selectedDeck.GetCharacterCountInDeck(selectedUICharacter) + "/" + characterData.savedCharacterData.ownedCount + "("+characterData.capacity+")"; 
+            
+        }
+        else
+        {
+            countText.text = characterData.savedCharacterData.ownedCount + "/"+ characterData.capacity; 
+
+        }
+    }
     public void SetCountText()
     {
-        if(moveable)
+        
+        if(moveable) 
         {
-            countText.text = DeckManager.Instance.selectedDeck.GetCharacterCountInDeck(selectedUICharacter) + "/" + characterData.savedCharacterData.ownedCount + "("+characterData.capacity+")"; 
+            if(selectedUICharacter == null) 
+            {
+                countText.text = 0 + "/" + characterData.savedCharacterData.ownedCount + "("+characterData.capacity+")"; 
+            }
+            else
+            {
+                countText.text = DeckManager.Instance.selectedDeck.GetCharacterCountInDeck(selectedUICharacter) + "/" + characterData.savedCharacterData.ownedCount + "("+characterData.capacity+")"; 
+            }
         }
         else
         {
@@ -134,7 +155,8 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
                     { 
                         selectedUICharacter = Instantiate(selectedGameobject,eventData.position,Quaternion.identity,dragParent).GetComponent<SelectedUICharacter>();
                         selectedUICharacter.uICharacter = this;
-                        
+                        selectedUICharacter.Initialize();
+                        selectedUICharacter.SetData();
                         isCreated = true;
                     }
                 }
@@ -166,7 +188,6 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
             DeckManager.Instance.currentRightClickedUICharacter = this;
             DeckManager.Instance.OpenRightclickCanvas();
             DeckManager.Instance.BuyButton();
-            
         }
     }
 

@@ -1284,7 +1284,6 @@ namespace Mirror
         public static bool SpawnObjects()
         {
             // only if server active
-            Debug.Log(active + " active");
             if (!active)
                 return false;
 

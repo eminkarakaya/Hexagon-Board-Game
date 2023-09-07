@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -21,14 +22,26 @@ public class DeckCharacterUIData
 [System.Serializable]
 public class Deck
 {
-    public Deck(DeckAllData _deckData)
+    public Deck()
     {
-        deckAllData = _deckData;
+        
     }
-    public DeckAllData deckAllData;
-    
+    public Deck(List<DeckCharacterUIData> selectedCards)
+    {
+        this.selectedCards = selectedCards;
+    }
+    public Deck(List<SavedCharacterData> savedCharacterData)
+    {
+        selectedCards = GlobalDeckSettingsSO.Instance.CreateAllSelectedUICharacter(savedCharacterData,DeckManager.Instance.selectedCardsParent);
+        foreach (var item in selectedCards)
+        {
+            item.selectedUICharacter.SetCountText();
+        }
+        // deck datalar atanıcak
+        
+    }
     public string deckName;
-    public RegionType regionType;
+    
     public List<DeckCharacterUIData> selectedCards = new List<DeckCharacterUIData>();
     public int GetCharacterCountInDeck(SelectedUICharacter selectedUICharacter)
     {
@@ -58,21 +71,12 @@ public class Deck
                 selectedCards[i].count ++;
                 AddAnimation(deckItem.selectedUICharacter);
                 selectedCards[i].selectedUICharacter.IncreaseCount();
-                // for (int j = 0; j < deckAllData.savedCharacterData.Count; j++)
-                // {
-                //     if(deckAllData.savedCharacterData[j] == deckItem.characterData.savedCharacterData)
-                //     {
-                //         deckAllData.savedCharacterData[j].ownedCount ++;
-                //     }
-                // }
                 deckItem.uICharacter.SetCountText();
                 MonoBehaviour.Destroy (deckItem.selectedUICharacter.gameObject);
                 return;
             }
         }
         
-        deckAllData.savedCharacterData = new List<SavedCharacterData>();
-        deckAllData.savedCharacterData.Add(deckItem.characterData.savedCharacterData);
         AddAnimation(deckItem.selectedUICharacter);
         selectedCards.Add(deckItem);
         deckItem.selectedUICharacter.transform.SetParent(DeckManager.Instance.selectedCardsParent);
@@ -104,13 +108,13 @@ public class Deck
         {
             deckItem.count --;
             deckItem.selectedUICharacter.DecreaseCount();
-            deckItem.selectedUICharacter.SetCountText();
+            deckItem.selectedUICharacter.SetCountTextUICharacter();
         }
         else
         {            
             deckItem.count --;
             deckItem.selectedUICharacter.DecreaseCount();
-            deckItem.selectedUICharacter.SetCountText();
+            deckItem.selectedUICharacter.SetCountTextUICharacter();
             selectedCards.Remove(deckItem);
             MonoBehaviour.Destroy(deckItem.selectedUICharacter.gameObject);
         }
@@ -122,7 +126,17 @@ public class Deck
             selectedCards.Remove(deckItem);
         }
     }
-
+    public SelectedUICharacter GetSelectedUICharacter(CharacterData characterData)
+    {
+        foreach (var item in selectedCards)
+        {
+            if(item.characterData == characterData)
+            {
+                return item.selectedUICharacter;
+            }
+        }
+        return null;
+    }
     
 }
 
