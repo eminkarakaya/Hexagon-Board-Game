@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
-using System.Collections.Generic;
+
 namespace Mirror
 {
     /// <summary>

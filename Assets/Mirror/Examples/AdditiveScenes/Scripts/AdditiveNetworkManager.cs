@@ -20,13 +20,12 @@ namespace Mirror.Examples.AdditiveScenes
         /// Runs on both Server and Client
         /// Networking is NOT initialized when this fires
         /// </summary>
-        
         public override void Awake()
         {
             base.Awake();
             singleton = this;
         }
-        
+
         public override void OnStartServer()
         {
             base.OnStartServer();

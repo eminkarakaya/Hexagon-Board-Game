@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using Mirror;
 public class UnitManager : SingletonMirror<UnitManager>
 {
     [SerializeField]

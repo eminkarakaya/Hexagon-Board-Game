@@ -25,6 +25,7 @@ namespace Mirror.Examples.AdditiveLevels
 
         public override void OnStartServer()
         {
+            base.OnStartServer();
 
             // This script is on players that are respawned repeatedly
             // so once the color has been set, don't change it.

@@ -22,7 +22,7 @@ namespace Mirror
         [Tooltip("Should the Network Manager object be persisted through scene changes?")]
         public bool dontDestroyOnLoad = true;
 
-        /// <summary>Multi games should always run in the background so the network doesn't time out.</summary>
+        /// <summary>Multiplayer games should always run in the background so the network doesn't time out.</summary>
         [FormerlySerializedAs("m_RunInBackground")]
         [Tooltip("Multiplayer games should always run in the background so the network doesn't time out.")]
         public bool runInBackground = true;
@@ -1298,8 +1298,14 @@ namespace Mirror
         public virtual void OnServerAddPlayer(NetworkConnectionToClient conn)
         {
             Transform startPos = GetStartPosition();
-            GameObject player = startPos != null ? Instantiate(playerPrefab,startPos.position,startPos.rotation):Instantiate(playerPrefab);
-            NetworkServer.AddPlayerForConnection(conn,player);
+            GameObject player = startPos != null
+                ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
+                : Instantiate(playerPrefab);
+
+            // instantiating a "Player" prefab gives it the name "Player(clone)"
+            // => appending the connectionId is WAY more useful for debugging!
+            player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
+            NetworkServer.AddPlayerForConnection(conn, player);
         }
 
         /// <summary>Called on server when transport raises an exception. NetworkConnection may be null.</summary>

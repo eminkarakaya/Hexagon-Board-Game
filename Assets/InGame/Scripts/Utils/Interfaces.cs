@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using Mirror;
 using System.Collections.Generic;
 using System.Linq;
 public interface IDamagable

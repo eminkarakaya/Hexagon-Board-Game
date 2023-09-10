@@ -91,7 +91,7 @@ namespace Mirror
 
         /// <summary>isOwned is true on the client if this NetworkIdentity is one of the .owned entities of our connection on the server.</summary>
         // for example: main player & pets are owned. monsters & npcs aren't.
-        public bool isOwned { get; set; }
+        public bool isOwned { get; internal set; }
 
         // Deprecated 2022-10-13
         [Obsolete(".hasAuthority was renamed to .isOwned. This is easier to understand and prepares for SyncDirection, where there is a difference betwen isOwned and authority.")]
