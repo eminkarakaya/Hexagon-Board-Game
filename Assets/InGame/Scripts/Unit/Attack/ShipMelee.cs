@@ -10,7 +10,7 @@ public class ShipMelee : Melee
         if(!damagable.Hex.IsWater()  && !damagable.Hex.IsBuilding()) yield break;
         if(isServer)
         {
-            Attack(damagable.hp);            
+            RPCAttack(damagable.hp);            
         }
         else
         {

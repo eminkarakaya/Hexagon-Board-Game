@@ -41,7 +41,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
     [SyncVar] [SerializeField] private bool isBuisy;
     public bool IsBuisy { get => isBuisy;set{isBuisy = value;}}
 
-    public List<PropertiesStruct> attackProperties { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    public List<PropertiesStruct> AttackProperties { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
     [SerializeField] Canvas _canvas;
     #endregion
@@ -89,6 +89,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         NetworkServer.Spawn(unit.gameObject,connectionToClient);
         if(CivManager == null)
             CivManager = PlayerManager.FindPlayerManager();
+        CivManager.AddOrderList(unit);
         RPCCreateWarrior(unit);
         FindPlayerManager(unit);
         _civManager.CMDSetTeamColor(unit.gameObject);
@@ -185,6 +186,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         NetworkServer.Spawn(settler.gameObject,connectionToClient);
         if(CivManager == null)
             CivManager = PlayerManager.FindPlayerManager();
+        CivManager.AddOrderList(settler);
         settler.CivManager = _civManager;
         RPCCreateSettler(settler);
         _civManager.CMDSetTeamColor(settler.gameObject);
@@ -298,6 +300,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         NetworkServer.Spawn(ship.gameObject,connectionToClient);
         if(CivManager == null)
             CivManager = PlayerManager.FindPlayerManager();
+        CivManager.AddOrderList(ship);
         CivManager.CMDAddOwnedObject(ship.gameObject);
         RPCCreateShip(ship);
         FindPlayerManager(ship);

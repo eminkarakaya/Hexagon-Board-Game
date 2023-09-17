@@ -56,7 +56,6 @@ public class UnitMovement : Movement
         // MovementFinishEvents
         
         Moveable.CivManager.CMDHideAllUnits();
-        
         CMDHide();
         CMDSetHex(nextHex,Moveable.Hex);
         this.Moveable.Hex = nextHex;
@@ -65,6 +64,8 @@ public class UnitMovement : Movement
         Moveable.CivManager.CMDShowAllUnits();
         CMDShow();
         CurrentMovementPoints -= 1;
+
+
         if(pathPositions.Count > 0)
         {
             if(animator != null)
@@ -132,6 +133,8 @@ public class UnitMovement : Movement
     {
         if(state)
         {
+
+            // oldurdugun unıt ın hexıne gecme ve vision kapatıp acma
             Moveable.CivManager.CMDHideAllUnits();
             
             CMDHide();
@@ -141,6 +144,8 @@ public class UnitMovement : Movement
             transform.position = new Vector3(hex.transform.position.x , 1 , hex.transform.position.z);
             Moveable.CivManager.CMDShowAllUnits();
             CMDShow();
+
+            // ileri gitme anımasyonu
             Vector3 startPos = transform.position;
             float timeElapsed = 0f;
             while(timeElapsed<movementDuration)
@@ -153,7 +158,7 @@ public class UnitMovement : Movement
         }
     }
 
-
+    // sen hareket edınce eger rakıpte secılı unıt varsa o unıtın enemy hex ı degısıyor.
     [Command]
     protected  override void CMDShow()
     {

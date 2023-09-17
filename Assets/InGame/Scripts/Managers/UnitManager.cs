@@ -8,11 +8,10 @@ public class UnitManager : SingletonMirror<UnitManager>
     [SerializeField]
     private HexGrid hexGrid;
     public LayerMask layer,defaulLayer;
-    [SerializeField] private UnityEvent OnSelectedUnit;
+    public UnityEvent OnSelectedUnit;
     [SerializeField] private AttackSystem attackSystem;
     [SerializeField] private bool playersTurn = true;
 
-    
     [SerializeField]
     public ISelectable selectedUnit;
     private Hex previouslySelectedHex;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 public interface IDamagable
 {
-    public List<PropertiesStruct> attackProperties{get;set;}
+    public List<PropertiesStruct> AttackProperties{get;set;}
     public CivManager CivManager { get; set; }
     public HP hp { get; set; }
     public Hex Hex { get; set; }
@@ -27,7 +27,7 @@ public interface IVisionable
 }
 public interface IMovable
 {
-    public List<PropertiesStruct> attackProperties{get;set;}
+    public List<PropertiesStruct> AttackProperties{get;set;}
     public bool IsBuisy { get; set; }
     public CivManager CivManager { get; set; }
     public void ToggleButtons(bool state);
@@ -53,7 +53,7 @@ public interface ISelectable
 
 public interface IAttackable
 {
-    public List<PropertiesStruct> attackProperties{get;set;}
+    public List<PropertiesStruct> AttackProperties{get;set;}
     public Hex Hex { get; set; }
     public Attack Attack { get; set; }
     public AttackSystem AttackSystem { get; set; }

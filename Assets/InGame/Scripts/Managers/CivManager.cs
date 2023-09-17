@@ -78,9 +78,14 @@ public abstract class CivManager : NetworkBehaviour
 
         CMDRemoveOwnedObject(obj);
 
+
         CMDRemoveOrderList(obj,obj);
         
-        
+    }
+    [Command(requiresAuthority = false)] private void CMDDestroyObj(GameObject obj)
+    {
+
+        NetworkServer.Destroy(obj);
     }
     [Command(requiresAuthority = false)] public void CMDSetTeamColor(GameObject obj)
     {
@@ -191,7 +196,8 @@ public abstract class CivManager : NetworkBehaviour
     [Command(requiresAuthority = false)] public void CMDRemoveOwnedObject(GameObject obj)
     {
         
-        RPCRemoveOwnedObj(obj);
+        RemoveOwnedObjTargetRpc(obj);
+        
     }
     private void TargetRemoveOrderListAM(GameObject taskable)
     {
@@ -206,8 +212,8 @@ public abstract class CivManager : NetworkBehaviour
         }
 
         taskable.gameObject.SetActive(false);
-        Debug.Log(taskable + " destroy",taskable);
-        NetworkServer.Destroy(taskable);
+        CMDDestroyObj(taskable);
+        // NetworkServer.Destroy(taskable);
         UnitManager.Instance.ClearOldSelection();
         
     }
@@ -223,6 +229,7 @@ public abstract class CivManager : NetworkBehaviour
                     break;
                 }
             }
+        Debug.Log(taskable,taskable);
         if(taskable == null) return;
         if(taskable.TryGetComponent(out ITaskable taskable1))
         {
@@ -233,8 +240,7 @@ public abstract class CivManager : NetworkBehaviour
             }
             playerManager.GetOrderIcon();
         }
-        Debug.Log(taskable + " destroy",taskable);
-        
+        CMDDestroyObj(taskable);
         UnitManager.Instance.ClearOldSelection();
         // taskable.SetActive(false);
         // Destroy(taskable,1);
@@ -249,12 +255,12 @@ public abstract class CivManager : NetworkBehaviour
         {
             CMDHideAllUnits();
             TargetRemoveOrderListPM(conn.GetComponent<NetworkIdentity>().connectionToClient,taskable);
-            NetworkServer.Destroy(taskable);
+            
             CMDShowAllUnits();
         }
 
     }
-    [ClientRpc] private void RPCRemoveOwnedObj(GameObject obj)
+    [TargetRpc] private void RemoveOwnedObjTargetRpc(GameObject obj)
     {
         PlayerManager playerManager = null;
         foreach (var item in FindObjectsOfType<PlayerManager>())
@@ -268,18 +274,20 @@ public abstract class CivManager : NetworkBehaviour
         {
             playerManager.ownedObjs.Remove(obj);
         }
+        // CMDDestroyObj(obj);
     }
     #endregion
 
 
     #region  Vision
-    
+    // butun playerlerde butun hexlerın visionunu kapatır
     [Command (requiresAuthority = false)]
     public virtual void CMDHideAllUnits()
     {
         RPCHideAllUnits();
     }
-   
+    
+    // // butun playerlerde butun hexlerın visionunu acar
     [Command(requiresAuthority = false)]
     public virtual void CMDShowAllUnits()
     {
@@ -288,7 +296,7 @@ public abstract class CivManager : NetworkBehaviour
     [ClientRpc] protected void RPCHideAllUnits()
     {
         hexGrid = FindObjectOfType<HexGrid>();
-        hexGrid.CloseVisible();
+        // hexGrid.CloseVisible();
         List<Vision> allUnits = FindObjectsOfType<Vision>().ToList();
         foreach (var item in allUnits)
         {

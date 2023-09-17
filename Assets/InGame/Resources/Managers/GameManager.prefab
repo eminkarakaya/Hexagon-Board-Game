@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &270059685851880820
 MonoBehaviour:
@@ -52,13 +52,26 @@ MonoBehaviour:
   goldText: {fileID: 0}
   goldPerRoundText: {fileID: 0}
   nextRoundTipText: {fileID: 0}
-  hoverTip: {fileID: 0}
+  tooltipTrigger: {fileID: 0}
   OrderButton: {fileID: 0}
-  playerCount: 0
+  playerCount: 1
   civUIParent: {fileID: 0}
-  npcHexes: []
-  playersHexes: []
-  buildings: []
+  npcHexes:
+  - {fileID: 0}
+  - {fileID: 0}
+  playersHexes:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  buildings:
+  - {fileID: 2946703733198959631, guid: 355a18b5a4d05d54cabeea49595848e6, type: 3}
+  - {fileID: 2946703733198959631, guid: 355a18b5a4d05d54cabeea49595848e6, type: 3}
+  - {fileID: 2946703733198959631, guid: 355a18b5a4d05d54cabeea49595848e6, type: 3}
+  - {fileID: 2946703733198959631, guid: 355a18b5a4d05d54cabeea49595848e6, type: 3}
+  - {fileID: 2946703733198959631, guid: 355a18b5a4d05d54cabeea49595848e6, type: 3}
   count: 0
   ownedPlayerManager: {fileID: 0}
   hexIndex: 0

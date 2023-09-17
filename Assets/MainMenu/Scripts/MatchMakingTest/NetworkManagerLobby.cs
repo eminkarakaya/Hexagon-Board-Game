@@ -10,10 +10,12 @@ using Mirror;
 
 public class NetworkManagerLobby : NetworkManager
 {
+
+    
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.
     public static new NetworkManagerLobby singleton { get; private set; }
-    [SerializeField] private GameObject prefabGO;
+
     /// <summary>
     /// Runs on both Server and Client
     /// Networking is NOT initialized when this fires

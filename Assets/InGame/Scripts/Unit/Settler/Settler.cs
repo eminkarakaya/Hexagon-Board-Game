@@ -34,7 +34,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     [SyncVar] [SerializeField] private bool isBuisy;
     public bool IsBuisy { get => isBuisy;set{isBuisy = value;}}
 
-    public List<PropertiesStruct> attackProperties { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    public List<PropertiesStruct> AttackProperties { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     #endregion
 
     #region Mirror and Unity callbacks

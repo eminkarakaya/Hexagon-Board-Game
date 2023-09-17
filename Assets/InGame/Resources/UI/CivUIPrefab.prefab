@@ -76,7 +76,7 @@ MonoBehaviour:
   civImage: {fileID: 8122669116366874764}
   civManager: {fileID: 0}
   civData: {fileID: 0}
-  hoverTip: {fileID: 2730660971074347362}
+  tooltipTrigger: {fileID: 2730660971074347362}
   dealUI: {fileID: 0}
 --- !u!114 &5846407217532994911
 MonoBehaviour:
@@ -316,7 +316,7 @@ GameObject:
   - component: {fileID: 3866240981269550866}
   - component: {fileID: 7836743243216828702}
   - component: {fileID: 8122669116366874764}
-  - component: {fileID: 7632329028862777073}
+  - component: {fileID: 4423929543735272410}
   m_Layer: 5
   m_Name: CivImage
   m_TagString: Untagged
@@ -382,7 +382,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7632329028862777073
+--- !u!114 &4423929543735272410
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -391,13 +391,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2730660971074347362}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b7c2a0a0640b174db95b1d965efb0b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalOffset: -50
-  verticalOffset: -50
-  tipToShow: civ12312312321321312321321312321asfdsfdasgdgs
-  timeToWait: 0
+  content: 
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5376940395273282571
 GameObject:
   m_ObjectHideFlags: 0

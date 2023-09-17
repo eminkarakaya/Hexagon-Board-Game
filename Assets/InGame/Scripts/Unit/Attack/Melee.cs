@@ -46,16 +46,18 @@ public class Melee : Attack
         }
         int hp  = damagable.hp.Hp;
         
-                StartCoroutine(CloseTransparentMaterial(attackTime/2));
+        StartCoroutine(CloseTransparentMaterial(attackTime/2));
+
+        // hasarın uygulandıgı yer
         if(isServer)
         {
-            Attack(damagable.hp);            
+            RPCAttack(damagable.hp);            
         }
         else
         {
             CMDAttack(damagable.hp);
         }
-        bool kill = true;
+        // serverden mesaj gelene kadar beklıyor
         while(hp == damagable.hp.Hp)
         {
             yield return null;
@@ -90,7 +92,6 @@ public class Melee : Attack
                     if(damagable.hp.Hp<=0)
                     {
                         movement1.TakeHostage(damagable.Hex,damagable.hp.Hp<=0);
-                        kill = false;
                     }
                     else
                     {
@@ -107,23 +108,18 @@ public class Melee : Attack
             }
             
         }
-         
-        damagable.hp.Death(damagable,attackable,kill,killEvent);
-        
-            
-         
+        damagable.hp.Death(damagable,attackable,true);
     }
     [Command]
     protected void CMDAttack(HP hp)
     {
-        Attack(hp);
+        RPCAttack(hp);
     }
     [ClientRpc]
-    public void Attack(HP hp)
+    public void RPCAttack(HP hp)
     {
         if(hp != null)
         {
-            
             hp.Hp -= _damagePower;
 
         }

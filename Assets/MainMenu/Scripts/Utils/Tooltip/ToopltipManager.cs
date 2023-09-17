@@ -8,6 +8,7 @@ public class ToopltipManager : MonoBehaviour
     public Tooltip tooltip;
     private void Awake() {
         instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     public static void Show(string content, string header = " ")
     {

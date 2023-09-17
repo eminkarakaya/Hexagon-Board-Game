@@ -265,6 +265,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8075675529393158573}
   - component: {fileID: 7469368668309294137}
+  - component: {fileID: 1087371435869337577}
   m_Layer: 0
   m_Name: FortifyButton
   m_TagString: Untagged
@@ -302,6 +303,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2714237873590134798}
   m_CullTransparentMesh: 1
+--- !u!114 &1087371435869337577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2714237873590134798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  content: Fortify
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2887287264141397081
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,6 +332,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 586253122105419042}
+  - component: {fileID: 5421245715713529051}
   m_Layer: 0
   m_Name: PillageBtn
   m_TagString: Untagged
@@ -340,6 +362,26 @@ RectTransform:
   m_AnchoredPosition: {x: 25, y: -25}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5421245715713529051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2887287264141397081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  content: Pillage
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4062042217395648256
 GameObject:
   m_ObjectHideFlags: 0
@@ -1504,13 +1546,13 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  PropertiesEnumList: []
   attackText: {fileID: 3499225400788010765}
   attackTime: 0
   networkAnimator: {fileID: 0}
   originalColor: {r: 0, g: 0, b: 0, a: 0}
   transparentMaterial: {fileID: 2100000, guid: 1742d856a5b41da4aac95455590de796, type: 2}
   originalMaterial: {fileID: 0}
-  funcs: 
   killEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -1917,7 +1959,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -25
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3627891315544119070, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
@@ -1926,7 +1969,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
       insertIndex: 1
       addedObject: {fileID: 8075675529393158573}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5333566007205954008, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7449510403750509125}
   m_SourcePrefab: {fileID: 100100000, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
 --- !u!224 &1915897548974522800 stripped
 RectTransform:
@@ -1960,6 +2006,31 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
   m_PrefabInstance: {fileID: 1903573397427813668}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5795706029116062972 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5333566007205954008, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+  m_PrefabInstance: {fileID: 1903573397427813668}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7449510403750509125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5795706029116062972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  content: Next Turn
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8084281487031063818 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7663994916113066030, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}

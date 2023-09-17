@@ -29,7 +29,7 @@ public class UnitMovementSystem : MovementSystem
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);
         if(hex.isVisible)
         {
-            if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
+            if(hex.IsEnemy())
             {
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
@@ -61,7 +61,7 @@ public class UnitMovementSystem : MovementSystem
                 }
                 return currentPath;
             }
-            else if(hex.Unit != null && hex.Unit.Side == Side.Me)
+            else if(hex.IsMe())
             {
                 if(movementRange.GetRangeMePositions().Contains(selectedHexPosition))
                 {
@@ -78,7 +78,7 @@ public class UnitMovementSystem : MovementSystem
                 }
                 return currentPath;
             }
-            else if(hex.Building != null && hex.Building.Side == Side.Me)
+            else if(hex.IsMeBuilding())
             {
                 if(movementRange.GetRangeAllPositions().Contains(selectedHexPosition))
                 {
@@ -94,7 +94,7 @@ public class UnitMovementSystem : MovementSystem
                 }
                 return currentPath;
             }
-            else if(hex.Building != null && hex.Building.Side == Side.Enemy)
+            else if(hex.IsEnemyBuilding())
             {
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
@@ -111,7 +111,7 @@ public class UnitMovementSystem : MovementSystem
                 }
                     return currentPath;
             }
-            else if(hex.Settler != null && hex.Settler.Side == Side.Enemy)
+            else if(hex.IsEnemySettler())
             {
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
@@ -160,7 +160,7 @@ public class UnitMovementSystem : MovementSystem
                 // }
                     return currentPath;
             }
-            else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)
+            else if(hex.IsEnemyShip())
             {
                 if(movementRange.GetRangeEnemiesPositions().Contains(selectedHexPosition))
                 {
@@ -179,7 +179,7 @@ public class UnitMovementSystem : MovementSystem
                 }
                     return currentPath;
             }
-            else if(hex.Ship != null && hex.Ship.Side == Side.Me)
+            else if(hex.IsMeShip())
             {
                 if(movementRange.GetRangeMePositions().Contains(selectedHexPosition))
                 {

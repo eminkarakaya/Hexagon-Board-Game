@@ -270,15 +270,15 @@ public abstract class Movement : NetworkBehaviour
     {
         if(TryGetComponent(out Attack attack))
         {
-            if(hex.Building != null && hex.Building.Side == Side.Enemy)
+            if(hex.IsEnemyBuilding())
             {
                 StartCoroutine (attack.AttackUnit(hex.Building,GetComponent<Unit>(),.2f));
             }
-            else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
+            else if(hex.IsEnemy())
             {
                 StartCoroutine (attack.AttackUnit(hex.Unit,GetComponent<Unit>(),.2f));
             }
-            else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)
+            else if(hex.IsEnemyShip())
             {
                 StartCoroutine (attack.AttackUnit(hex.Ship,GetComponent<Unit>(),.2f));
 

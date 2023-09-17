@@ -19,15 +19,27 @@ public class HP : NetworkBehaviour
         slider.maxValue = Hp;
         slider.value = Hp;
     }
+    [Command(requiresAuthority = false)] public void CMDRemoveOrderList()
+    {
+        RemoveOrderListTargetRpc();
+    }
+    [TargetRpc] private void RemoveOrderListTargetRpc()
+    {
+        if(Hp<=0)
+        {
+            if(TryGetComponent(out ITaskable taskable))
+            {
+                civManager.RemoveOrderList(taskable);
+            }
 
-
+        }
+    }
                                 // ddamage alan      // damage atan
+                                // öldüren objede çalışıyor
     public virtual void Death(IDamagable damagable, IAttackable attackable, bool kill,UnityEvent action = null)
     {   
-        if(_hp <= 0 )
+        if(Hp <= 0 )
         {
-            if(kill == true)
-                civManager.DestroyObj(gameObject);
             if(action == null)
             {
 
@@ -35,6 +47,14 @@ public class HP : NetworkBehaviour
             else
             {
                 action?.Invoke();
+                
+            }
+            
+            if(kill == true)
+            {
+                // CMDRemoveOrderList();
+                civManager.DestroyObj(damagable.hp.gameObject);
+                
             }
         } 
     }

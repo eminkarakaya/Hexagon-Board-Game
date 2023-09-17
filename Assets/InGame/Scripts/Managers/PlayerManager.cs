@@ -11,6 +11,7 @@ using System;
 public class PlayerManager : CivManager
 {
 
+    
     #region  properties
     [SyncVar] public bool isStart;
     public Action NextRoundEvent;
@@ -26,9 +27,9 @@ public class PlayerManager : CivManager
     // public List<ITaskable> liveUnits = new List<ITaskable>();
     [SerializeField] private GameObject civUIPrefab;
     /* PlayerInfoDisplay */
-    
-    
-  
+
+
+
     #endregion
 
 
@@ -40,12 +41,11 @@ public class PlayerManager : CivManager
     //         item.gameObject.SetActive(true);
     //     }
     // }
-    private void Start() {
+    public override void OnStartAuthority()
+    {
         if(isOwned)
         {
-           
-            FindObjectOfType<SelectCiv>().button.onClick.AddListener(()=> StartCoroutine(StartGame()));
-            
+            StartCoroutine(WaitSelectCiv());   
         }
     }
 
@@ -53,10 +53,22 @@ public class PlayerManager : CivManager
     {
         isStart = true;
     }
+    
+    IEnumerator WaitSelectCiv()
+    {
+        SelectCiv selectCiv = null;
+        while(selectCiv == null)
+        {
+           selectCiv =  FindObjectOfType<SelectCiv>();
+           yield return null;
+        }
+        selectCiv.button.onClick.AddListener(()=> StartCoroutine(StartGame()));
+    }
     public IEnumerator StartGame()
     {
         if(isOwned)
         {
+            // FindObjectOfType<UnitManager>().
             SetIsStart();
             while(gameManager == null)
             {
@@ -264,9 +276,11 @@ public class PlayerManager : CivManager
 
     #region  round order
     public override void GetOrderIcon()
-    {
+    {   
+        // Debug.Log(orderList.Count + " orderList.Count");
         if(orderList.Count == 0)
         {
+            
             orderButton.image.sprite = GameSettingsScriptable.Instance.nextRoundSprite;
             tipText.text = NETX_ROUND_STRING;
         }
@@ -288,6 +302,16 @@ public class PlayerManager : CivManager
     }
     public override void GetOrder()
     {
+        if(orderList.Count != 0)
+        {
+            if( orderList[orderList.Count-1].Equals(null) )
+            {
+                // Debug.Log("deleted obj");
+                orderList.RemoveAt(orderList.Count-1);
+                GetOrder();
+                return;
+            }
+        }
         if(orderList.Count == 0)
         {
             // orderlist bıttıyse
@@ -311,12 +335,7 @@ public class PlayerManager : CivManager
             return;
         }
         // sıradakı objeyı seciyo
-        while( orderList[orderList.Count-1] == null)
-        {
-            orderList.RemoveAt(orderList.Count-1);
-            GetOrder();
-        }
-        orderList[orderList.Count-1].LeftClick();
+        
         UnitManager.Instance.HandleUnitSelected(orderList[orderList.Count-1].Transform);
         Transform targetCameraTransform = orderList[orderList.Count-1].Transform;
         CameraMovement.OnTargetObject?.Invoke(targetCameraTransform);
@@ -350,7 +369,6 @@ public class PlayerManager : CivManager
 
     public void SetWaitedListTip()
     {
-        
         foreach (var item in FindObjectsOfType<PlayerManager>())
         {
             if(item.isOwned)
@@ -363,6 +381,10 @@ public class PlayerManager : CivManager
                 if(str == string.Empty) return;
                 if(str.Length < 3) return;
                 str.Remove(str.Count()-3,3);
+                if(item.tooltipTrigger == null)
+                {
+                    item.tooltipTrigger = gameManager.tooltipTrigger;
+                }
                 item.tooltipTrigger.content = string.Empty;
                 item.tooltipTrigger.content += str;
             }
@@ -414,18 +436,18 @@ public class PlayerManager : CivManager
         // }
     }
     // TUR BITIMI
+    private void CancelReady()
+    {
+
+    }
     public override void NextRound()
     {
         NextRoundEvent?.Invoke();
         waitedPlayers = FindObjectsOfType<PlayerManager>().ToList();
         ResetOrderIndex();
         GetOrderIcon();
-        // TotalGold += GoldPerTurn;
         SetTotalGoldText();
-        // SetWaitedListTip();
     }
-
-
 
     public override void AddOrderList(ITaskable taskable)
     {
@@ -442,7 +464,10 @@ public class PlayerManager : CivManager
             orderList.Remove(taskable);
         }
         
-
+        foreach (var item in orderList)
+        {
+            // Debug.Log(item + " orderlist" ,item.Transform);
+        }
         GetOrderIcon();
     }
 
@@ -454,9 +479,5 @@ public class PlayerManager : CivManager
     }
     #endregion
 
-    public override void OnStopClient()
-    {
-        base.OnStopClient();
     
-    }
 }

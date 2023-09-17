@@ -49,8 +49,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     public Sprite OrderSprite { get =>orderImage; set {orderImage = value;} }
     [SyncVar] [SerializeField] private bool isBuisy;
     public bool IsBuisy { get => isBuisy;set{isBuisy = value;}}
-
-    public List<PropertiesStruct> attackProperties { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    [SerializeField] private List<PropertiesStruct> attackProperties = new List<PropertiesStruct>();
+    public List<PropertiesStruct> AttackProperties { get => attackProperties; set{attackProperties = value;} }
     #endregion
     #region Mirror and Unity Callback
 
@@ -107,16 +107,16 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     {
         if(TryGetComponent(out Attack attack))
         {
-            if(hex.Building != null && hex.Building.Side == Side.Enemy)
+            if(hex.IsEnemyBuilding())
             {
                 StartCoroutine (attack.AttackUnit(hex.Building,GetComponent<Unit>(),.2f));
             }
-            else if(hex.Ship != null && hex.Ship.Side == Side.Enemy)
+            else if(hex.IsEnemyShip())
             {
 
                 StartCoroutine (attack.AttackUnit(hex.Ship,GetComponent<Ship>(),.2f));
             }
-            else if(hex.Unit != null && hex.Unit.Side == Side.Enemy)
+            else if(hex.IsEnemy())
             {
                 StartCoroutine(attack.AttackUnit(hex.Unit,GetComponent<Unit>(),.2f));
             }
@@ -174,6 +174,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     public void RightClick(Hex selectedHex)
     {
         if(!isOwned) return;
+        
         HexGrid hexGrid =FindObjectOfType<HexGrid>();
         List<Vector3Int> path = Result.ShowPath(selectedHex.HexCoordinates,hexGrid,Attack.range);
         
