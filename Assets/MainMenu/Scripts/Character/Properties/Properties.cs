@@ -5,7 +5,6 @@ using UnityEngine;
 public struct PropertiesData
 {
     public PropertiesEnum propertiesEnum;
-    public PropertiesType propertiesType;
     public Sprite propertySprite;
     [TextArea]
     public string propTip;

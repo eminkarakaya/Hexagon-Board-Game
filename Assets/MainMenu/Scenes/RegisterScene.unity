@@ -816,9 +816,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29661afcc367fe745827d173b6370a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
   joinMatchInput: {fileID: 0}
   lobbySelectables: []
   lobbyCanvas: {fileID: 621359569}

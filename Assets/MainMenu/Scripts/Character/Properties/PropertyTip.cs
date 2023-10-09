@@ -20,6 +20,7 @@ public class PropertyTip : MonoBehaviour
     }
     public void SetHoverTipText()
     {
+        toolTipTrigger.header = propertiesData.propertiesEnum.ToString();
         toolTipTrigger.content = propertiesData.propTip.ToString();
     }
 }
