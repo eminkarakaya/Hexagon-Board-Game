@@ -4,7 +4,8 @@ When it is finished, it will be a strategy game that is a combination of civiliz
   Indexes and positions of hexes are assigned in the HexCoordinates class.
   BFS algorithm was used for the path finding algorithm of the characters. (GraphSearch Class)
     Created dictionary named hexsInRange Dictionary<Vector3Int, Vector3Int>  
-    ![image](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/b854ff8b-3a85-442d-ae8c-4facd5c210d9)
+    ![image](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/f2239194-9c94-4e68-91a8-c118317e4e87)
+
      
     The beginning of the arrow indicates value and the end indicates key.
    GneratePathBFS function was created to find the path from the hexagon you clicked to your current location (GraphSearch class)
