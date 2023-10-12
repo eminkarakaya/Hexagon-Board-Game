@@ -11,7 +11,7 @@ When it is finished, it will be a strategy game that is a combination of civiliz
    GneratePathBFS function was created to find the path from the hexagon you clicked to your current location (GraphSearch class)
    The GeneratePathBFS function finds the hexagon we clicked in the hexInRange dictionary and creates the path by continuously going to its key with a while loop.
 
-    
+   Separate movement systems were written for naval units, land units and settler units.
     
 - Playfab was used for data storage and user login.
 - Mirror network was used for multiplayer.
