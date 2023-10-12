@@ -23,6 +23,8 @@ When it is finished, it will be a strategy game that is a combination of civiliz
    Unit class was created. Includes interfaces ISelectable, IMovable, IAttackable, IVisionable,IDamagable, ISideable,ITaskable.
 
    You can hit a unit containing Iattackable with a unit containing Idamagable.
+   ![Movie_005](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/46e589bb-aeb0-4795-8748-bf8595b4af53)
+
    
 - Playfab was used for data storage and user login.
 - Mirror network was used for multiplayer.
