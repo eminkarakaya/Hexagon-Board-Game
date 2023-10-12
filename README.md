@@ -13,7 +13,10 @@ When it is finished, it will be a strategy game that is a combination of civiliz
 
    Separate movement systems were written for naval units, land units and settler units. (Settler units can pass through other units)
     ![image](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/b19d8e29-bd8a-4cb5-b377-8feda3047932)
-    
+
+
+   The settlers class has been created. Builds a city in the hexagon where it is activated.
+   
 - Playfab was used for data storage and user login.
 - Mirror network was used for multiplayer.
 - State machine will be used for AI (not done yet)
