@@ -1,5 +1,6 @@
 # Hexagon-Board-Game
 When it is finished, it will be a strategy game that is a combination of civilization and legends of runeterra.
+UI and models were not handled.
 # Movement
 
   Indexes and positions of hexes are assigned in the HexCoordinates class.
@@ -87,6 +88,11 @@ https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/6175f7a6-bfc7
   ##coming soon
   # DECK SYSTEM
   Legends of Runeterra style deck creation system has been created. It has not been integrated into the game yet.
+
+  
+https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/e725cec9-efd1-432e-b25c-5a71b8378a2c
+
+
   
   # PLAYFAB
   Registration and login system was created. 
