@@ -49,9 +49,13 @@ When it is finished, it will be a strategy game that is a combination of civiliz
   # CAPTURABLE OBJECTS
     Objects with ISideable can be captured (change sides)
 
+  ![1014](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/3925233f-9d5c-4e2b-a38b-a8a1f11a9abb)
+
+  
     
   # BUILDINGS
-
+    base - you can produce units from the base.
+    
   # MULTIPLAYER
 
   # DEALS
