@@ -68,11 +68,20 @@ When it is finished, it will be a strategy game that is a combination of civiliz
   ![1014(1)](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/23e54eb6-1116-4ee3-aabe-8bf80c0578ee)
 
   # ROUND MANAGER
+    Everyone must press the next turn button to complete the round.
+
+    
+https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/6175f7a6-bfc7-4eb2-b10a-b7a38652f74f
+
 
   
   # MULTIPLAYER
 
   # DEALS
+    You can make agreements with other civilizations (for now there is only war and peace)
+  https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/e7120f89-55e0-4bda-97ca-3a1fec3c2e2e
+
+
 
   # LOBBY
 
