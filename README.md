@@ -54,8 +54,22 @@ When it is finished, it will be a strategy game that is a combination of civiliz
   
     
   # BUILDINGS
-    base - you can produce units from the base.
-    
+  ### Base
+     you can produce units from the base.
+  ![image](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/b59be47b-7ee8-461e-bc00-be8959f41ae7)
+
+  ### MINE
+  You can mine the resources.
+  Mines earn money per turn.
+  Mines can be plundered and seized.
+  Mines can be built by workers.
+  ![Movie_022](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/981d1452-ef30-491b-82b0-716a00884826)
+
+  ![1014(1)](https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/23e54eb6-1116-4ee3-aabe-8bf80c0578ee)
+
+  # ROUND MANAGER
+
+  
   # MULTIPLAYER
 
   # DEALS
