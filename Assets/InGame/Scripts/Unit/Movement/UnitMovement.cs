@@ -8,21 +8,21 @@ public class UnitMovement : Movement
 {
     public UnityEvent EnemyResourceEventOpen,EnemyResourceEventClose;
      private void OnDrawGizmos() {
-        // movementSystem = InitMovementSystem();
-        // if(movementSystem.movementRange.allNodesDict2== null)
-        // {
-        //     return;
-        // }
-        // HexGrid hexGrid = FindObjectOfType<HexGrid>();
-        // foreach (var item in movementSystem.movementRange.allNodesDict2 )
-        // {
-        //     Vector3 startPos =hexGrid.GetTileAt (item.Key).transform.position;
-        //     if( item.Value != null)
-        //     {
-        //         Vector3 valuePos = hexGrid.GetTileAt ((Vector3Int)item.Value).transform.position;
-        //         DrawArrow.ForGizmo(valuePos + Vector3.up * h,(startPos-valuePos),Color.red,.5f,25);
-        //     }
-        // }
+        movementSystem = InitMovementSystem();
+        if(movementSystem.movementRange.visitedNodesDict== null || !isOwned)
+        {
+            return;
+        }
+        HexGrid hexGrid = FindObjectOfType<HexGrid>();
+        foreach (var item in movementSystem.movementRange.visitedNodesDict )
+        {
+            Vector3 startPos =hexGrid.GetTileAt (item.Key).transform.position;
+            if( item.Value != null)
+            {
+                Vector3 valuePos = hexGrid.GetTileAt ((Vector3Int)item.Value).transform.position;
+                DrawArrow.ForGizmo(valuePos + Vector3.up * h,(startPos-valuePos),Color.red,.5f,25);
+            }
+        }
     }
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex nextHex,Hex lastHex,MovementSystem movementSystem)
     {
@@ -120,9 +120,9 @@ public class UnitMovement : Movement
         {
             Moveable.CivManager.CMDHideAllUnits();
             // CMDHide();
-
-            GetComponent<Unit>().CivManager.Capture(hex.Unit.GetComponent<NetworkIdentity>());     
-            hex.Unit.StartCaptureCoroutine(hex.Unit.GetComponent<NetworkIdentity>(),hex.Unit.gameObject,GetComponent<Unit>().CivManager);
+            Unit unit = GetComponent<Unit>();
+            unit.CivManager.Capture(unit.GetComponent<NetworkIdentity>());     
+            unit.StartCaptureCoroutine(unit.GetComponent<NetworkIdentity>(),unit.gameObject,unit.CivManager);
 
             Moveable.CivManager.CMDShowAllUnits();
             // CMDShow();
@@ -150,6 +150,7 @@ public class UnitMovement : Movement
                 transform.position = Vector3.Lerp(startPos,new Vector3(hex.transform.position.x , 1 , hex.transform.position.z),lerpStep);
                 yield return null;
             }
+            movementSystem.HideRange(Moveable,this);
         }
     }
 

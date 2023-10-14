@@ -27,13 +27,13 @@ public abstract class Attack : NetworkBehaviour
     protected int DamagePower { get; set; }
     public int range = 1;
     private void Awake() {
-        PropertiesEnumList = attackable.attackProperties;
     }
     private void OnValidate() {
         
         networkAnimator = GetComponent<NetworkAnimator>();
     }
     private void Start() {
+        PropertiesEnumList = attackable.attackProperties;
         attackable = GetComponent<IAttackable>();
         PrepareMaterialDictionaries();
         originalColor = transparentMaterial.GetColor("_Color");

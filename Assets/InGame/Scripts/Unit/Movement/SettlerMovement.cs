@@ -4,7 +4,23 @@ using UnityEngine;
 using Mirror;
 public class SettlerMovement : Movement
 { 
-    
+    private void OnDrawGizmos() {
+        movementSystem = InitMovementSystem();
+        if(movementSystem.movementRange.visitedNodesDict== null || !isOwned)
+        {
+            return;
+        }
+        HexGrid hexGrid = FindObjectOfType<HexGrid>();
+        foreach (var item in movementSystem.movementRange.visitedNodesDict )
+        {
+            Vector3 startPos =hexGrid.GetTileAt (item.Key).transform.position;
+            if( item.Value != null)
+            {
+                Vector3 valuePos = hexGrid.GetTileAt ((Vector3Int)item.Value).transform.position;
+                DrawArrow.ForGizmo(valuePos + Vector3.up * h,(startPos-valuePos),Color.red,.5f,25);
+            }
+        }
+    }
     protected override IEnumerator MovementCoroutine(Vector3 endPos,Hex endHex,Hex lastHex,MovementSystem movementSystem)
     {
         animator.SetBool("Move",true);

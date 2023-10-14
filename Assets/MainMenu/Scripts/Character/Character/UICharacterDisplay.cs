@@ -28,7 +28,7 @@ public class UICharacterDisplay : MonoBehaviour
         propertiesType = CharacterData.Properties.Select(x=>x.attackPropertiesEnum).ToList();
         foreach (var item in propertiesType)
         {
-            if(item == PropertiesEnum.MoveKill) continue;
+            if(item == PropertiesEnum.Default) continue;
             var go = Properties.CreateCardProperty(item,propParent);
             PropertyTip propertyTip = go.GetComponent<PropertyTip>();
             propertyTip.propertiesEnum = item;

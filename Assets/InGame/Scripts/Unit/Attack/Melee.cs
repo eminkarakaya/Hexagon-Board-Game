@@ -34,7 +34,7 @@ public class Melee : Attack
             float lerpStep = timeElapsed / movementDuration;
             transform.position = Vector3.Lerp(transform.position,TransformUtils.FixY(damagable.Hex.transform.position),lerpStep);
             yield return null;
-        }
+        }   
 
         StartCoroutine(OpenTransparentMaterial(attackTime/2));
         networkAnimator.SetTrigger("Attack");
@@ -64,7 +64,7 @@ public class Melee : Attack
         foreach (var item in PropertiesEnumList)
         {
 
-            if(item.attackPropertiesEnum == PropertiesEnum.MoveKill)
+            if(item.attackPropertiesEnum == PropertiesEnum.Default)
             {
                 if(TryGetComponent(out UnitMovement movement0))
                 {
@@ -92,8 +92,7 @@ public class Melee : Attack
                         movement1.TakeHostage(damagable.Hex,damagable.hp.Hp<=0);
                         kill = false;
                     }
-                    else
-                    {
+                    
                             timeElapsed = 0f;
                         while(timeElapsed<movementDuration)
                         {
@@ -102,16 +101,12 @@ public class Melee : Attack
                             transform.position = Vector3.Lerp(transform.position,TransformUtils.FixY(attackable.Hex.transform.position),lerpStep);
                             yield return null;
                         }
-                    }
+                    
                 }
             }
             
         }
-         
-        damagable.hp.Death(damagable,attackable,kill,killEvent);
-        
-            
-         
+        damagable.hp.Death(damagable,attackable,kill,killEvent); 
     }
     [Command]
     protected void CMDAttack(HP hp)

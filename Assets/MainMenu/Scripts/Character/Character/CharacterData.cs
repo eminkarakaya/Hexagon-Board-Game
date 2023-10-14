@@ -6,23 +6,16 @@ using PlayFab.ClientModels;
 using Newtonsoft.Json;
 public enum PropertiesEnum
 {
-    MoveKill,
+    Default,
     TakeHostage,
     Assassin,
     
 }
 
-public enum PropertiesType
-{
-    Attack,
-    Move,
-    Death
-}
 [System.Serializable]
 public struct PropertiesStruct
 {
     public PropertiesEnum attackPropertiesEnum;
-    public PropertiesType propertiesType;
 }
 
 [System.Serializable]

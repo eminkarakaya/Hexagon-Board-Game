@@ -62,7 +62,7 @@ public class Range : Attack
         foreach (var item in PropertiesEnumList)
         {
 
-            if(item.attackPropertiesEnum == PropertiesEnum.MoveKill)
+            if(item.attackPropertiesEnum == PropertiesEnum.Default)
             {
                 if(TryGetComponent(out UnitMovement movement0))
                 {

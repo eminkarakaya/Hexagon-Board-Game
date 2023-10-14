@@ -10719,7 +10719,7 @@ PrefabInstance:
       objectReference: {fileID: 1679763723426274556}
     - target: {fileID: 270059685851880820, guid: b7b092293cb59c84990473ddd4694eff, type: 3}
       propertyPath: playerCount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 270059685851880820, guid: b7b092293cb59c84990473ddd4694eff, type: 3}
       propertyPath: goldPerTurnText

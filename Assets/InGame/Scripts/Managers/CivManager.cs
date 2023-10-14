@@ -206,7 +206,6 @@ public abstract class CivManager : NetworkBehaviour
         }
 
         taskable.gameObject.SetActive(false);
-        Debug.Log(taskable + " destroy",taskable);
         NetworkServer.Destroy(taskable);
         UnitManager.Instance.ClearOldSelection();
         
@@ -239,8 +238,23 @@ public abstract class CivManager : NetworkBehaviour
         // taskable.SetActive(false);
         // Destroy(taskable,1);
     }
+    [Command(requiresAuthority = false)] public void CMDRemoveOrderListDontDestroy(GameObject conn, GameObject taskable)
+    {
+        
+        if(conn.GetComponent<NetworkIdentity>().connectionToClient == null)
+        {
+            TargetRemoveOrderListAM(taskable);
+        }
+        else
+        {
+            
+            TargetRemoveOrderListPM(conn.GetComponent<NetworkIdentity>().connectionToClient,taskable);
+            
+        }
+    }
     [Command(requiresAuthority = false)] public void CMDRemoveOrderList(GameObject conn, GameObject taskable)
     {
+        
         if(conn.GetComponent<NetworkIdentity>().connectionToClient == null)
         {
             TargetRemoveOrderListAM(taskable);

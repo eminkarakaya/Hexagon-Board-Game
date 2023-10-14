@@ -27,7 +27,6 @@ public interface IVisionable
 }
 public interface IMovable
 {
-    public List<PropertiesStruct> attackProperties{get;set;}
     public bool IsBuisy { get; set; }
     public CivManager CivManager { get; set; }
     public void ToggleButtons(bool state);

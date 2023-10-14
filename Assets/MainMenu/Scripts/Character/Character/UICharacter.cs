@@ -47,7 +47,7 @@ public class UICharacter : MonoBehaviour,IDragHandler ,IPointerDownHandler , IPo
         propertiesType = characterData.Properties.Select(x=>x.attackPropertiesEnum).ToList();
         foreach (var item in propertiesType)
         {
-            if(item == PropertiesEnum.MoveKill) continue;
+            if(item == PropertiesEnum.Default) continue;
             var go = Properties.CreateCardProperty(item,propParent);
             PropertyTip propertyTip = go.GetComponent<PropertyTip>();
             propertyTip.propertiesEnum = item;

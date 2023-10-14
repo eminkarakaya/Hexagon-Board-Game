@@ -11,7 +11,7 @@ public abstract class Movement : NetworkBehaviour
     #region  props
     [SerializeField] protected Animator animator;
     protected IMovable Moveable;
-    public float h = 1.2f;
+    public float h = 1.4f;
     [SerializeField] private TMP_Text movePointText;
   
     [SerializeField] protected float movementDuration = 1, rotationDuration = .3f;

@@ -622,7 +622,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 338183886589318353}
-  - component: {fileID: 289448089984898505}
+  - component: {fileID: 2667878219485169361}
   m_Layer: 0
   m_Name: PillageButton
   m_TagString: Untagged
@@ -652,7 +652,7 @@ RectTransform:
   m_AnchoredPosition: {x: 145, y: -25}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &289448089984898505
+--- !u!114 &2667878219485169361
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -661,13 +661,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 5494361872837338956}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b7c2a0a0640b174db95b1d965efb0b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalOffset: 10
-  verticalOffset: 70
-  tipToShow: Pillage
-  timeToWait: 0
+  content: Pillage
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5915276681888508788
 GameObject:
   m_ObjectHideFlags: 0
@@ -1217,6 +1221,8 @@ MonoBehaviour:
   - {fileID: 7682826372743563359}
   orderImage: {fileID: 21300000, guid: 72e7643c92ef003419089e9d11d03696, type: 3}
   isBuisy: 0
+  _attackProperties:
+  - attackPropertiesEnum: 1
 --- !u!114 &9121927625654363817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1232,13 +1238,14 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  PropertiesEnumList:
+  - attackPropertiesEnum: 0
   attackText: {fileID: 3982923851569764595}
   attackTime: 0
   networkAnimator: {fileID: 5010907181256969769}
   originalColor: {r: 0, g: 0, b: 0, a: 0}
   transparentMaterial: {fileID: 2100000, guid: 1742d856a5b41da4aac95455590de796, type: 2}
   originalMaterial: {fileID: 0}
-  funcs: 0100000003000000
   killEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -1922,7 +1929,8 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: e61956f4d3509ca44b6f2e8772898416, type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3627891315544119070, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
@@ -1931,7 +1939,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 338183886589318353}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5333566007205954008, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4603953147315347216}
   m_SourcePrefab: {fileID: 100100000, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
 --- !u!224 &683404397886249170 stripped
 RectTransform:
@@ -1960,6 +1971,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &4864778113484416414 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5333566007205954008, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+  m_PrefabInstance: {fileID: 686671318368216134}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4603953147315347216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4864778113484416414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  content: Next Turn
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!224 &6614907149893101169 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
@@ -2458,6 +2494,10 @@ PrefabInstance:
     - target: {fileID: 1552662535423402017, guid: a771ab3ab0299c3498c4e78d31304345, type: 3}
       propertyPath: m_Name
       value: FortifyBtn
+      objectReference: {fileID: 0}
+    - target: {fileID: 1722123779259162915, guid: a771ab3ab0299c3498c4e78d31304345, type: 3}
+      propertyPath: content
+      value: Fortify
       objectReference: {fileID: 0}
     - target: {fileID: 1733363258450669518, guid: a771ab3ab0299c3498c4e78d31304345, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target

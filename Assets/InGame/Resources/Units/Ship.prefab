@@ -1419,6 +1419,7 @@ MonoBehaviour:
   - {fileID: 8971725080631080537}
   orderImage: {fileID: 21300000, guid: 72e7643c92ef003419089e9d11d03696, type: 3}
   isBuisy: 0
+  _attackProperties: []
 --- !u!114 &1988886627388644654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1504,13 +1505,15 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  PropertiesEnumList:
+  - attackPropertiesEnum: 0
+    propertiesType: 0
   attackText: {fileID: 3499225400788010765}
-  attackTime: 0
+  attackTime: 1
   networkAnimator: {fileID: 0}
   originalColor: {r: 0, g: 0, b: 0, a: 0}
   transparentMaterial: {fileID: 2100000, guid: 1742d856a5b41da4aac95455590de796, type: 2}
   originalMaterial: {fileID: 0}
-  funcs: 
   killEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -1532,6 +1535,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   range: 1
+  _attackTime: 0.4
 --- !u!114 &-8367308604707285934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1917,7 +1921,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -25
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3627891315544119070, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
@@ -1926,7 +1931,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
       insertIndex: 1
       addedObject: {fileID: 8075675529393158573}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5333566007205954008, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 396885096005533149}
   m_SourcePrefab: {fileID: 100100000, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
 --- !u!224 &1915897548974522800 stripped
 RectTransform:
@@ -1960,6 +1968,31 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5929926708619149879, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
   m_PrefabInstance: {fileID: 1903573397427813668}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5795706029116062972 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5333566007205954008, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}
+  m_PrefabInstance: {fileID: 1903573397427813668}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &396885096005533149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5795706029116062972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  content: Next Turn
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8084281487031063818 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7663994916113066030, guid: 0278adba450f9184ca589a89c30bb97d, type: 3}

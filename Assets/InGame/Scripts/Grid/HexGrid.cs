@@ -167,7 +167,7 @@ public class HexGrid : NetworkBehaviour
             }
         }
     }
-    public void DeleteBorders(Hex hex,Hex currentHex)
+    public void DeleteBorders(Hex hex)
     {
         List<Hex> hexes =  GetNeighboursForHex(hex);
         for (int i = 0; i < hexes.Count; i++)

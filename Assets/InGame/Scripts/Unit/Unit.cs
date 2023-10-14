@@ -50,7 +50,8 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     [SyncVar] [SerializeField] private bool isBuisy;
     public bool IsBuisy { get => isBuisy;set{isBuisy = value;}}
 
-    public List<PropertiesStruct> attackProperties { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    [SerializeField] private List<PropertiesStruct> _attackProperties;
+    public List<PropertiesStruct> attackProperties { get => _attackProperties; set{_attackProperties = value;} }
     #endregion
     #region Mirror and Unity Callback
 

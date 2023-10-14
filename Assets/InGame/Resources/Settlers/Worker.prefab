@@ -143,7 +143,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9798}
   - component: {fileID: 9504}
-  - component: {fileID: 10525}
+  - component: {fileID: 7830317581282574954}
   m_Layer: 0
   m_Name: 'CoalButton '
   m_TagString: Untagged
@@ -181,7 +181,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2765}
   m_CullTransparentMesh: 1
---- !u!114 &10525
+--- !u!114 &7830317581282574954
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -190,13 +190,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2765}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b7c2a0a0640b174db95b1d965efb0b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalOffset: 30
-  verticalOffset: 100
-  tipToShow: Coal Mine
-  timeToWait: 0
+  content: Coal
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2804
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,7 +344,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9875}
   - component: {fileID: 9630}
-  - component: {fileID: 10281}
+  - component: {fileID: 8040727758077166060}
   m_Layer: 0
   m_Name: IronButton
   m_TagString: Untagged
@@ -378,7 +382,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3241}
   m_CullTransparentMesh: 1
---- !u!114 &10281
+--- !u!114 &8040727758077166060
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -387,13 +391,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 3241}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b7c2a0a0640b174db95b1d965efb0b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalOffset: 30
-  verticalOffset: 100
-  tipToShow: Iron Mine
-  timeToWait: 0
+  content: Iron
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3643
 GameObject:
   m_ObjectHideFlags: 0
@@ -556,7 +564,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9989}
   - component: {fileID: 9554}
-  - component: {fileID: 10282}
+  - component: {fileID: 3073882416044848157}
   m_Layer: 0
   m_Name: 'NiterButton '
   m_TagString: Untagged
@@ -594,7 +602,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3815}
   m_CullTransparentMesh: 1
---- !u!114 &10282
+--- !u!114 &3073882416044848157
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -603,13 +611,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 3815}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b7c2a0a0640b174db95b1d965efb0b2, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalOffset: 30
-  verticalOffset: 100
-  tipToShow: Niter Mine
-  timeToWait: 0
+  content: Niter
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3887
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,6 +1096,8 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 5994801004511592387, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
     - {fileID: 1601254842856570630, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+    - {fileID: 7891973603493801854, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+    - {fileID: 3852159732081497066, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
     m_RemovedGameObjects:
     - {fileID: 9090025504956994828, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
     - {fileID: 1013820326947404207, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
@@ -1126,12 +1140,43 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4789344810278432504, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 10159}
+    - targetCorrespondingSourceObject: {fileID: 3804588410588588219, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 51509283318241058}
+    - targetCorrespondingSourceObject: {fileID: 5560229432333911340, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5350173290923176509}
   m_SourcePrefab: {fileID: 100100000, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
 --- !u!4 &275138725090570339 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3615432535757577972, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
   m_PrefabInstance: {fileID: 3602287658233130647}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &374212780002182700 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3804588410588588219, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+  m_PrefabInstance: {fileID: 3602287658233130647}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &51509283318241058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374212780002182700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  content: 
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!223 &2548710665082899043 stripped
 Canvas:
   m_CorrespondingSourceObject: {fileID: 1342973544191386868, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
@@ -1282,6 +1327,31 @@ MonoBehaviour:
   m_Spacing: {x: 30, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
+--- !u!1 &8994817377278176187 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5560229432333911340, guid: 2744e043478a6144081ce1bae34b6a9d, type: 3}
+  m_PrefabInstance: {fileID: 3602287658233130647}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5350173290923176509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8994817377278176187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b254dfc9531cc94f840d79b834cc6d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  content: Next Turn
+  header: 
+  PointerEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  PointerExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &4933096955171561467
 PrefabInstance:
   m_ObjectHideFlags: 0

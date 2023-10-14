@@ -137,7 +137,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         }
         TaskComplate();
         civManager.CMDRemoveOwnedObject(this.gameObject);
-        civManager.CMDRemoveOrderList(this.gameObject,this.gameObject);
+        civManager.CMDRemoveOrderListDontDestroy(this.gameObject,this.gameObject);
         
     }
     [Command]
@@ -158,8 +158,10 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         NetworkServer.Spawn(building.gameObject,connectionToClient);
         RPCCreateBuilding(building);
     }
+    [ClientRpc]
     protected void RPCCreateBuilding(Building building)
     {
+        Debug.Log(building.transform.position,building);
         building.transform.position = new Vector3 (Hex.transform.position.x , 1 , Hex.transform.position.z );
         building.transform.rotation = Quaternion.Euler(-90,0,0);
         building.Hex = Hex;
@@ -168,9 +170,11 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         civManager.CMDAddOwnedObject(building.gameObject);        
         building.SetSide(this.Side,building.GetComponent<Outline>());
         civManager.CMDSetTeamColor(building.gameObject);
-        Result.HideRange(this,Movement);  
+        Result.HideRange(this,Movement); 
+        civManager.CMDShowAllUnits();
         UnitManager.Instance.selectedUnit = null;
         NetworkServer.Destroy(this.gameObject);
+        civManager.CMDHideAllUnits();
     }
     #endregion
 

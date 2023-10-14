@@ -20,10 +20,6 @@ public class UnitMovementSystem : MovementSystem
     public override List<Vector3Int> ShowPath(Vector3Int selectedHexPosition,HexGrid hexGrid,int attackRange)
     {
 
-        // if(hexGrid.GetTileAt(selectedHexPosition).GetHexInAnimation())
-        // {
-        //     return null;
-        // }
         currentPath.Clear();
         
         Hex hex = hexGrid.GetTileAt(selectedHexPosition);

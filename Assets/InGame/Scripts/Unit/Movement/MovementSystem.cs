@@ -39,16 +39,11 @@ public abstract class MovementSystem
             hex.isReachable = false;
             hex.DisableHighlighEnemy();
         }
-        foreach (Vector3Int hexPosition in poses)
+        IEnumerable<Hex> allHex = MonoBehaviour.FindObjectsOfType<Hex>(); 
+        foreach (var hexPosition in allHex)
         {
-            Hex hex = hexGrid.GetTileAt(hexPosition);
-            hexGrid.DeleteBorders(hex,movable.Hex);
+            hexGrid.DeleteBorders(hexPosition);
 
-        }
-        foreach (Vector3Int hexPosition in enemyPoses)
-        {
-            Hex hex = hexGrid.GetTileAt(hexPosition);
-            hexGrid.DeleteBorders(hex,movable.Hex);
         }
         movementRange = new BFSResult();
     }
