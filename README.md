@@ -85,7 +85,9 @@ https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/6175f7a6-bfc7
 
 
   # LOBBY
-  ##coming soon
+   coming soon
+  # AI 
+   coming soon
   # DECK SYSTEM
   Legends of Runeterra style deck creation system has been created. It has not been integrated into the game yet.
 
