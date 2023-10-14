@@ -105,9 +105,19 @@ https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/e510db8d-4cc8
 DONE
 Legends of Runeterra style deck system
 
+## CONTACT
+
+  meminkkaya1@gmail.com
+  
+  https://www.linkedin.com/in/muhammet-emin-karakaya/
+  
+  [@eminkarakaya](https://github.com/eminkarakaya)
+
+  project link : https://github.com/eminkarakaya/Hexagon-Board-Game/
+
+  Gameplay = https://www.youtube.com/watch?v=NTXiuueBVoE
 
 
 
 
 
-https://www.youtube.com/watch?v=NTXiuueBVoE
