@@ -84,13 +84,18 @@ https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/6175f7a6-bfc7
 
 
   # LOBBY
-
+  ##coming soon
   # DECK SYSTEM
-
-  # TIP MANAGER
-
+  Legends of Runeterra style deck creation system has been created. It has not been integrated into the game yet.
+  
   # PLAYFAB
+  Registration and login system was created. 
+    Data was kept in the database.
+  
+https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/e510db8d-4cc8-4be7-b6a4-075bcebbf169
 
+
+    
   
    
 - Playfab was used for data storage and user login.
