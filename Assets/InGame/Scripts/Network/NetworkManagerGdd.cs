@@ -13,9 +13,29 @@ using System.Collections;
 
 public class NetworkManagerGdd : NetworkManager
 {
+    [SerializeField] private int minPlayers = 2;
+    [Scene] [SerializeField] private string menuScene = string.Empty;
+
+    [Header("Maps")]
+    [SerializeField] private int numberOfRounds = 1;
+
+    [Header("Room")]
+    [SerializeField] private NetworkRoomPlayerLobby roomPlayerPrefab = null;
+
+    [Header("Game")]
+    [SerializeField] private PlayerManager gamePlayerPrefab = null;
+
+
+    public static event Action OnClientConnected;
+    public static event Action OnClientDisconnected;
+    public static event Action<NetworkConnection> OnServerReadied;
+    public static event Action OnServerStopped;
+
+    public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>();
+    public List<PlayerManager> GamePlayers { get; } = new List<PlayerManager>();
+
+    // public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
     [SerializeField] GameObject playerManagerPrefab;
-    public bool isInTransition;
-    [SerializeField] private string scene;
     public Dictionary<NetworkConnection,Player> LocalPlayers = new Dictionary<NetworkConnection, Player>();
     /// <summary>
     public static new NetworkManagerGdd singleton { get; private set; }
@@ -52,55 +72,7 @@ public class NetworkManagerGdd : NetworkManager
         base.Start();
         
     }
-    IEnumerator AddPlayerDelayed(NetworkConnectionToClient conn)
-    {
-        NetworkIdentity [] identities = FindObjectsOfType<NetworkIdentity>();
-
-        foreach (var item in identities)
-        {
-            item.enabled = true;
-        }
-        conn.Send(new SceneMessage{sceneName = scene,sceneOperation = SceneOperation.LoadAdditive,customHandling = true});
-
-        GameObject pm = Instantiate(playerManagerPrefab);
-        yield return new WaitForEndOfFrame();
-
-        SceneManager.MoveGameObjectToScene(pm,SceneManager.GetSceneByName(scene));
-    }
-    IEnumerator LoadAdditive(string sceneName)
-    {
-        isInTransition = true;
-        if(mode == NetworkManagerMode.ClientOnly)
-        {
-            loadingSceneAsync = SceneManager.LoadSceneAsync(sceneName,LoadSceneMode.Additive);
-
-            while(loadingSceneAsync != null && !loadingSceneAsync.isDone)
-            {
-                yield return null;
-            }
-        }
-        NetworkClient.isLoadingScene = false;
-        isInTransition = false;
-        OnClientSceneChanged();
-    }
-    IEnumerator UnloadAdditive(string sceneName)
-    {
-        isInTransition = true;
-
-        if(mode == NetworkManagerMode.ClientOnly)
-        {
-            yield return SceneManager.UnloadSceneAsync(sceneName);
-            
-        }
-        NetworkClient.isLoadingScene = false;
-        isInTransition = false;
-        OnClientSceneChanged();
-    }
-    IEnumerator ServerLoadSubScene()
-    {
-        yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
-    }
-
+   
     /// <summary>
     /// Runs on both Server and Client
     /// </summary>
@@ -157,51 +129,41 @@ public class NetworkManagerGdd : NetworkManager
     /// <para>This allows server to do work / cleanup / prep before the scene changes.</para>
     /// </summary>
     /// <param name="newSceneName">Name of the scene that's about to be loaded</param>
-    public override void OnServerChangeScene(string newSceneName) { }
+    public override void OnServerChangeScene(string newSceneName) {
+        // if (SceneManager.GetActiveScene().name == menuScene && newSceneName.StartsWith("Scene1"))
+        // {
+            for (int i = RoomPlayers.Count - 1; i >= 0; i--)
+            {
+                var conn = RoomPlayers[i].connectionToClient;
+                var gameplayerInstance = Instantiate(gamePlayerPrefab);
+                // gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
+                DontDestroyOnLoad(gameplayerInstance);
+                NetworkServer.Destroy(conn.identity.gameObject);
+
+                NetworkServer.ReplacePlayerForConnection(conn, gameplayerInstance.gameObject);
+            }
+        // }
+
+    }
 
     /// <summary>
     /// Called on the server when a scene is completed loaded, when the scene load was initiated by the server with ServerChangeScene().
     /// </summary>
     /// <param name="sceneName">The name of the new scene.</param>
     public override void OnServerSceneChanged(string sceneName) { 
-        base.OnServerSceneChanged(sceneName);
-        if(sceneName == scene)
+        if (sceneName.StartsWith("Scene1"))
         {
-            StartCoroutine(ServerLoadSubScene());
+            // GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
+            // NetworkServer.Spawn(playerSpawnSystemInstance);
+
+            // GameObject roundSystemInstance = Instantiate(roundSystem);
+            // NetworkServer.Spawn(roundSystemInstance);
         }
     }
 
-    /// <summary>
-    /// Called from ClientChangeScene immediately before SceneManager.LoadSceneAsync is executed
-    /// <para>This allows client to do work / cleanup / prep before the scene changes.</para>
-    /// </summary>
-    /// <param name="newSceneName">Name of the scene that's about to be loaded</param>
-    /// <param name="sceneOperation">Scene operation that's about to happen</param>
-    /// <param name="customHandling">true to indicate that scene loading will be handled through overrides</param>
-    public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling) { 
-        if(sceneOperation == SceneOperation.UnloadAdditive)
-        {
-            StartCoroutine(UnloadAdditive(newSceneName));
-        }
-        if(sceneOperation == SceneOperation.LoadAdditive)
-        {
-            StartCoroutine(LoadAdditive(newSceneName));
-        }
-    }
+  
 
-    /// <summary>
-    /// Called on clients when a scene has completed loaded, when the scene load was initiated by the server.
-    /// <para>Scene changes can cause player objects to be destroyed. The default implementation of OnClientSceneChanged in the NetworkManager is to add a player object for the connection if no player object exists.</para>
-    /// </summary>
-    public override void OnClientSceneChanged()
-    {
-        if(isInTransition == false)
-        {
-            base.OnClientSceneChanged();
-        }
-
-
-    }
+   
 
     #endregion
 
@@ -212,7 +174,19 @@ public class NetworkManagerGdd : NetworkManager
     /// <para>Unity calls this on the Server when a Client connects to the Server. Use an override to tell the NetworkManager what to do when a client connects to the server.</para>
     /// </summary>
     /// <param name="conn">Connection from client.</param>
-    public override void OnServerConnect(NetworkConnectionToClient conn) { }
+    public override void OnServerConnect(NetworkConnectionToClient conn) { 
+        if (numPlayers >= maxConnections)
+        {
+            conn.Disconnect();
+            return;
+        }
+
+        // if (SceneManager.GetActiveScene().name != menuScene)
+        // {
+        //     conn.Disconnect();
+        //     return;
+        // }
+    }
 
     /// <summary>
     /// Called on the server when a client is ready.
@@ -222,6 +196,8 @@ public class NetworkManagerGdd : NetworkManager
     public override void OnServerReady(NetworkConnectionToClient conn)
     {
         base.OnServerReady(conn);
+
+        OnServerReadied?.Invoke(conn);
     }
 
     /// <summary>
@@ -231,21 +207,59 @@ public class NetworkManagerGdd : NetworkManager
     /// <param name="conn">Connection from client.</param>
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
-        Transform startPos = GetStartPosition();
-        GameObject player = startPos != null
-            ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
-            : Instantiate(playerPrefab);
+        // Transform startPos = GetStartPosition();
+        // GameObject player = startPos != null
+        //     ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
+        //     : Instantiate(playerPrefab);
 
-        // instantiating a "Player" prefab gives it the name "Player(clone)"
-        // => appending the connectionId is WAY more useful for debugging!
-        player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
+        // // instantiating a "Player" prefab gives it the name "Player(clone)"
+        // // => appending the connectionId is WAY more useful for debugging!
+        // player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
 
-        NetworkServer.AddPlayerForConnection(conn, player);
-        LocalPlayers.Add(conn,player.GetComponent<Player>());
+        // NetworkServer.AddPlayerForConnection(conn, player);
+        // LocalPlayers.Add(conn,player.GetComponent<Player>());
+        // if (SceneManager.GetActiveScene().name == menuScene)
+        // {
+            bool isLeader = RoomPlayers.Count == 0;
+
+            NetworkRoomPlayerLobby roomPlayerInstance = Instantiate(roomPlayerPrefab);
+
+            roomPlayerInstance.IsLeader = isLeader;
+
+            NetworkServer.AddPlayerForConnection(conn, roomPlayerInstance.gameObject);
+        // }
         // base.OnServerAddPlayer(conn);
     }
 
+    public void NotifyPlayersOfReadyState()
+    {
+        foreach (var player in RoomPlayers)
+        {
+            player.HandleReadyToStart(IsReadyToStart());
+        }
+    }
+        private bool IsReadyToStart()
+    {
+        if (numPlayers < minPlayers) { return false; }
 
+        foreach (var player in RoomPlayers)
+        {
+            if (!player.IsReady) { return false; }
+        }
+
+        return true;
+    }
+
+    public void StartGame()
+    {
+        // if (SceneManager.GetActiveScene().name == menuScene)
+        // {
+            if (!IsReadyToStart()) { return; }
+
+
+            ServerChangeScene("Scene1");
+        // }
+    }
     /// <summary>
     /// Called on the server when a client disconnects.
     /// <para>This is called on the Server when a Client disconnects from the Server. Use an override to decide what should happen when a disconnection is detected.</para>
@@ -253,6 +267,14 @@ public class NetworkManagerGdd : NetworkManager
     /// <param name="conn">Connection from client.</param>
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
+        if (conn.identity != null)
+        {
+            var player = conn.identity.GetComponent<NetworkRoomPlayerLobby>();
+
+            RoomPlayers.Remove(player);
+
+            NotifyPlayersOfReadyState();
+        }
     }
 
     /// <summary>
@@ -274,13 +296,19 @@ public class NetworkManagerGdd : NetworkManager
     public override void OnClientConnect()
     {
         base.OnClientConnect();
+
+        OnClientConnected?.Invoke();
     }
 
     /// <summary>
     /// Called on clients when disconnected from a server.
     /// <para>This is called on the client when it disconnects from the server. Override this function to decide what happens when the client disconnects.</para>
     /// </summary>
-    public override void OnClientDisconnect() { }
+    public override void OnClientDisconnect() { 
+        base.OnClientDisconnect();
+
+        OnClientDisconnected?.Invoke();
+    }
 
     /// <summary>
     /// Called on clients when a servers tells the client it is no longer ready.
@@ -309,15 +337,16 @@ public class NetworkManagerGdd : NetworkManager
     public override void OnStartHost() { }
 
     /// <summary>
-    /// This is invoked when a server is started - including when a host is started.
-    /// <para>StartServer has multiple signatures, but they all cause this hook to be called.</para>
-    /// </summary>
-    public override void OnStartServer() { }
-
-    /// <summary>
     /// This is invoked when the client is started.
     /// </summary>
-    public override void OnStartClient() { }
+    public override void OnStartClient() { 
+        var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+
+        foreach (var prefab in spawnablePrefabs)
+        {
+            NetworkClient.RegisterPrefab(prefab);
+        }
+    }
 
     /// <summary>
     /// This is called when a host is stopped.
@@ -327,7 +356,12 @@ public class NetworkManagerGdd : NetworkManager
     /// <summary>
     /// This is called when a server is stopped - including when a host is stopped.
     /// </summary>
-    public override void OnStopServer() { }
+    public override void OnStopServer() { 
+        OnServerStopped?.Invoke();
+
+        RoomPlayers.Clear();
+        GamePlayers.Clear();
+    }
 
     /// <summary>
     /// This is called when a client is stopped.

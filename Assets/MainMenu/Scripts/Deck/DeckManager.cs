@@ -10,20 +10,32 @@ using System.Linq;
 
 public class DeckManager : Singleton<DeckManager>
 {   
+    private const string TITLE_CARDDATA_KEY ="CardData";
+    private const string TITLE_DATA_KEY ="DeckData";
+    [Header("Prefabs")]
+    
+    [SerializeField] private GameObject uICharacterPrefab;
+    [SerializeField] private GameObject deckPrefab,selectedUICharacterPrefab;
+    
+    [Header("Panels")]
+    [SerializeField] private Canvas editDeckPanel;
+
+    [SerializeField] private GameObject SaveOrDiscardPanel;
     /// <summary>
     /// sadece olustururken kullanıyorum. canvası kapalı bı objenın altında olusturunca 
     /// scale sı 0 oluyo bazen ondan burda olusturuyorum.
     /// </summary>
-    public Transform createdParent; 
 
     /// <summary>
     /// test için eger acıksa ve save ypaarsam save ler sılınır.
     /// </summary>
     public bool deleteDecks;
+    [Header("UI")]
+
     [SerializeField] private TMP_InputField deckNameInputField;
-    private const string TITLE_DATA_KEY ="DeckData";
     [SerializeField] private GameObject displayUICharacter;
     [SerializeField] private Transform displayUIParent,deckParent,playParent;
+    public TMP_Dropdown dropdownDeckCards,dropdownCollectionCards;
 
     /// <summary>
     /// buy canvası ve display UIChaaacter bulunur.
@@ -38,17 +50,120 @@ public class DeckManager : Singleton<DeckManager>
 
     public UICharacter currentRightClickedUICharacter;
 
+    [Header("Character And Deck Data")]
     [Space(10)]
+    public List<CharacterData> allCharactersData;
+    public List<DeckAllData> allDecksData;
+
     public List<UIDeck> allDecks = new List<UIDeck>();
-    public TMP_Dropdown dropdownDeckCards,dropdownCollectionCards;
     public List<UICharacter> allCharacters;
+    [Header("Parents")]
+    public Transform createdParent; 
     public Transform editCardsParent,editCardsParentTemp;
     public Transform collectionCardsParent,collectionTempCardsParent;
     public Transform selectedCardsParent;
+    [Space(20)]
     public Deck selectedDeck;
     public UIDeck selectedUIDeck;
-    [SerializeField] private Canvas editDeckPanel;
     public bool isNew = false;
+    private void Start() {
+        GetAppearance();
+        GetAppearanceCharacterData();
+        allCharacters = CreateAllCharacters(createdParent,true);
+    }
+    #region CreateUI
+    public UICharacter CreateUICharacter(CharacterData characterData, Transform parent)
+    {   
+        var obj = Instantiate(uICharacterPrefab,parent);
+        UICharacter uICharacter = obj.GetComponent<UICharacter>();
+        uICharacter.SetCharacterData(characterData);
+        uICharacter.Initialize();
+        // uICharacter.SetCountText();
+        return uICharacter;
+    }   
+    
+    public List<UICharacter> CreateAllCharacters(Transform parent,bool moveable)
+    {
+        List<UICharacter> characterDatas = new List<UICharacter>();
+        for (int i = 0; i < allCharactersData.Count; i++)
+        {
+            var obj = CreateUICharacter(allCharactersData[i],parent);
+            obj.moveable = moveable;
+            characterDatas.Add (obj);
+        }
+        return characterDatas;
+    } 
+    
+    public UIDeck CreateUIDeck(DeckAllData deckAllData, Transform parent)
+    {   
+        var obj = Instantiate(deckPrefab,parent);
+        UIDeck uIDeck = obj.GetComponent<UIDeck>();
+        
+        uIDeck.SetDeckData(deckAllData);
+        
+        return uIDeck;
+    }  
+
+    public List<UIDeck> CreateAllDecks(Transform parent)
+    {
+        List<UIDeck> deckData = new List<UIDeck>();
+        for (int i = 0; i < allDecks.Count; i++)
+        {
+            deckData.Add (CreateUIDeck(allDecksData[i],parent));
+
+        }
+        return deckData;
+    }
+
+    public DeckCharacterUIData CreateSelectedUICharacter(SavedCharacterData savedCharacterData,Transform parent)
+    {
+        CharacterData characterData = GetCharacterData(savedCharacterData.characterID);
+        SelectedUICharacter selectedUICharacter = Instantiate(selectedUICharacterPrefab,parent).GetComponent<SelectedUICharacter>();
+        UICharacter uICharacter = DeckManager.Instance.GetUICharacter(characterData);
+        selectedUICharacter.uICharacter = uICharacter;
+        selectedUICharacter.SetData();
+        selectedUICharacter.count = savedCharacterData.ownedCount;
+        DeckCharacterUIData deckCharacterUIData = new DeckCharacterUIData{characterData = characterData,selectedUICharacter = selectedUICharacter,uICharacter = uICharacter,count = savedCharacterData.ownedCount};
+        // uICharacter.SetCountText();
+        
+        return deckCharacterUIData;
+    }
+    public List<DeckCharacterUIData> CreateAllSelectedUICharacter(List<SavedCharacterData> savedCharacterData,Transform parent)
+    {
+        List<DeckCharacterUIData> deckCharacterUIData = new List<DeckCharacterUIData>();
+        for (int i = 0; i < savedCharacterData.Count; i++)
+        {
+            deckCharacterUIData.Add(CreateSelectedUICharacter(savedCharacterData[i],parent));
+        }
+        
+
+        
+        return deckCharacterUIData;
+    }
+    public CharacterData GetCharacterData(int ID)
+    {
+        foreach (var item in allCharactersData)
+        {
+            if(item.savedCharacterData.characterID == ID)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+    #endregion
+    
+    public void DoneButton()
+    {
+        if(deckNameInputField.text == string.Empty)
+        {
+            AlertManager.Instance.ShowAlert("Deste Adı Giriniz");
+        }
+        else
+        {
+            SaveOrDiscardPanel.SetActive(true);
+        }
+    }
     public void NewDeck()
     {
         selectedDeck = new Deck();
@@ -81,10 +196,36 @@ public class DeckManager : Singleton<DeckManager>
     {
         selectedDeck.RemoveItem(selectedUICharacter);
     }
-    private void Start() {
-        GetAppearance();
-        GlobalDeckSettingsSO.Instance.GetAppearance();
-        allCharacters = GlobalDeckSettingsSO.Instance.CreateAllCharacters(createdParent,true);
+    
+    #region TranslateUI
+
+    public void TranslateCharacter(Transform parent,bool moveable,UICharacter uICharacter)
+    {
+        uICharacter.transform.SetParent(parent);
+        uICharacter.moveable = moveable;
+        uICharacter.SetCountText();
+        uICharacter.transform.localScale = Vector3.one;
+    }
+    public void TranslateAllCharacters(Transform parent,bool moveable)
+    {
+        foreach (var item in allCharacters)
+        {
+            TranslateCharacter(parent,moveable,item);
+        }
+    }
+    public void TranslateAllDecks(Transform parent,bool isplay)
+    {
+        foreach (var item in allDecks)
+        {
+            item.transform.SetParent(parent);
+            item.isPlay = isplay;
+            item.transform.localScale = Vector3.one;
+            if (selectedUIDeck != null)
+            {
+                selectedUIDeck.DeselectEvent();
+                selectedDeck = null;
+            }
+        }
     }
     public void ListAllCharactersCollectionCards()
     {
@@ -198,6 +339,9 @@ public class DeckManager : Singleton<DeckManager>
             ListIncomplateCharacters();
         }
     }
+    #endregion
+   
+    #region  BuyCanvas
     public void Buy()
     {
         currentRightClickedUICharacter.Buy();
@@ -213,7 +357,7 @@ public class DeckManager : Singleton<DeckManager>
     {
         rightClickPanel.enabled = false;
         Destroy(display.gameObject);
-        GlobalDeckSettingsSO.Instance.SaveCards();
+        SaveCards();
     }
     public void OpenRightclickCanvas()
     {
@@ -252,6 +396,8 @@ public class DeckManager : Singleton<DeckManager>
         display.CharacterData = currentRightClickedUICharacter.CharacterData;
         return display;
     }
+    #endregion
+    
     public void OpenEditDeckPanel()
     {
         editDeckPanel.enabled = true;
@@ -278,34 +424,7 @@ public class DeckManager : Singleton<DeckManager>
         OnToggleChangedCollection();
         // TranslateAllCharacters(collectionCardsParent,false);
     }
-    public void TranslateCharacter(Transform parent,bool moveable,UICharacter uICharacter)
-    {
-        uICharacter.transform.SetParent(parent);
-        uICharacter.moveable = moveable;
-        uICharacter.SetCountText();
-        uICharacter.transform.localScale = Vector3.one;
-    }
-    public void TranslateAllCharacters(Transform parent,bool moveable)
-    {
-        foreach (var item in allCharacters)
-        {
-            TranslateCharacter(parent,moveable,item);
-        }
-    }
-    public void TranslateAllDecks(Transform parent,bool isplay)
-    {
-        foreach (var item in allDecks)
-        {
-            item.transform.SetParent(parent);
-            item.isPlay = isplay;
-            item.transform.localScale = Vector3.one;
-            if (selectedUIDeck != null)
-            {
-                selectedUIDeck.DeselectEvent();
-                selectedDeck = null;
-            }
-        }
-    }
+    
 
     public void OpenPlayPlayersPanel()
     {
@@ -317,7 +436,66 @@ public class DeckManager : Singleton<DeckManager>
     }
 
     #region  Playfab
+    public void SaveAppearanceCharacterData()
+    {
+        List<SavedCharacterData> savedCharacterData = new List<SavedCharacterData>();
+        foreach (var item in allCharactersData)
+        {
+            savedCharacterData.Add(item.savedCharacterData);
+        }
 
+        var request = new UpdateUserDataRequest
+        {
+            Data = new Dictionary<string, string>
+            {
+                {TITLE_CARDDATA_KEY,JsonConvert.SerializeObject(savedCharacterData)}
+            }
+        };
+        
+        PlayFabClientAPI.UpdateUserData(request,OnDataSendCharacterData,OnErrorCharacterData);
+        
+    }
+    void OnDataSendCharacterData(UpdateUserDataResult result)
+    {
+    }
+    public void GetDeckDataCharacterData()
+    {
+
+    }
+    public void GetAppearanceCharacterData()
+    {
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest{ },OnDataRecivedCharacterData,OnErrorCharacterData);
+    }
+    void OnDataRecivedCharacterData(GetUserDataResult result)
+    {
+        if(result.Data != null && result.Data.ContainsKey(TITLE_CARDDATA_KEY))
+        {
+            List<SavedCharacterData> deckDatas = JsonConvert.DeserializeObject<List<SavedCharacterData>>(result.Data[TITLE_CARDDATA_KEY].Value);
+                // allCharacters.Clear();
+            for (int i = 0; i < deckDatas.Count; i++)
+            {
+                allCharactersData[i].savedCharacterData = deckDatas[i];
+            }
+        }
+        else
+        {
+            SaveAppearanceCharacterData();
+            GetAppearanceCharacterData();
+        }
+    }
+    void OnErrorCharacterData(PlayFabError error)
+    {
+    }
+
+
+    public void SaveCards()
+    {
+       
+        // allCharacters.Add(selectedDeck);
+        // selectedDeck.deckData = new DeckData{characterDataId = }
+        
+        SaveAppearanceCharacterData();
+    }
 
     [ContextMenu("Save")]
     public void SaveAppearance()
@@ -335,7 +513,7 @@ public class DeckManager : Singleton<DeckManager>
                 
             }
         }
-        GlobalDeckSettingsSO.Instance.allDecks = allDecks.Select(x=>x.deckAllData).ToList();
+        allDecksData = allDecks.Select(x=>x.deckAllData).ToList();
         var request = new UpdateUserDataRequest
         {
             Data = new Dictionary<string, string>
@@ -354,6 +532,7 @@ public class DeckManager : Singleton<DeckManager>
     {
 
     }
+    
     public void GetAppearance()
     {
         PlayFabClientAPI.GetUserData(new GetUserDataRequest{ },OnDataRecived,OnError);
@@ -366,10 +545,10 @@ public class DeckManager : Singleton<DeckManager>
                 allDecks.Clear();
             for (int i = 0; i < deckDatas.Count; i++)
             {
-                UIDeck uIDeck = GlobalDeckSettingsSO.Instance.CreateUIDeck(deckDatas[i],deckParent);
+                UIDeck uIDeck = CreateUIDeck(deckDatas[i],deckParent);
                 allDecks.Add(uIDeck);
             }
-            GlobalDeckSettingsSO.Instance.allDecks = allDecks.Select(x=>x.deckAllData).ToList();
+            allDecksData = allDecks.Select(x=>x.deckAllData).ToList();
             // CreateDeckUI();
         }
         else
@@ -396,8 +575,8 @@ public class DeckManager : Singleton<DeckManager>
             }
             deckAllData.deckName = selectedDeck.deckName;
             
-            var obj = GlobalDeckSettingsSO.Instance.CreateUIDeck(deckAllData,createdParent);
-            GlobalDeckSettingsSO.Instance.CreateUIDeck(deckAllData,createdParent);
+            var obj = CreateUIDeck(deckAllData,createdParent);
+            CreateUIDeck(deckAllData,createdParent);
             allDecks.Add(obj);            
         }       
         else

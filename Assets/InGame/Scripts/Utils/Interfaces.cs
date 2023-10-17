@@ -32,7 +32,7 @@ public interface IMovable
     public void ToggleButtons(bool state);
     public Movement Movement { get; set; }
     public MovementSystem Result { get; set; }
-    public Outline Outline { get; set; } 
+    public OutlineObj Outline { get; set; } 
     public Hex Hex { get; set; }
 }
 
@@ -64,6 +64,6 @@ public interface ISideable
     public Hex Hex { get; set; }
     public CivManager CivManager { get; set; }
     public Side Side { get; set; }
-    public Outline Outline { get; set; }
-    public void SetSide(Side side , Outline outline);
+    public OutlineObj Outline { get; set; }
+    public void SetSide(Side side , OutlineObj outline);
 }

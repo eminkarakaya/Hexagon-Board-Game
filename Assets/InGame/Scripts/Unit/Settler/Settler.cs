@@ -22,7 +22,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
     public Vector3Int Position { get; set; }
     [SerializeField] Canvas canvas;
     public Canvas Canvas { get => canvas; set{canvas = value;} }
-    public Outline Outline { get; set; }
+    public OutlineObj Outline { get; set; }
     public Side Side { get =>_side; set{_side = value;} }
     [SerializeField] private List<GameObject> visions;
     public List<GameObject> Visions=>visions;
@@ -53,7 +53,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         UnitManager.Instance.ClearOldSelection();
     }
     private void Start() {
-        Outline = GetComponent<Outline>();
+        Outline = GetComponent<OutlineObj>();
         Movement = GetComponent<Movement>();
         if(TryGetComponent(out SettlerMovementSeaAndLand settlerMovementSeaAndLand))
         {
@@ -168,7 +168,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         building.Hex.Building = building;
         building.CivManager = civManager;
         civManager.CMDAddOwnedObject(building.gameObject);        
-        building.SetSide(this.Side,building.GetComponent<Outline>());
+        building.SetSide(this.Side,building.GetComponent<OutlineObj>());
         civManager.CMDSetTeamColor(building.gameObject);
         Result.HideRange(this,Movement); 
         civManager.CMDShowAllUnits();
@@ -210,7 +210,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         attackableCivManager.CMDShowAllUnits();
 
     }
-    public void SetSide(Side side, Outline outline)
+    public void SetSide(Side side, OutlineObj outline)
     {
         this.Side = side;
         if(outline == null) return;
@@ -254,5 +254,7 @@ public class Settler : NetworkBehaviour , IMovable , ISelectable ,IVisionable ,I
         civManager.AddOrderList(this);
         Movement.ResetMovementPoint();
     }
+
+   
     #endregion
 }

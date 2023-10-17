@@ -28,7 +28,7 @@ public class Mine : NetworkBehaviour, ISelectable, IVisionable, ISideable
     ResourceType resourceType;
     
     [Space(100)]
-    [SerializeField] Outline outline;
+    [SerializeField] OutlineObj outline;
     Resource resource;
     [SerializeField] UnityEngine.Canvas _canvas;
     [SerializeField] private  CivManager civManager;
@@ -43,7 +43,7 @@ public class Mine : NetworkBehaviour, ISelectable, IVisionable, ISideable
     public List<GameObject> Visions => visions;
 
     public Vision Vision { get; set; }
-    public Outline Outline { get => outline; set{outline = value;} }
+    public OutlineObj Outline { get => outline; set{outline = value;} }
 
     private void UpdateUI()
     {
@@ -58,7 +58,7 @@ public class Mine : NetworkBehaviour, ISelectable, IVisionable, ISideable
         {
             CMDOpenActive(resource);
         }
-        Outline = GetComponent<Outline>();
+        Outline = GetComponent<OutlineObj>();
         UpdateUI();
     }
     [Command] private void CMDOpenActive(Resource resource)
@@ -103,7 +103,7 @@ public class Mine : NetworkBehaviour, ISelectable, IVisionable, ISideable
         
     }
 
-    public void SetSide(Side side, Outline outline)
+    public void SetSide(Side side, OutlineObj outline)
     {
         this.side = side;
         if(outline == null) return;

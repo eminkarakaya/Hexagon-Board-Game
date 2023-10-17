@@ -7,15 +7,19 @@ using PlayFab.ClientModels;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Newtonsoft.Json;
+
 public class PlayfabManager : MonoBehaviour
 {
+    string _name = null;
+    private const string NICK_DATA_KEY = "NameData";  
     [SerializeField] private Toggle _rememberMeToggle;
     [SerializeField] private TextMeshProUGUI _statusText;
     [SerializeField] private GameObject _nameWindow,_registerWindow;
     [SerializeField] private TMP_InputField _emailInputField,_passwordInputField,_nameInput;
     void Start()
     {
-        if(PlayerPrefs.HasKey("EMAIL"))
+        if(PlayerPrefs.HasKey("EMAIL1"))
         {
             _emailInputField.text = PlayerPrefs.GetString("EMAIL");
             _passwordInputField.text = PlayerPrefs.GetString("PASSWORD");
@@ -93,30 +97,43 @@ public class PlayfabManager : MonoBehaviour
         PlayFabClientAPI.LoginWithEmailAddress(request,OnLoginSuccess,OnError);
         
     }
+    void OnDataSend(UpdateUserDataResult result)
+    {
+        Debug.Log("Successfull Data send");
+    }
     void OnLoginSuccess(LoginResult result)
     {
-        Debug.Log("Login success + " + result.InfoResultPayload.UserData);
         _statusText.text = " Login success + " + result.InfoResultPayload.UserData;
-        string name = null;
-        if(result.InfoResultPayload.PlayerProfile != null)
-            name = result.InfoResultPayload.PlayerProfile.DisplayName;  
-        if(name == null)
-        {
-            _nameWindow.SetActive(true);
-            _registerWindow.SetActive(false);
-        }
-        else
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest{ },OnDataRecived,OnError);   
+    }
+    void OnDataRecived(GetUserDataResult result)
+    {
+        _name = null;
+        Debug.Log("Recieved user data");
+        if(result.Data != null && result.Data.ContainsKey(NICK_DATA_KEY))
         {
             SceneManager.LoadScene(1);
         }
+        else
+        {
+            
+            _nameWindow.SetActive(true);
+            _registerWindow.SetActive(false);
+        
+        }
+        
     }
     void OnLoginSuccessAndroid(LoginResult result)
     {
         Debug.Log("Login success + " + result.InfoResultPayload.UserData);
         _statusText.text = " Login success + " + result.InfoResultPayload.UserData;
         string name = null;
+        
         if(result.InfoResultPayload.PlayerProfile != null)
+        {
             name = result.InfoResultPayload.PlayerProfile.DisplayName;  
+        
+        }
         if(name == null)
         {
             _nameWindow.SetActive(true);
@@ -132,6 +149,15 @@ public class PlayfabManager : MonoBehaviour
         var request = new UpdateUserTitleDisplayNameRequest{
             DisplayName = _nameInput.text
         };
+        _name = _nameInput.text.ToString();
+        var request_ = new UpdateUserDataRequest
+            {
+                Data = new Dictionary<string, string>
+                {
+                    {NICK_DATA_KEY,_name}
+                }
+            };
+        PlayFabClientAPI.UpdateUserData(request_,OnDataSend,OnError); 
         PlayFabClientAPI.UpdateUserTitleDisplayName(request,OnDisplayNameUpdate,OnError);
         SceneManager.LoadScene(1);
     }

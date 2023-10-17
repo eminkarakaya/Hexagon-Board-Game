@@ -21,6 +21,15 @@ public class PlayerManager : CivManager
     public const string NETX_ROUND_STRING = "Next Round",UNIT_NEEDS_ORDER = "Unit Needs Orders", WAITING_OTHER_PLAYERS = "Waiting Other Players";
     public List<PlayerManager> waitedPlayers = new List<PlayerManager>();
     public GameManager gameManager;
+    private NetworkManagerGdd room;
+    private NetworkManagerGdd Room
+    {
+        get
+        {
+            if (room != null) { return room; }
+            return room = NetworkManager.singleton as NetworkManagerGdd;
+        }
+    }
     
 
     // public List<ITaskable> liveUnits = new List<ITaskable>();
@@ -41,12 +50,7 @@ public class PlayerManager : CivManager
     //     }
     // }
     private void Start() {
-        if(isOwned)
-        {
-           
-            FindObjectOfType<SelectCiv>().button.onClick.AddListener(()=> StartCoroutine(StartGame()));
-            
-        }
+        
     }
 
     [Command] private void SetIsStart()
@@ -60,17 +64,20 @@ public class PlayerManager : CivManager
             SetIsStart();
             while(gameManager == null)
             {
+                Debug.Log("GAMEMANAGER");
                 gameManager = GameManager.instance;
                 yield return null;
             }
             while(gameManager.playerCount != FindObjectsOfType<PlayerManager>().Where(x=>x.isStart == true).Count())
             {
+                Debug.Log("ISSTART");
                 yield return null;
             }
             // if(isOwned)
             //     CMDSetCivData();
             while(civData == null)
             {
+                Debug.Log("CIVDATA");
                 yield return null;
             }
             
@@ -97,6 +104,24 @@ public class PlayerManager : CivManager
         {
             item.SetDeclareWarButton(this);
         }
+    }
+    public override void OnStartClient()
+    {
+        // DontDestroyOnLoad(gameObject);
+
+        Room.GamePlayers.Add(this);
+
+        if(isOwned)
+        {
+           
+            FindObjectOfType<SelectCiv>().button.onClick.AddListener(()=> StartCoroutine(StartGame()));
+            
+        }
+    }
+
+    public override void OnStopClient()
+    {
+        Room.GamePlayers.Remove(this);
     }
 
 
@@ -183,10 +208,10 @@ public class PlayerManager : CivManager
             if(item == null) continue;
             if(item.isOwned)
             {
-                item.SetSide(Side.Me,item.GetComponent<Outline>());
+                item.SetSide(Side.Me,item.GetComponent<OutlineObj>());
             }
             else
-                item.SetSide(Side.None,item.GetComponent<Outline>());
+                item.SetSide(Side.None,item.GetComponent<OutlineObj>());
         }
         
         var managers = FindObjectsOfType<PlayerManager>();
@@ -454,9 +479,5 @@ public class PlayerManager : CivManager
     }
     #endregion
 
-    public override void OnStopClient()
-    {
-        base.OnStopClient();
     
-    }
 }

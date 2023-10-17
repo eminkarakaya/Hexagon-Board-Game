@@ -37,7 +37,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
 
     public Vision Vision { get; set; }
     public HP hp { get; set; }
-    public Outline Outline { get; set; }
+    public OutlineObj Outline { get; set; }
     [SyncVar] [SerializeField] private bool isBuisy;
     public bool IsBuisy { get => isBuisy;set{isBuisy = value;}}
 
@@ -56,7 +56,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         settler = Resources.Load<GameObject>("Settlers/Settler");
     }
     private IEnumerator Start() {
-        Outline = GetComponent<Outline>();
+        Outline = GetComponent<OutlineObj>();
         hp = GetComponent<HP>();
         Vision = GetComponent<Vision>();
         while(Hex == null)
@@ -132,7 +132,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         unit.CivManager = _civManager;
         unit.Hex = Hex;
         unit.Hex.Unit = unit;
-        unit.SetSide(side,unit.GetComponent<Outline>());
+        unit.SetSide(side,unit.GetComponent<OutlineObj>());
         CivManager.CMDAddOwnedObject(unit.gameObject);
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();
@@ -174,7 +174,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         unit.Hex = Hex;
         unit.Hex.Settler = unit;
         _civManager.CMDAddOwnedObject(unit.gameObject);
-        unit.SetSide(side,unit.GetComponent<Outline>());
+        unit.SetSide(side,unit.GetComponent<OutlineObj>());
 
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();
@@ -253,7 +253,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         CMDSetSide(attackableCivManager);
         attackableCivManager.CMDShowAllUnits();
     }
-    public void SetSide(Side side, Outline outline)
+    public void SetSide(Side side, OutlineObj outline)
     {
         this.side = side;
         if(outline == null) return;
@@ -311,7 +311,7 @@ public class Building : NetworkBehaviour , ISelectable ,IVisionable,IDamagable,I
         ship.Hex.Ship = ship;
         _civManager.CMDAddOwnedObject(ship.gameObject);
         
-        ship.SetSide(side,ship.GetComponent<Outline>());
+        ship.SetSide(side,ship.GetComponent<OutlineObj>());
        
         CivManager.CMDHideAllUnits();
         CivManager.CMDShowAllUnits();

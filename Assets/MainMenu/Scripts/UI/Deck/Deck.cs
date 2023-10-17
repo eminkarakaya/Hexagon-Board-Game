@@ -32,7 +32,7 @@ public class Deck
     }
     public Deck(List<SavedCharacterData> savedCharacterData)
     {
-        selectedCards = GlobalDeckSettingsSO.Instance.CreateAllSelectedUICharacter(savedCharacterData,DeckManager.Instance.selectedCardsParent);
+        selectedCards = DeckManager.Instance.CreateAllSelectedUICharacter(savedCharacterData,DeckManager.Instance.selectedCardsParent);
         foreach (var item in selectedCards)
         {
             item.selectedUICharacter.SetCountText();

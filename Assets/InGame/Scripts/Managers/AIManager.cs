@@ -43,10 +43,10 @@ public class AIManager : CivManager
             if(item == null) continue;
             if(item.isOwned)
             {
-                item.SetSide(Side.Me,item.GetComponent<Outline>());
+                item.SetSide(Side.Me,item.GetComponent<OutlineObj>());
             }
             else
-                item.SetSide(Side.Enemy,item.GetComponent<Outline>());  
+                item.SetSide(Side.Enemy,item.GetComponent<OutlineObj>());  
         }
     }
 

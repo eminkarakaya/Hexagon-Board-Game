@@ -6,6 +6,27 @@ using TMPro;
 using PlayFab;
 using PlayFab.ClientModels;
 using Newtonsoft.Json;
+[System.Serializable]
+public class NickData
+{
+    public string _nickName;
+    public void SetNick(string nick)
+    {
+        _nickName = nick;
+    }
+    public string GetNick()
+    {
+        return _nickName;
+    }
+    public NickData(string nickName)
+    {
+        _nickName = nickName;
+    }
+    public NickData ReturnNickData()
+    {
+        return new NickData(GetNick());
+    }
+}
 
 [System.Serializable]
 public class Data
@@ -20,12 +41,16 @@ public class Data
         this.SetGold(gold);
         this.SetHealth(energy);
         this.SetGem(gem);
+        // this.SetNick(nick);
     }
     #region GETSET
+    
     public int GetGem()
     {
         return _gem;
     }
+    
+
     public void SetGem(int value)
     {
         _gem = value;
@@ -57,6 +82,7 @@ public class Data
         
     }
     #endregion
+    
     public Data ReturnData()
     {
         return new Data(GetGold(),GetHealth(),GetGem(),GetLevel());
@@ -65,11 +91,14 @@ public class Data
 public class MainMenuManager : MonoBehaviour
 {
     public static MainMenuManager instance;
-    [SerializeField] private List<GameObject> UIandCameraEtc;
+    [SerializeField] private List<GameObject> UIAndCameraEtc;
     int levelOffset = 1;
     public Data data;
+    public NickData nickData;
+    private const string NICK_DATA_KEY = "NameData";  
+
     [SerializeField] private const string TITLE_DATA_KEY ="PlayerData";
-    [SerializeField] private TextMeshProUGUI _goldText,_healthText,_gemText,_levelText;
+    [SerializeField] private TextMeshProUGUI _goldText,_healthText,_gemText,_levelText,_nickText;
     private void Awake() {
         instance = this;
     }
@@ -83,14 +112,14 @@ public class MainMenuManager : MonoBehaviour
     }
     public void CloseUI()
     {
-        foreach (var item in UIandCameraEtc)
+        foreach (var item in UIAndCameraEtc)
         {
             item.SetActive(false);
         }
     }
     public void OpenUI()
     {
-        foreach (var item in UIandCameraEtc)
+        foreach (var item in UIAndCameraEtc)
         {
             item.SetActive(true);
         }
@@ -102,12 +131,17 @@ public class MainMenuManager : MonoBehaviour
     void OnDataRecived(GetUserDataResult result)
     {
         Debug.Log("Recieved user data");
+        if(result.Data != null && result.Data.ContainsKey(NICK_DATA_KEY))
+        {
+            nickData = new NickData(result.Data[NICK_DATA_KEY].Value);
+            _nickText.text = nickData._nickName;
+        }
         if(result.Data != null && result.Data.ContainsKey(TITLE_DATA_KEY))
         {
             data = JsonConvert.DeserializeObject<Data>(result.Data[TITLE_DATA_KEY].Value);
-            _goldText.text = data._gold.ToString();
-            _healthText.text = data._health.ToString();
-            _gemText.text = data._gem.ToString();
+            _goldText.text = "Gold: "+ data._gold.ToString();
+            _healthText.text = "Health: "+ data._health.ToString();
+            _gemText.text = "Gem: " + data._gem.ToString();
             _levelText.text ="Level " + data._level.ToString();
         }
         else

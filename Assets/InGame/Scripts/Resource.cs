@@ -102,7 +102,7 @@ public class Resource : NetworkBehaviour
         CivManager = civManager;
         
     }
-    public void SetSide(Side side, Outline outline)
+    public void SetSide(Side side, OutlineObj outline)
     {
         this.side = side;
         if(outline == null) return;

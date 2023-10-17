@@ -34,7 +34,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
     [SerializeField] Canvas canvas;
     public Canvas Canvas { get => canvas; set {canvas = value;} }
     public int Range { get; set; }
-    public Outline Outline { get; set; }
+    public OutlineObj Outline { get; set; }
     public Side Side { get => side; set {side = value;} }
     [SerializeField] private List<GameObject> visions;
     public List<GameObject> Visions=>visions;
@@ -73,7 +73,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
         }
         else
             Result = new UnitMovementSystem(this);
-        Outline = GetComponent<Outline>();
+        Outline = GetComponent<OutlineObj>();
         Movable = GetComponent<IMovable>();
         pillageButton.onClick.AddListener(()=> PillageButton(Hex.gameObject.transform));
         UpdateUI();
@@ -228,7 +228,7 @@ public class Unit : NetworkBehaviour , ISelectable, IMovable , IAttackable  , IV
 
     #region  SETSIDE
 
-    public void SetSide(Side side,Outline outline)
+    public void SetSide(Side side,OutlineObj outline)
     {
         this.side = side;
         if(outline == null) return;

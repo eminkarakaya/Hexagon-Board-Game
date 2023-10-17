@@ -93,7 +93,7 @@ public class Worker : Settler
         mine.CivManager = CivManager;
         CivManager.CMDAddOwnedObject(mine.gameObject);
         
-        mine.SetSide(this.Side,mine.GetComponent<Outline>());
+        mine.SetSide(this.Side,mine.GetComponent<OutlineObj>());
         CivManager.CMDSetTeamColor(mine.gameObject);
         Result.HideRange(this,Movement);  
         UnitManager.Instance.selectedUnit = null;
