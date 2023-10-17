@@ -85,6 +85,11 @@ https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/6175f7a6-bfc7
 
 
   # LOBBY
+  A temporary lobby system was created for testing until we put the game on Steam.
+  
+  https://github.com/eminkarakaya/Hexagon-Board-Game/assets/71080980/4e0b232e-00ff-46d6-8d2c-556bc203c378
+
+
    coming soon
   # AI 
    coming soon
